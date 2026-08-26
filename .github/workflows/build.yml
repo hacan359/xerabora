@@ -108,3 +108,4 @@ jobs:
         with:
           files: out/*
           generate_release_notes: true
+          prerelease: true
