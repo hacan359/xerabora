@@ -1,0 +1,25 @@
+# OPL build output
+opl/*.ELF
+opl/*.elf
+opl/*.map
+opl/obj/
+opl/**/obj/
+opl/**/*.o
+opl/**/*.irx
+opl/**/*.notiopmod.elf
+opl/**/*.stripped.elf
+opl/**/*.d
+opl/lng/*.lng
+opl/ee_core/ee_core.elf
+
+# Client build output
+client/build/
+client/ps2ra
+client/ps2ra.exe
+*.o
+
+# Local secrets
+*.token
+
+# Build outputs copied to the repo root by local builds
+/*.ELF

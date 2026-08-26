@@ -1,0 +1,54 @@
+/*
+  Platform shims: sockets, sleeping, config directory, password prompt.
+  POSIX and Windows (MinGW) share the rest of the client.
+*/
+#ifndef PS2RA_PLATFORM_H
+#define PS2RA_PLATFORM_H
+
+#include <stddef.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+typedef SOCKET sock_t;
+typedef int socklen_t_compat;
+#define SOCK_INVALID INVALID_SOCKET
+#define sock_close closesocket
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+typedef int sock_t;
+#define SOCK_INVALID (-1)
+#define sock_close close
+#endif
+
+/* Console setup: UTF-8 output on Windows. */
+void platform_console_init(void);
+
+/* Installs a Ctrl-C / SIGTERM handler that sets *flag to 1. */
+void platform_on_stop(volatile int *flag);
+
+/* One-time socket library setup. Returns 0 on success. */
+int platform_net_init(void);
+void platform_net_shutdown(void);
+
+void platform_sleep_ms(unsigned int ms);
+
+/* Directory for the credentials file, created if missing:
+   %LOCALAPPDATA%\ps2ra on Windows, $XDG_CONFIG_HOME/ps2ra or
+   ~/.config/ps2ra elsewhere. Returns 0 on success. */
+int platform_config_dir(char *out, size_t size);
+
+/* Reads a line from the terminal without echo. Returns 0 on success. */
+int platform_read_password(char *out, size_t size);
+
+/* Waits until the socket is readable. Returns 1 when readable, 0 on
+   timeout, -1 on error. */
+int platform_wait_readable(sock_t sock, int timeout_ms);
+
+/* Human-readable text for the last socket error. */
+const char *platform_sock_error(void);
+
+#endif

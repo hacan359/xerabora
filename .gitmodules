@@ -1,0 +1,7 @@
+[submodule "opl"]
+	path = opl
+	url = https://github.com/hacan359/Open-PS2-Loader.git
+	branch = ra
+[submodule "third_party/rcheevos"]
+	path = third_party/rcheevos
+	url = https://github.com/RetroAchievements/rcheevos.git
