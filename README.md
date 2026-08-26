@@ -13,10 +13,16 @@ network. A small program on your PC receives the stream, runs
 achievements on your RetroAchievements account. No emulator, no modchip
 beyond what OPL already needs, no changes to the game.
 
+> [!WARNING]
+> **Experimental.** This is a hobby experiment, not a finished product.
+> Treat it as one, and use it at your own risk. Run it from a USB stick
+> that holds your game images: that is the only setup tested so far. The
+> internal HDD is untested, and without a USB stick you may hit problems.
+
 ## What you need
 
 - A PS2 with a network adapter and a way to run OPL (FMCB, FHDB or similar).
-- Games loaded through OPL from USB, SMB share or internal HDD.
+- Your game images on a USB stick. That is the tested path; a share is optional and the internal HDD is untested.
 - A PC on the same local network, Windows or Linux.
 - A [RetroAchievements](https://retroachievements.org) account.
 

@@ -54,14 +54,14 @@ SRC := src/main.c src/config.c src/console.c src/log.c src/platform.c \
 all: ps2ra
 
 ps2ra: $(SRC) src/http_curl.c $(RC_SRC) $(HDRS)
-	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^) -lcurl
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^) -lcurl -lm
 
 WINCC ?= x86_64-w64-mingw32-gcc
 
 windows: ps2ra.exe
 
 ps2ra.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS)
-	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -o $@ $(filter %.c,$^) -lws2_32 -lwinhttp -lwinmm
+	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -o $@ $(filter %.c,$^) -lws2_32 -lwinhttp -lwinmm -lm -lpthread
 
 clean:
 	rm -f ps2ra ps2ra.exe
