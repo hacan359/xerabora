@@ -1,4 +1,4 @@
-# ps2ra PC client.
+# xerabora PC client.
 #
 #   make            native build (Linux, macOS, MSYS2): needs libcurl
 #   make windows    cross build for Windows with MinGW-w64: no external
@@ -9,19 +9,19 @@
 # src/sounds_data.c.
 
 RC      := ../third_party/rcheevos
-COMMON  := ../opl/modules/network/common
+PROTO   := ../protocol
 # Version: the v* tag of the checked-out commit, else the default in
 # src/version.h. Override with VERSION=1.2.3.
 VERSION ?= $(shell git describe --tags --exact-match --match 'v*' 2>/dev/null | sed 's/^v//')
 
 CFLAGS  ?= -O2
 CFLAGS  += -Wall -Wextra -std=gnu99 \
-           -I$(RC)/include -I$(RC)/src -I$(RC)/src/rcheevos -I$(RC)/src/rapi -I$(COMMON)
+           -I$(RC)/include -I$(RC)/src -I$(RC)/src/rcheevos -I$(RC)/src/rapi -I$(PROTO)
 ifneq ($(VERSION),)
-CFLAGS  += -DPS2RA_VERSION=\"$(VERSION)\"
+CFLAGS  += -DXERABORA_VERSION=\"$(VERSION)\"
 endif
 
-HDRS := $(wildcard src/*.h) $(wildcard $(COMMON)/*.h)
+HDRS := $(wildcard src/*.h) $(wildcard $(PROTO)/*.h)
 
 RC_SRC := \
 	$(RC)/src/rcheevos/alloc.c \
@@ -51,19 +51,19 @@ RC_SRC := \
 SRC := src/main.c src/config.c src/console.c src/log.c src/platform.c \
        src/ra.c src/snapshot.c src/sound.c src/sounds_data.c src/watchlist.c
 
-all: ps2ra
+all: xerabora
 
-ps2ra: $(SRC) src/http_curl.c $(RC_SRC) $(HDRS)
+xerabora: $(SRC) src/http_curl.c $(RC_SRC) $(HDRS)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^) -lcurl -lm
 
 WINCC ?= x86_64-w64-mingw32-gcc
 
-windows: ps2ra.exe
+windows: xerabora.exe
 
-ps2ra.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS)
+xerabora.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS)
 	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -o $@ $(filter %.c,$^) -lws2_32 -lwinhttp -lwinmm -lm -lpthread
 
 clean:
-	rm -f ps2ra ps2ra.exe
+	rm -f xerabora xerabora.exe
 
 .PHONY: all windows clean

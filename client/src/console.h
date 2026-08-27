@@ -3,8 +3,8 @@
   Also the table mapping game serials to image hashes, persisted in the
   config directory so a client restart mid-game needs no new image check.
 */
-#ifndef PS2RA_CONSOLE_H
-#define PS2RA_CONSOLE_H
+#ifndef XERABORA_CONSOLE_H
+#define XERABORA_CONSOLE_H
 
 #include <stddef.h>
 

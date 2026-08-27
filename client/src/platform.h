@@ -2,8 +2,8 @@
   Platform shims: sockets, sleeping, config directory, password prompt.
   POSIX and Windows (MinGW) share the rest of the client.
 */
-#ifndef PS2RA_PLATFORM_H
-#define PS2RA_PLATFORM_H
+#ifndef XERABORA_PLATFORM_H
+#define XERABORA_PLATFORM_H
 
 #include <stddef.h>
 
@@ -37,8 +37,8 @@ void platform_net_shutdown(void);
 void platform_sleep_ms(unsigned int ms);
 
 /* Directory for the credentials file, created if missing:
-   %LOCALAPPDATA%\ps2ra on Windows, $XDG_CONFIG_HOME/ps2ra or
-   ~/.config/ps2ra elsewhere. Returns 0 on success. */
+   %LOCALAPPDATA%\xerabora on Windows, $XDG_CONFIG_HOME/xerabora or
+   ~/.config/xerabora elsewhere. Returns 0 on success. */
 int platform_config_dir(char *out, size_t size);
 
 /* Reads a line from the terminal without echo. Returns 0 on success. */

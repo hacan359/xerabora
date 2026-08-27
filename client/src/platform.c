@@ -105,7 +105,7 @@ int platform_config_dir(char *out, size_t size)
         base = getenv("APPDATA");
     if (base == NULL || base[0] == '\0')
         return -1;
-    snprintf(out, size, "%s\\ps2ra", base);
+    snprintf(out, size, "%s\\xerabora", base);
     return make_dir(out);
 #else
     const char *xdg = getenv("XDG_CONFIG_HOME");
@@ -122,7 +122,7 @@ int platform_config_dir(char *out, size_t size)
 
     if (make_dir(parent) != 0)
         return -1;
-    snprintf(out, size, "%s/ps2ra", parent);
+    snprintf(out, size, "%s/xerabora", parent);
     return make_dir(out);
 #endif
 }

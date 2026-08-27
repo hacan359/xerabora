@@ -2,8 +2,8 @@
   Saved credentials: the RetroAchievements username and login token,
   stored in the user's config directory. The password is never stored.
 */
-#ifndef PS2RA_CONFIG_H
-#define PS2RA_CONFIG_H
+#ifndef XERABORA_CONFIG_H
+#define XERABORA_CONFIG_H
 
 #include <stddef.h>
 

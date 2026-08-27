@@ -2,8 +2,8 @@
   The watch list: which addresses the console reads every frame, in
   which order, and the sparse memory image built from its snapshots.
 */
-#ifndef PS2RA_WATCHLIST_H
-#define PS2RA_WATCHLIST_H
+#ifndef XERABORA_WATCHLIST_H
+#define XERABORA_WATCHLIST_H
 
 #include <stddef.h>
 #include <stdint.h>

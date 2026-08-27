@@ -117,10 +117,10 @@ const char *console_hash_for(const char *serial)
 
 static size_t pad_reply(char *buf, size_t len, size_t cap)
 {
-    size_t want = (len + PS2RA_REPLY_ALIGN - 1) / PS2RA_REPLY_ALIGN * PS2RA_REPLY_ALIGN;
+    size_t want = (len + XERABORA_REPLY_ALIGN - 1) / XERABORA_REPLY_ALIGN * XERABORA_REPLY_ALIGN;
 
-    if (want < PS2RA_REPLY_MIN)
-        want = PS2RA_REPLY_MIN;
+    if (want < XERABORA_REPLY_MIN)
+        want = XERABORA_REPLY_MIN;
     if (want > cap)
         return len;
 
@@ -184,7 +184,7 @@ static int serve_load(rc_client_t *client, const char *hash)
 int console_serve(sock_t sock, const char *pkt, size_t len,
                   const struct sockaddr_in *from, rc_client_t *client)
 {
-    char hash[64], serial[32], ip[32], reply[PS2RA_CHUNK + 64];
+    char hash[64], serial[32], ip[32], reply[XERABORA_CHUNK + 64];
     struct sockaddr_in to;
     int port = 0, idx = 0, n;
 
@@ -196,7 +196,7 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
             return 1;
         pick_target(&to, from, ip, port);
         /* The version lets the console's link test show what answered. */
-        n = snprintf(reply, sizeof(reply), "RAO1 OK %s/%s", PS2RA_NAME, PS2RA_VERSION);
+        n = snprintf(reply, sizeof(reply), "RAO1 OK %s/%s", XERABORA_NAME, XERABORA_VERSION);
         send_reply(sock, reply, (size_t)n, sizeof(reply), &to);
         log_info("console found at %s:%d", ip, port);
         return 2;
@@ -212,7 +212,7 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
             console_remember_game(serial, hash);
 
         if (strcmp(g_serve_hash, hash) == 0 && g_serve_len > 0) {
-            int chunks = (g_serve_len + PS2RA_CHUNK - 1) / PS2RA_CHUNK;
+            int chunks = (g_serve_len + XERABORA_CHUNK - 1) / XERABORA_CHUNK;
             char title[64] = "";
             unsigned total = 0, unlocked = 0, unsupported = 0;
 
@@ -253,15 +253,15 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
             return 1;
         pick_target(&to, from, ip, port);
 
-        if (!serve_load(client, hash) || idx < 0 || idx * PS2RA_CHUNK >= g_serve_len)
+        if (!serve_load(client, hash) || idx < 0 || idx * XERABORA_CHUNK >= g_serve_len)
             return 1;
 
-        take = g_serve_len - idx * PS2RA_CHUNK;
-        if (take > PS2RA_CHUNK)
-            take = PS2RA_CHUNK;
+        take = g_serve_len - idx * XERABORA_CHUNK;
+        if (take > XERABORA_CHUNK)
+            take = XERABORA_CHUNK;
 
         hdr = snprintf(reply, sizeof(reply), "RAC1 %d %d ", idx, take);
-        memcpy(reply + hdr, &g_serve[idx * PS2RA_CHUNK], (size_t)take);
+        memcpy(reply + hdr, &g_serve[idx * XERABORA_CHUNK], (size_t)take);
         send_reply(sock, reply, (size_t)hdr + (size_t)take, sizeof(reply), &to);
         return 1;
     }

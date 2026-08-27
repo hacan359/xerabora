@@ -2,8 +2,8 @@
   Timestamped console logging. Everything goes to stdout so that a
   redirect captures the whole session.
 */
-#ifndef PS2RA_LOG_H
-#define PS2RA_LOG_H
+#ifndef XERABORA_LOG_H
+#define XERABORA_LOG_H
 
 void log_set_trace(int on);
 int log_trace_enabled(void);

@@ -1,10 +1,10 @@
-#ifndef PS2RA_VERSION_H
-#define PS2RA_VERSION_H
+#ifndef XERABORA_VERSION_H
+#define XERABORA_VERSION_H
 
-#define PS2RA_NAME "ps2ra"
+#define XERABORA_NAME "xerabora"
 
-#ifndef PS2RA_VERSION
-#define PS2RA_VERSION "1.0.0"
+#ifndef XERABORA_VERSION
+#define XERABORA_VERSION "1.0.0"
 #endif
 
 #endif

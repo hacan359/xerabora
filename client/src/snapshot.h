@@ -2,8 +2,8 @@
   Telemetry packets: header parsing and reassembly of a snapshot that
   the console split across several packets.
 */
-#ifndef PS2RA_SNAPSHOT_H
-#define PS2RA_SNAPSHOT_H
+#ifndef XERABORA_SNAPSHOT_H
+#define XERABORA_SNAPSHOT_H
 
 #include <stddef.h>
 

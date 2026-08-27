@@ -1,5 +1,5 @@
 /*
-  ps2ra: RetroAchievements client for a real PlayStation 2.
+  xerabora: RetroAchievements client for a real PlayStation 2.
 
   The console runs a fork of Open PS2 Loader that reads game memory
   every frame and streams snapshots over UDP. This program receives
@@ -30,12 +30,12 @@
 
 static void usage(void)
 {
-    printf("ps2ra %s - RetroAchievements client for PlayStation 2 hardware\n"
+    printf("xerabora %s - RetroAchievements client for PlayStation 2 hardware\n"
            "\n"
-           "usage: ps2ra [options]\n"
+           "usage: xerabora [options]\n"
            "  --user NAME        RetroAchievements username\n"
            "  --password PASS    password; prompted for when omitted. Visible to other\n"
-           "                     processes; scripts should set PS2RA_PASSWORD instead\n"
+           "                     processes; scripts should set XERABORA_PASSWORD instead\n"
            "  --logout           forget the saved login and exit\n"
            "  --port N           UDP port to listen on (default %d)\n"
            "  --game SERIAL=HASH remember an image hash for a game serial\n"
@@ -43,11 +43,11 @@ static void usage(void)
            "  --trace            log every server request and rcheevos message\n"
            "  --help             this text\n"
            "\n"
-           "On the first run ps2ra asks for your username and password. Only the\n"
+           "On the first run xerabora asks for your username and password. Only the\n"
            "login token is saved, in your user profile.\n"
            "Sounds: connect.wav, disconnect.wav, achievement.wav in the 'sounds'\n"
            "folder next to the saved login replace the built-in ones.\n",
-           PS2RA_VERSION, PS2RA_DEFAULT_PORT);
+           XERABORA_VERSION, XERABORA_DEFAULT_PORT);
 }
 
 static int prompt(const char *what, char *out, size_t size)
@@ -86,7 +86,7 @@ static int login(rc_client_t *client, const char *arg_user, const char *arg_pass
         return 0;
 
     if (arg_password == NULL)
-        arg_password = getenv("PS2RA_PASSWORD");
+        arg_password = getenv("XERABORA_PASSWORD");
 
     if (arg_password != NULL && arg_password[0] != '\0') {
         snprintf(password, sizeof(password), "%s", arg_password);
@@ -160,7 +160,7 @@ static volatile int g_stop = 0;
 int main(int argc, char **argv)
 {
     const char *arg_user = NULL, *arg_password = NULL;
-    int port = PS2RA_DEFAULT_PORT, sounds = 1;
+    int port = XERABORA_DEFAULT_PORT, sounds = 1;
     int i;
     rc_client_t *client;
     sock_t sock;
@@ -201,11 +201,11 @@ int main(int argc, char **argv)
     }
 
     if (port <= 0 || port > 65535)
-        port = PS2RA_DEFAULT_PORT;
+        port = XERABORA_DEFAULT_PORT;
 
     setvbuf(stdout, NULL, _IOLBF, 0);
     platform_console_init();
-    log_info("ps2ra %s", PS2RA_VERSION);
+    log_info("xerabora %s", XERABORA_VERSION);
 
     if (platform_net_init() != 0 || http_init() != 0) {
         log_error("network initialisation failed");

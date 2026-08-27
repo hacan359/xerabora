@@ -14,8 +14,8 @@ opl/ee_core/ee_core.elf
 
 # Client build output
 client/build/
-client/ps2ra
-client/ps2ra.exe
+client/xerabora
+client/xerabora.exe
 *.o
 
 # Local secrets

@@ -104,11 +104,11 @@ rc_client_t *ra_create(void)
     if (client == NULL)
         return NULL;
 
-    /* "ps2ra/1.0.0 rcheevos/12.4": RetroAchievements identifies the
+    /* "xerabora/1.0.0 rcheevos/12.4": RetroAchievements identifies the
        client by this string and flags unknown ones. */
     clause[0] = '\0';
     rc_client_get_user_agent_clause(client, clause, sizeof(clause));
-    snprintf(g_user_agent, sizeof(g_user_agent), "%s/%s %s", PS2RA_NAME, PS2RA_VERSION, clause);
+    snprintf(g_user_agent, sizeof(g_user_agent), "%s/%s %s", XERABORA_NAME, XERABORA_VERSION, clause);
 
     /* Memory arrives in snapshots; rcheevos may read only inside
        do_frame, when a complete snapshot is in place. */

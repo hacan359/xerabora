@@ -1,8 +1,8 @@
 /*
   rc_client glue: login, game loading, events.
 */
-#ifndef PS2RA_RA_H
-#define PS2RA_RA_H
+#ifndef XERABORA_RA_H
+#define XERABORA_RA_H
 
 #include <stddef.h>
 

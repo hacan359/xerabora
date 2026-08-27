@@ -33,15 +33,15 @@
   fork). Fields this client reads: sq, vb, n, pt, np, id. The values
   start 4 + 15 + 1 bytes after " id=".
 */
-#ifndef PS2RA_PROTOCOL_H
-#define PS2RA_PROTOCOL_H
+#ifndef XERABORA_PROTOCOL_H
+#define XERABORA_PROTOCOL_H
 
 #include "ra_snap.h"
 #include "ra_watch.h"
 
-#define PS2RA_DEFAULT_PORT 18194
-#define PS2RA_CHUNK 896
-#define PS2RA_REPLY_ALIGN 64
-#define PS2RA_REPLY_MIN 128
+#define XERABORA_DEFAULT_PORT 18194
+#define XERABORA_CHUNK 896
+#define XERABORA_REPLY_ALIGN 64
+#define XERABORA_REPLY_MIN 128
 
 #endif

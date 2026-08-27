@@ -3,8 +3,8 @@
   disconnect.wav or achievement.wav in the "sounds" folder of the config
   directory replaces the corresponding default.
 */
-#ifndef PS2RA_SOUND_H
-#define PS2RA_SOUND_H
+#ifndef XERABORA_SOUND_H
+#define XERABORA_SOUND_H
 
 enum sound_id {
     SOUND_CONNECT,

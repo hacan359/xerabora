@@ -54,12 +54,12 @@ jobs:
 
       - name: Build
         working-directory: client
-        run: make ps2ra && ./ps2ra --help
+        run: make xerabora && ./xerabora --help
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ps2ra-linux-x86_64
-          path: client/ps2ra
+          name: xerabora-linux-x86_64
+          path: client/xerabora
 
   client-windows:
     name: PC client (Windows, MinGW cross build)
@@ -75,12 +75,12 @@ jobs:
 
       - name: Build
         working-directory: client
-        run: make ps2ra.exe
+        run: make xerabora.exe
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ps2ra-windows-x86_64
-          path: client/ps2ra.exe
+          name: xerabora-windows-x86_64
+          path: client/xerabora.exe
 
   release:
     name: Release
@@ -100,8 +100,8 @@ jobs:
           mkdir out
           cp dist/OPL-RA.ELF/OPL-RA.ELF out/
           cp dist/OPL-RA-debug.ELF/OPL-RA-debug.ELF out/
-          cp dist/ps2ra-windows-x86_64/ps2ra.exe out/
-          cp dist/ps2ra-linux-x86_64/ps2ra out/ps2ra-linux-x86_64
+          cp dist/xerabora-windows-x86_64/xerabora.exe out/
+          cp dist/xerabora-linux-x86_64/xerabora out/xerabora-linux-x86_64
           cd out && sha256sum * > SHA256SUMS
 
       - uses: softprops/action-gh-release@v2

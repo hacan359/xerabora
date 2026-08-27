@@ -17,7 +17,7 @@ There are two parts:
 - **The console** runs a patched OPL (`OPL-RA.ELF`). It hashes the game
   image, asks the PC which achievements to watch, then reads console
   memory every frame during play and streams snapshots to the PC.
-- **The PC client** (`ps2ra.exe` on Windows, `ps2ra-linux-x86_64` on
+- **The PC client** (`xerabora.exe` on Windows, `xerabora-linux-x86_64` on
   Linux) talks to the RetroAchievements server, tells the console what
   to watch, receives the snapshots, and unlocks achievements.
 
@@ -118,7 +118,7 @@ Highlight a game in the list and open its context menu. Two items:
 Broadcasts for up to 3 seconds and reports whether the PC client
 answered. Use it to confirm the network path before playing.
 
-- Success: `PC client found at 192.168.1.87 ps2ra/1.0.0` /
+- Success: `PC client found at 192.168.1.87 xerabora/1.0.0` /
   `Reply in N ms, console 192.168.1.142`
 - No client: `No PC client answered within 3 seconds` — check that the
   client is running and UDP 18194 is open on the PC.
@@ -151,16 +151,16 @@ console and are disabled automatically (the client logs how many).
 ## The PC client
 
 First run asks for your RetroAchievements login and password once; the
-token is then saved (`%LOCALAPPDATA%\ps2ra` on Windows,
-`~/.config/ps2ra` on Linux). Useful flags:
+token is then saved (`%LOCALAPPDATA%\xerabora` on Windows,
+`~/.config/xerabora` on Linux). Useful flags:
 
 - `--logout` — forget the saved token.
 - `--port N` — listen on a different UDP port (default 18194).
-- `PS2RA_PASSWORD` — environment variable for non-interactive login.
+- `XERABORA_PASSWORD` — environment variable for non-interactive login.
 
 On Windows the client needs an inbound firewall rule for UDP (the
 installer/first run usually prompts; if broadcasts never arrive, add an
-"Allow inbound UDP" rule for `ps2ra.exe`, all ports, on the active
+"Allow inbound UDP" rule for `xerabora.exe`, all ports, on the active
 profile).
 
 ## Running from USB only (no share)
@@ -187,7 +187,7 @@ an address (DHCP is enough).
 | No on-screen messages at all | Turn on **Notifications** and cold-boot. |
 | "test" works, "check" says no answer | Client not running, or not on the same subnet. |
 | "could not open a network socket" | ETH device off/misconfigured, or no cable/link. |
-| Client shows nothing when you press a menu item | Windows firewall blocking inbound UDP to `ps2ra.exe`. |
+| Client shows nothing when you press a menu item | Windows firewall blocking inbound UDP to `xerabora.exe`. |
 | Achievements don't unlock in game | Client must stay running; run "check game support" once first so the watch list is loaded. |
 
 ## Notes and limits

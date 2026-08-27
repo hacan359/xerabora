@@ -3,8 +3,8 @@
   Implemented with libcurl on POSIX and WinHTTP on Windows, so the
   Windows binary needs no bundled TLS library.
 */
-#ifndef PS2RA_HTTP_H
-#define PS2RA_HTTP_H
+#ifndef XERABORA_HTTP_H
+#define XERABORA_HTTP_H
 
 #include <stddef.h>
 

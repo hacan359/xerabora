@@ -30,7 +30,7 @@ static wchar_t *to_wide(const char *s)
 
 int http_init(void)
 {
-    g_session = WinHttpOpen(L"ps2ra", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+    g_session = WinHttpOpen(L"xerabora", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
                             WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (g_session == NULL)
         return -1;
