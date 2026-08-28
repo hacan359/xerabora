@@ -15,6 +15,9 @@
 int watchlist_build(rc_client_t *client);
 
 int watchlist_count(void);
+/* Achievements that read through a pointer: active, but they cannot
+   unlock on this console. Reported as "unsupported". */
+int watchlist_indirect_count(void);
 int watchlist_bytes(void);
 
 /* Serialises the list in the on-wire/file format the console expects.

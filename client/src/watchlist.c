@@ -46,11 +46,17 @@ static int memsize_bytes(uint8_t size)
     }
 }
 
-/* Achievements and leaderboards that read through a pointer chain
-   (indirect modified memrefs) are disabled here. The console does only direct
-   reads, and rcheevos does not disable indirect reads on its own: an
-   unreadable dereferenced address evaluates as zero, which could unlock
-   an achievement whose condition happens to match zero. */
+/* Achievements that read through a pointer chain cannot unlock on this
+   console: it reads a fixed list of addresses, so the dereferenced
+   value is 0 on every frame. They are NOT disabled. The rcheevos
+   maintainers' guidance (RA forum, 28.08.2026): the runtime follows
+   pointers whatever they hold and expects a failed read to return 0;
+   since nearly all logic watches values change, a permanent 0 does not
+   trigger anything, it just never fires. Disabling them would only hide
+   that from the user. So they stay active, and their number is counted
+   here and reported as "unsupported" in the notice and the log. */
+static int g_indirect = 0;
+
 /* Not every modified memref is a pointer chain. rcheevos also builds
    them for arithmetic between direct reads -- AddSource/SubSource
    chains, combining conditions, prev(x)+prev(y) -- and those the
@@ -79,65 +85,55 @@ static int memref_is_indirect(const rc_memref_t *m)
     return 0;
 }
 
-static void disable_indirect(rc_client_t *client)
+static void count_indirect(rc_client_t *client)
 {
     rc_client_game_info_t *game = client->game;
-    rc_modified_memref_list_t *ml;
-    int disabled = 0;
+    rc_client_subset_info_t *subset;
 
-    for (ml = &game->runtime.memrefs->modified_memrefs; ml != NULL; ml = ml->next) {
-        uint16_t k;
+    g_indirect = 0;
 
-        for (k = 0; k < ml->count; k++) {
-            rc_memref_t *memref = &ml->items[k].memref;
-            rc_client_subset_info_t *subset;
+    for (subset = game->subsets; subset != NULL; subset = subset->next) {
+        rc_client_achievement_info_t *a = subset->achievements;
+        rc_client_achievement_info_t *a_end = a + subset->public_.num_achievements;
 
-            if (!memref_is_indirect(memref))
+        for (; a < a_end; a++) {
+            rc_modified_memref_list_t *ml;
+            int hit = 0;
+
+            if (a->trigger == NULL)
                 continue;
 
-            for (subset = game->subsets; subset != NULL; subset = subset->next) {
-                rc_client_achievement_info_t *a = subset->achievements;
-                rc_client_achievement_info_t *a_end = a + subset->public_.num_achievements;
-                rc_client_leaderboard_info_t *l = subset->leaderboards;
-                rc_client_leaderboard_info_t *l_end = l + subset->public_.num_leaderboards;
+            for (ml = &game->runtime.memrefs->modified_memrefs; ml != NULL && !hit; ml = ml->next) {
+                uint16_t k;
 
-                for (; a < a_end; a++) {
-                    if (a->public_.state == RC_CLIENT_ACHIEVEMENT_STATE_DISABLED || a->trigger == NULL)
-                        continue;
-                    if (rc_trigger_contains_memref(a->trigger, memref)) {
-                        a->public_.state = RC_CLIENT_ACHIEVEMENT_STATE_DISABLED;
-                        a->public_.bucket = RC_CLIENT_ACHIEVEMENT_BUCKET_UNSUPPORTED;
-                        a->trigger->state = RC_TRIGGER_STATE_DISABLED;
-                        log_trace("disabled achievement %u: pointer chain at %06X", a->public_.id, memref->address);
-                        disabled++;
-                    }
-                }
+                for (k = 0; k < ml->count; k++) {
+                    rc_memref_t *memref = &ml->items[k].memref;
 
-                for (; l < l_end; l++) {
-                    if (l->public_.state == RC_CLIENT_LEADERBOARD_STATE_DISABLED || l->lboard == NULL)
-                        continue;
-                    if (rc_trigger_contains_memref(&l->lboard->start, memref) ||
-                        rc_trigger_contains_memref(&l->lboard->cancel, memref) ||
-                        rc_trigger_contains_memref(&l->lboard->submit, memref) ||
-                        rc_value_contains_memref(&l->lboard->value, memref)) {
-                        l->public_.state = RC_CLIENT_LEADERBOARD_STATE_DISABLED;
-                        l->lboard->state = RC_LBOARD_STATE_DISABLED;
+                    if (memref_is_indirect(memref) && rc_trigger_contains_memref(a->trigger, memref)) {
+                        log_trace("achievement %u reads through a pointer at %06X; it cannot unlock here", a->public_.id, memref->address);
+                        hit = 1;
+                        break;
                     }
                 }
             }
+
+            g_indirect += hit;
         }
     }
 
-    if (disabled > 0) {
-        rc_client_update_active_achievements(game);
-        rc_client_update_active_leaderboards(game);
-        log_info("%d achievement%s disabled: pointer chains are not supported by the console",
-                 disabled, disabled == 1 ? "" : "s");
+    if (g_indirect > 0) {
+        log_info("%d achievement%s read through pointers the console cannot follow; they stay active but will not unlock",
+                 g_indirect, g_indirect == 1 ? "" : "s");
     }
 }
 
-/* Pointer chains (modified memrefs) are not read: the console does only
-   direct reads. See disable_indirect().
+int watchlist_indirect_count(void)
+{
+    return g_indirect;
+}
+
+/* Pointer chains are not read: the console does only direct reads. See
+   count_indirect().
 
    The order of entries here is the order of values in every snapshot;
    the console reads addresses in the order it received them. */
@@ -192,7 +188,7 @@ int watchlist_build(rc_client_t *client)
     g_bytes = off;
     log_info("watch list: %d addresses, %d bytes per snapshot", n, off);
 
-    disable_indirect(client);
+    count_indirect(client);
     return 1;
 }
 

@@ -248,7 +248,9 @@ int ra_game_summary(rc_client_t *client, char *title, size_t title_size,
     snprintf(title, title_size, "%s", game->title ? game->title : "");
     *total = sum.num_core_achievements;
     *unlocked = sum.num_unlocked_achievements;
-    *unsupported = sum.num_unsupported_achievements;
+    /* rcheevos' own count (unreadable static addresses) plus the
+       pointer readers, which stay active but cannot unlock here. */
+    *unsupported = sum.num_unsupported_achievements + (unsigned)watchlist_indirect_count();
     return 1;
 }
 
@@ -257,7 +259,7 @@ void ra_log_summary(rc_client_t *client)
     rc_client_user_game_summary_t sum;
 
     rc_client_get_user_game_summary(client, &sum);
-    log_info("achievements: %u total, %u unlocked, %u unsupported (pointer chains)",
+    log_info("achievements: %u total, %u unlocked, %u cannot unlock here (pointer chains)",
              sum.num_core_achievements, sum.num_unlocked_achievements,
-             sum.num_unsupported_achievements);
+             sum.num_unsupported_achievements + (unsigned)watchlist_indirect_count());
 }
