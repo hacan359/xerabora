@@ -47,10 +47,38 @@ static int memsize_bytes(uint8_t size)
 }
 
 /* Achievements and leaderboards that read through a pointer chain
-   (modified memrefs) are disabled here. The console does only direct
+   (indirect modified memrefs) are disabled here. The console does only direct
    reads, and rcheevos does not disable indirect reads on its own: an
    unreadable dereferenced address evaluates as zero, which could unlock
    an achievement whose condition happens to match zero. */
+/* Not every modified memref is a pointer chain. rcheevos also builds
+   them for arithmetic between direct reads -- AddSource/SubSource
+   chains, combining conditions, prev(x)+prev(y) -- and those the
+   console serves fine, since every underlying read is a plain address
+   already on the watch list. Only RC_OPERATOR_INDIRECT_READ, anywhere
+   up the chain, needs a dereference the console cannot do.
+
+   Transformers: The Game showed the difference: 5 of 76 achievements
+   use pointers, all 75 were being disabled. */
+static int memref_is_indirect(const rc_memref_t *m)
+{
+    const rc_modified_memref_t *mm;
+
+    if (m == NULL || m->value.memref_type != RC_MEMREF_TYPE_MODIFIED_MEMREF)
+        return 0;
+
+    mm = (const rc_modified_memref_t *)m;
+    if (mm->modifier_type == RC_OPERATOR_INDIRECT_READ)
+        return 1;
+
+    if (rc_operand_is_memref(&mm->parent) && memref_is_indirect(mm->parent.value.memref))
+        return 1;
+    if (rc_operand_is_memref(&mm->modifier) && memref_is_indirect(mm->modifier.value.memref))
+        return 1;
+
+    return 0;
+}
+
 static void disable_indirect(rc_client_t *client)
 {
     rc_client_game_info_t *game = client->game;
@@ -63,6 +91,9 @@ static void disable_indirect(rc_client_t *client)
         for (k = 0; k < ml->count; k++) {
             rc_memref_t *memref = &ml->items[k].memref;
             rc_client_subset_info_t *subset;
+
+            if (!memref_is_indirect(memref))
+                continue;
 
             for (subset = game->subsets; subset != NULL; subset = subset->next) {
                 rc_client_achievement_info_t *a = subset->achievements;
