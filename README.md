@@ -22,7 +22,8 @@ beyond what OPL already needs, no changes to the game.
 ## What you need
 
 - A PS2 with a network adapter and a way to run OPL (FMCB, FHDB or similar).
-- Your game images on a USB stick. That is the tested path; a share is optional and the internal HDD is untested.
+- Your game images on a USB stick, or the original disc in the drive. Both
+  are tested; a share is optional and the internal HDD is untested.
 - A PC on the same local network, Windows or Linux.
 - A [RetroAchievements](https://retroachievements.org) account.
 
@@ -52,6 +53,15 @@ beyond what OPL already needs, no changes to the game.
 7. Start the game. Within about 30 seconds the PC shows the first snapshot
    and the number of achievements it is tracking. Unlocks appear in the
    PC window and on your profile.
+
+**Playing from the original disc.** Put the disc in the drive, press START
+for OPL's main menu and choose **RA: check disc support**, then **RA: launch
+disc**. The check reads the disc through the console's own driver and asks
+the PC the same way it does for an image; the launch boots the disc under
+OPL's in-game hooks, so telemetry and unlocks work exactly as from USB.
+In this mode OPL's virtual memory cards, per-game compatibility patches
+and cheats are not available -- they live inside the part of OPL that
+emulates the drive, which a real disc does not use.
 
 The full walkthrough is in [docs/USAGE.md](docs/USAGE.md).
 
@@ -87,8 +97,10 @@ PS2 game ──► ee_core reads watched addresses every frame (VBLANK)
   a sparse memory space, and rc_client evaluates the achievements.
 
 The console side does not follow pointer chains (indirect reads).
-`xerabora` disables the achievements that need them after the game loads
-and reports how many.
+`xerabora` disables the achievements that actually dereference one after
+the game loads and reports how many; arithmetic over plain addresses
+(AddSource chains and the like) is fine. Most PS2 sets lose few or none:
+Shadow of the Colossus none of 96, Transformers: The Game 5 of 76.
 
 The wire protocol is documented in [`client/src/protocol.h`](client/src/protocol.h).
 
@@ -98,8 +110,12 @@ Known limits:
   PC's MAC address from the discovery reply; a PC behind a router is heard
   but cannot be answered.
 - The image check reads plain ISO images whose boot executable sits in the
-  root directory (all retail PS2 discs do). ZSO and UL-format images are not
-  hashed.
+  root directory (all retail PS2 discs do), named either `Title.iso` or the
+  OPL Manager way, `SLUS_123.45.Title.iso`. ZSO and UL-format images are
+  not hashed.
+- A disc the drive cannot read all the way through -- one the console will
+  not boot from its own browser either -- fails the check with "could not
+  read SYSTEM.CNF"; that is the disc or the laser, not the software.
 - Telemetry starts when the game opens its controller through libpad, which
   is how OPL's in-game hooks attach. A game with unusual input code may
   never start sending; the PC then shows no snapshots.

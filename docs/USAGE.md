@@ -98,16 +98,12 @@ directly (below), which does not need `conf_apps.cfg` at all.
 Launching directly (option 1) is the most reliable and is recommended if
 the app entry ever fails to appear.
 
-## Turn on Notifications (required to see anything)
+## Notifications
 
-The RA menu items report their result as an on-screen notice. OPL only
-draws notices when the **Notifications** setting is enabled, and it is
-**off by default**.
-
-**Settings → Notifications → On**, then **Save Changes**, then cold-boot
-the console (power cycle) so the setting takes effect.
-
-Without this, the check/test actions still run, but you see no message.
+The RA menu items report their result as an on-screen notice in the top
+right corner, and they do so regardless of OPL's **Notifications**
+setting (which is off by default). Turning that setting on only adds
+OPL's own notices.
 
 ## The two menu items
 
@@ -136,6 +132,32 @@ it once per game before playing (the list is cached afterwards).
 - Client busy identifying: `The PC is still identifying the image` — try
   again in a few seconds.
 - No answer: `The PC client did not answer` — run "test PC connection".
+
+## Playing from the original disc
+
+Two more items live in OPL's **main menu** (press START in the game list):
+
+### RA: check disc support
+
+Reads `SYSTEM.CNF` and the boot executable off the disc through the
+console's own driver, hashes them and asks the PC, exactly like the
+image check. Run it once per disc; the watch list is then in memory (and
+saved next to your other games when a USB stick or share is available).
+
+- `Could not read SYSTEM.CNF from the disc` — the drive gave up on that
+  disc. If the console does not boot it from its own browser either, it is
+  the disc or the laser, not the software.
+- `No disc in the drive` / `The disc tray is open` — as it says.
+
+### RA: launch disc
+
+Boots the disc under OPL's in-game hooks. Telemetry and unlocks then work
+as from USB. Not available in this mode: OPL's virtual memory cards,
+per-game compatibility patches and cheats, and the in-game power-off
+combo. START+SELECT to leave the game works.
+
+Tested with Shadow of the Colossus: identified, launched, 60 snapshots a
+second for a full session.
 
 ## Playing and unlocking
 
@@ -194,6 +216,11 @@ an address (DHCP is enough).
 
 - Console and PC must be on the same subnet (the client learns the
   console's MAC from its request).
-- ZSO/UL images and ELFs outside the image root are not covered.
+- Images may be named `Title.iso` or the OPL Manager way,
+  `SLUS_123.45.Title.iso`. ZSO/UL images and ELFs outside the image root
+  are not covered.
+- Games that load their own network modules (DEV9/SMAP) may take the
+  interface away from the telemetry when launched from a disc; from USB
+  the same games are fine.
 - Games without `libpad` may not start telemetry (the hook rides the
   in-game reset path).
