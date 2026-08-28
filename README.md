@@ -63,6 +63,11 @@ In this mode OPL's virtual memory cards, per-game compatibility patches
 and cheats are not available -- they live inside the part of OPL that
 emulates the drive, which a real disc does not use.
 
+Disc mode is experimental. It has been verified with Shadow of the
+Colossus only; a game it cannot boot may hang the console hard (black
+screen, the reset button does nothing) -- power the console off and back on
+to recover. Transformers: The Game is one known case.
+
 The full walkthrough is in [docs/USAGE.md](docs/USAGE.md).
 
 Softcore only. The console can write to game memory (OPL's cheat engine),

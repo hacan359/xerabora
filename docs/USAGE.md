@@ -157,7 +157,13 @@ per-game compatibility patches and cheats, and the in-game power-off
 combo. START+SELECT to leave the game works.
 
 Tested with Shadow of the Colossus: identified, launched, 60 snapshots a
-second for a full session.
+second for a full session, unlocks from the disc.
+
+**Experimental.** A game this mode cannot boot may hang the console hard:
+black screen, the reset button does nothing, only a power cycle helps.
+Known case: Transformers: The Game (`SLUS_216.02`) -- the same disc
+hashes and is identified fine, the game itself never starts. Games from
+USB are unaffected.
 
 ## Playing and unlocking
 
