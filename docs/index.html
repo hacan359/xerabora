@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xeRAbora · RetroAchievements on a real PlayStation 2</title>
+<meta name="description" content="RetroAchievements on a real PlayStation 2. A patched Open PS2 Loader and a PC client unlock achievements on the original console, from USB or the disc. No emulator.">
+<link rel="canonical" href="https://hacan359.github.io/xerabora/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="xeRAbora">
+<meta property="og:url" content="https://hacan359.github.io/xerabora/">
+<meta property="og:title" content="xeRAbora: RetroAchievements on a real PlayStation 2">
+<meta property="og:description" content="Unlock RetroAchievements on the original PS2 console. A patched Open PS2 Loader and a PC client, games from USB or the disc, no emulator.">
+<meta property="og:image" content="https://hacan359.github.io/xerabora/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="xeRAbora: RetroAchievements on a real PlayStation 2">
+<meta name="twitter:description" content="Unlock RetroAchievements on the original PS2 console. A patched Open PS2 Loader and a PC client, games from USB or the disc, no emulator.">
+<meta name="twitter:image" content="https://hacan359.github.io/xerabora/banner.png">
+<meta name="color-scheme" content="dark light">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "xeRAbora",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "PlayStation 2, Windows, Linux",
+  "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from a USB stick or the disc, without an emulator.",
+  "softwareVersion": "0.1.0-alpha.3",
+  "url": "https://hacan359.github.io/xerabora/",
+  "downloadUrl": "https://github.com/hacan359/xerabora/releases/latest",
+  "codeRepository": "https://github.com/hacan359/xerabora",
+  "license": "https://opensource.org/licenses/MIT",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #0A1020;
+    --bg-raised: #0F1729;
+    --bg-sunken: #060B17;
+    --line: #1E2A45;
+    --line-strong: #2C3C62;
+    --ink: #E8ECF5;
+    --ink-soft: #AEB8D0;
+    --ink-mute: #7C88A6;
+    --blue: #3D8BFF;
+    --blue-bright: #34D0FF;
+    --gold: #E0A526;
+    --gold-soft: rgba(224, 165, 38, 0.14);
+    --danger: #FF6B6B;
+    --ok: #5FD38A;
+    --term-bg: #060B17;
+    --term-bar: #0C1324;
+    --term-ink: #CBD3E6;
+    --term-time: #5A6785;
+    --term-info: #8FB4FF;
+    --term-warn: #F2B96B;
+    --term-unlock: #F3C86B;
+    --shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+    --radius: 12px;
+    --font-display: "Chakra Petch", "Trebuchet MS", "Segoe UI", sans-serif;
+    --font-body: "Atkinson Hyperlegible", "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F4F6FB;
+      --bg-raised: #FFFFFF;
+      --bg-sunken: #E9EDF6;
+      --line: #D5DCEC;
+      --line-strong: #B9C3DB;
+      --ink: #111A33;
+      --ink-soft: #3B4766;
+      --ink-mute: #6B7593;
+      --blue: #1F5FD6;
+      --blue-bright: #0E7FBF;
+      --gold: #8A5E00;
+      --gold-soft: rgba(138, 94, 0, 0.12);
+      --danger: #B42318;
+      --ok: #1F7A44;
+      --term-bg: #0B1222;
+      --term-bar: #111A2F;
+      --term-ink: #CBD3E6;
+      --term-time: #5A6785;
+      --term-info: #8FB4FF;
+      --term-warn: #F2B96B;
+      --term-unlock: #F3C86B;
+      --shadow: 0 24px 48px rgba(17, 26, 51, 0.16);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F6FB;
+    --bg-raised: #FFFFFF;
+    --bg-sunken: #E9EDF6;
+    --line: #D5DCEC;
+    --line-strong: #B9C3DB;
+    --ink: #111A33;
+    --ink-soft: #3B4766;
+    --ink-mute: #6B7593;
+    --blue: #1F5FD6;
+    --blue-bright: #0E7FBF;
+    --gold: #8A5E00;
+    --gold-soft: rgba(138, 94, 0, 0.12);
+    --danger: #B42318;
+    --ok: #1F7A44;
+    --term-bg: #0B1222;
+    --term-bar: #111A2F;
+    --term-ink: #CBD3E6;
+    --term-time: #5A6785;
+    --term-info: #8FB4FF;
+    --term-warn: #F2B96B;
+    --term-unlock: #F3C86B;
+    --shadow: 0 24px 48px rgba(17, 26, 51, 0.16);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--blue-bright); outline-offset: 3px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(2.4rem, 5.2vw, 3.9rem); font-weight: 700; }
+  h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); }
+  h3 { font-size: 1.2rem; }
+  p { margin: 0; max-width: 62ch; }
+  p + p { margin-top: 1em; }
+  code, kbd { font-family: var(--font-mono); font-size: 0.9em; }
+  p code, li code, td code { background: var(--bg-sunken); border: 1px solid var(--line); border-radius: 5px; padding: 0.05em 0.4em; color: var(--ink); }
+  kbd { background: var(--bg-raised); border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 5px; padding: 0.05em 0.45em; font-size: 0.85em; }
+  .wrap { width: min(100% - 2.5rem, 68rem); margin-inline: auto; }
+  .eyebrow { font-family: var(--font-display); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
+  .eyebrow.gold { color: var(--gold); }
+  section { padding: 5.5rem 0; border-top: 1px solid var(--line); }
+  .section-head { display: grid; gap: 0.9rem; margin-bottom: 2.75rem; }
+  .section-head p { color: var(--ink-soft); font-size: 1.08rem; }
+
+  /* ---- header ---- */
+  header.top {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  header.top .wrap { display: flex; align-items: center; gap: 1.5rem; height: 3.8rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--ink); letter-spacing: 0.02em; line-height: 1; }
+  .brand .word { display: inline-flex; align-items: center; }
+  .brand .ra { height: 1.05em; width: auto; margin: 0 0.06em; transform: translateY(0.02em); }
+  .brand small { font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; color: var(--ink-mute); letter-spacing: 0; }
+  .brand.big { font-size: clamp(2.6rem, 6vw, 4.4rem); gap: 0; letter-spacing: 0.01em; }
+  .brand.big .ra { height: 1.0em; margin: 0 0.08em; }
+  .brand:hover { text-decoration: none; }
+  nav.links { display: flex; gap: 1.3rem; margin-left: auto; font-size: 0.93rem; }
+  nav.links a { color: var(--ink-soft); }
+  nav.links a:hover { color: var(--ink); text-decoration: none; }
+  @media (max-width: 760px) { nav.links { display: none; } }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+    padding: 0.7rem 1.15rem; border-radius: 8px; border: 1px solid var(--line-strong);
+    color: var(--ink); background: var(--bg-raised);
+    transition: transform 120ms ease, border-color 120ms ease;
+  }
+  .btn:hover { text-decoration: none; border-color: var(--blue); transform: translateY(-1px); }
+  .btn.primary { background: var(--gold); border-color: var(--gold); color: #1A1200; }
+  .btn.primary:hover { filter: brightness(1.05); }
+  header.top .btn { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:hover { transform: none; } }
+
+  /* ---- hero ---- */
+  .hero { padding: 5rem 0 5.5rem; border-top: 0; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 3.5rem; align-items: center; }
+  @media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; gap: 2.5rem; } }
+  .hero-copy { display: grid; gap: 1.4rem; }
+  .hero-copy h1 span { color: var(--gold); }
+  .hero-copy .lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 40ch; }
+  .hero-cta { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.4rem; }
+  .hero-meta { display: flex; gap: 1.6rem; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-mute); margin-top: 0.6rem; }
+  .hero-meta b { color: var(--ink-soft); font-weight: 500; }
+
+  /* ---- terminal ---- */
+  .term {
+    background: var(--term-bg); border: 1px solid var(--line-strong); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow); color: var(--term-ink);
+  }
+  .term__bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: var(--term-bar); border-bottom: 1px solid #1B2540; }
+  .term__bar i { width: 10px; height: 10px; border-radius: 50%; background: #26314F; }
+  .term__bar span { margin-left: 8px; font-family: var(--font-mono); font-size: 0.74rem; color: #6C7A9C; }
+  .term pre { margin: 0; padding: 16px 18px; font: 500 0.82rem/1.8 var(--font-mono); overflow-x: auto; white-space: pre; }
+  .term .t { color: var(--term-time); }
+  .term .i { color: var(--term-info); }
+  .term .w { color: var(--term-warn); }
+  .term .c { color: #5A6785; }
+  .term .u { color: var(--term-unlock); font-weight: 600; }
+  .term .u-line { background: var(--gold-soft); display: inline-block; width: 100%; box-shadow: inset 3px 0 0 var(--gold); padding-left: 10px; margin-left: -18px; padding-right: 18px; width: calc(100% + 36px); }
+  .term .cursor { display: inline-block; width: 0.6em; height: 1.05em; background: var(--term-ink); vertical-align: -0.2em; margin-left: 2px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .term .cursor { animation: none; } }
+  .term.console { background: #0B1533; border-color: #24407A; }
+  .term.console .term__bar { background: #0E1A40; border-bottom-color: #24407A; }
+  .term.console pre { color: #D9E2FF; }
+  .term.console .sel { color: #FFFFFF; background: #234CB2; display: inline-block; width: calc(100% + 36px); margin-left: -18px; padding-left: 18px; }
+  .term.console .dim { color: #6E82B8; }
+  .term.console .notice { color: #F3C86B; }
+
+  /* ---- pipeline ---- */
+  .pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.9rem; counter-reset: none; }
+  @media (max-width: 900px) { .pipeline { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .pipeline { grid-template-columns: 1fr; } }
+  .node { position: relative; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem 1.2rem 1.35rem; display: grid; gap: 0.55rem; }
+  .node .where { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-mute); letter-spacing: 0.04em; }
+  .node h3 { font-size: 1.05rem; }
+  .node p { font-size: 0.93rem; color: var(--ink-soft); }
+  .node.ra { border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+  .node.ra .where { color: var(--gold); }
+  .node::after { content: "→"; position: absolute; right: -0.95rem; top: 1.15rem; color: var(--ink-mute); font-size: 1.2rem; }
+  .node:last-child::after { content: none; }
+  @media (max-width: 900px) { .node::after { content: none; } }
+  .pipeline-note { margin-top: 1.6rem; color: var(--ink-soft); font-size: 0.98rem; }
+
+  /* ---- steps ---- */
+  .steps { display: grid; gap: 0; counter-reset: step; }
+  .step { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 2.5rem; padding: 2.4rem 0; border-top: 1px dashed var(--line); align-items: start; }
+  .step:first-child { border-top: 0; padding-top: 0; }
+  @media (max-width: 900px) { .step { grid-template-columns: 1fr; gap: 1.4rem; } }
+  .step-text { display: grid; gap: 0.8rem; }
+  .step-text .n { font-family: var(--font-display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.14em; color: var(--gold); }
+  .step-text .n::before { counter-increment: step; content: "STEP " counter(step, decimal-leading-zero); }
+  .step-text .side { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-left: 0.8rem; }
+  .step-text h3 { font-size: 1.35rem; }
+  .step-text p, .step-text li { color: var(--ink-soft); font-size: 0.98rem; }
+  .step-text ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+  .step-text .tip { border-left: 3px solid var(--gold); padding: 0.55rem 0.9rem; background: var(--gold-soft); border-radius: 0 8px 8px 0; font-size: 0.93rem; color: var(--ink); }
+  .step-text .tip b { font-family: var(--font-display); font-weight: 600; }
+  .step-vis { display: grid; gap: 0.8rem; }
+  .step-vis .cap { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-mute); }
+  .files { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.2rem; font: 500 0.82rem/1.8 var(--font-mono); color: var(--ink-soft); overflow-x: auto; white-space: pre; margin: 0; }
+  .files b { color: var(--ink); font-weight: 600; }
+  .files .new { color: var(--gold); }
+
+  /* ---- tables ---- */
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-raised); }
+  th, td { text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.st { white-space: nowrap; font-family: var(--font-mono); font-size: 0.8rem; }
+  .pill { display: inline-block; padding: 0.15em 0.6em; border-radius: 999px; font-family: var(--font-mono); font-size: 0.74rem; border: 1px solid var(--line-strong); color: var(--ink-soft); }
+  .pill.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 50%, transparent); }
+  .pill.warn { color: var(--term-warn); border-color: color-mix(in srgb, var(--term-warn) 50%, transparent); }
+  .pill.bad { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 50%, transparent); }
+
+  /* ---- verified cards ---- */
+  .verified { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 0.9rem; }
+  @media (max-width: 900px) { .verified { grid-template-columns: 1fr; } }
+  .vcard { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.3rem 1.3rem 1.4rem; display: grid; gap: 0.6rem; align-content: start; }
+  .vcard p { font-size: 0.95rem; color: var(--ink-soft); }
+  .vcard.ok { border-color: color-mix(in srgb, var(--ok) 45%, var(--line)); }
+  .vcard.ok .eyebrow { color: var(--ok); }
+  .vcard.warn { border-color: color-mix(in srgb, var(--term-warn) 55%, var(--line)); background: color-mix(in srgb, var(--term-warn) 7%, var(--bg-raised)); }
+  .vcard.warn .eyebrow { color: var(--term-warn); }
+
+  /* ---- two-col prose ---- */
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 3rem; }
+  @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
+  .cols h3 { margin-bottom: 0.6rem; }
+  .cols p, .cols li { color: var(--ink-soft); font-size: 0.98rem; }
+  .cols ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+  .callout { border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line)); background: color-mix(in srgb, var(--danger) 8%, var(--bg-raised)); border-radius: var(--radius); padding: 1.1rem 1.3rem; display: grid; gap: 0.4rem; }
+  .callout .eyebrow { color: var(--danger); }
+  .callout p { color: var(--ink); }
+
+  /* ---- faq ---- */
+  .faq { display: grid; gap: 0.6rem; max-width: 52rem; }
+  details { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 10px; padding: 0 1.2rem; }
+  details[open] { border-color: var(--line-strong); }
+  summary { cursor: pointer; padding: 1rem 0; font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; list-style: none; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--font-mono); color: var(--ink-mute); font-size: 1.1rem; }
+  details[open] summary::after { content: "–"; }
+  details p { padding: 0 0 1.1rem; color: var(--ink-soft); font-size: 0.97rem; }
+
+  /* ---- footer ---- */
+  footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; color: var(--ink-mute); font-size: 0.93rem; }
+  footer .wrap { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2.5rem; }
+  @media (max-width: 800px) { footer .wrap { grid-template-columns: 1fr; } }
+  footer h4 { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.9rem; }
+  footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  footer p { max-width: 46ch; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v0.1.0-alpha.3</small></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#start">How to start</a>
+      <a href="#tested">Verified</a>
+      <a href="#limits">Limits</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/hacan359/xerabora">GitHub</a>
+    </nav>
+    <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download</a>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="brand big" aria-label="xeRAbora"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span></div>
+      <h1>RetroAchievements on a <span>real</span> PlayStation&nbsp;2.</h1>
+      <p class="lede">Play on the original console and unlock achievements on your RetroAchievements account. A patched Open PS2 Loader on the PS2, a small client on your PC, games from a USB stick or the disc. No emulator, no changes to the game.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download alpha.3</a>
+        <a class="btn" href="#start">How to start</a>
+      </div>
+      <div class="hero-meta">
+        <span><b>Softcore</b> only</span>
+        <span><b>USB</b> and the original <b>disc</b></span>
+        <span><b>Windows</b> / <b>Linux</b> client</span>
+      </div>
+    </div>
+    <div class="term" aria-label="xerabora log excerpt">
+      <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe · Need for Speed: Underground 2</span></div>
+<pre><span class="t">15:00:41</span> console connected
+<span class="t">15:00:41</span> console started SLUS_210.65
+<span class="t">15:00:41</span> game identified: Need for Speed: Underground 2 (id 5613)
+<span class="t">15:00:42</span> first complete snapshot: 2 parts, 1351 bytes, 490 addresses
+<span class="t">15:00:42</span> achievements: 76 total, 0 unlocked, 0 cannot unlock here
+<span class="t">15:04:19</span> 3600 snapshots | 400 skipped by console | 0 repeated | 1 incomplete
+<span class="t">15:05:25</span> 7200 snapshots | 738 skipped by console | 0 repeated | 1 incomplete
+<span class="c">…</span>
+<span class="u-line"><span class="t">15:13:08</span> <span class="u">Achievement unlocked: Yo Noobie (2 points)</span></span>
+<span class="t">15:13:08</span>     Win an Outrun during the Tutorial
+<span class="t">15:13:09</span> 32400 snapshots | 3387 skipped by console | 0 repeated | 1 incomplete<span class="cursor" aria-hidden="true"></span></pre>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>The console plays. The PC watches.</h2>
+      <p>Your PS2 runs the game as usual. While it plays, the loader sends the PC a copy of what the game keeps in memory. The PC compares that with the achievement rules and tells RetroAchievements when you earn one.</p>
+    </div>
+    <div class="pipeline">
+      <div class="node">
+        <span class="where">Your PS2</span>
+        <h3>Runs the game</h3>
+        <p>A patched Open PS2 Loader starts the game the same way OPL always does, from a USB stick or the disc.</p>
+      </div>
+      <div class="node">
+        <span class="where">Your PS2</span>
+        <h3>Shares what the game remembers</h3>
+        <p>While you play, the loader sends the PC the numbers the game keeps in memory: score, position, health, whatever the achievements look at.</p>
+      </div>
+      <div class="node">
+        <span class="where">Your PC</span>
+        <h3>Checks the achievement rules</h3>
+        <p>xerabora runs rcheevos, the same engine the emulators use, and watches those numbers for the moment an achievement is earned.</p>
+      </div>
+      <div class="node ra">
+        <span class="where">retroachievements.org</span>
+        <h3>Records the unlock</h3>
+        <p>The unlock lands on your profile like any other. Softcore, on a real console.</p>
+      </div>
+    </div>
+    <p class="pipeline-note">Curious about the details? The wire between the two halves is a documented protocol (<a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">PROTOCOL.md</a>), and the <a href="https://github.com/hacan359/xerabora#how-it-works">README</a> goes into the internals.</p>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow gold">How to start</span>
+      <h2>From download to the first unlock.</h2>
+      <p>One evening, one USB stick. The log on the right comes from a real session: what the PC window printed at each step.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Download two files</h3>
+          <p>From the <a href="https://github.com/hacan359/xerabora/releases/latest">latest release</a>: <code>OPL-RA.ELF</code> for the console and <code>xerabora.exe</code> (Windows) or <code>xerabora-linux-x86_64</code> (Linux) for the PC. <code>SHA256SUMS</code> lets you check them.</p>
+          <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> files on a USB stick or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
+        </div>
+        <div class="step-vis">
+          <pre class="files"><b>xerabora v0.1.0-alpha.3</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
+├─ <span class="new">OPL-RA.ELF</span>              console loader (OPL 1.2.0 + RA)
+├─ OPL-RA-debug.ELF        same, with on-screen diagnostics
+├─ <span class="new">xerabora.exe</span>            PC client, Windows
+├─ xerabora-linux-x86_64   PC client, Linux
+└─ SHA256SUMS</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Put the loader next to your games</h3>
+          <p><code>OPL-RA.ELF</code> is a full OPL build, so it goes wherever your OPL apps live. On a USB stick: an <code>APPS</code> folder, and one line in <code>conf_apps.cfg</code> in the root so it shows up under <strong>Apps</strong>. Your images stay in <code>DVD</code> and <code>CD</code> as always.</p>
+          <div class="tip"><b>Turn notifications on.</b> In OPL: Settings → Notifications → On, Save Changes, then cold-boot. OPL ships with them off. The RA menu items report through notices, so with them off you see nothing.</div>
+        </div>
+        <div class="step-vis">
+          <pre class="files"><b>E:\</b>  <span class="c">(mass0:)</span>
+├─ <span class="new">conf_apps.cfg</span>       <span class="c">OPL+RA=mass0:APPS/OPL-RA.ELF</span>
+├─ APPS\
+│   └─ <span class="new">OPL-RA.ELF</span>
+├─ DVD\                 <span class="c">your .iso images</span>
+├─ CD\
+└─ CFG\  LNG\  THM\  ART\  CHT\  VMC\</pre>
+          <span class="cap">Plain ASCII, CRLF line endings.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Start xerabora on the PC</h3>
+          <p>Run it. It asks for your RetroAchievements username and password once, saves a login token in your profile (<code>%LOCALAPPDATA%\xerabora</code> or <code>~/.config/xerabora</code>) and never stores the password. Then it listens on UDP port 18194 and waits.</p>
+          <p>Leave the window open while you play; everything below shows up there. If Windows asks about the firewall, allow it on private networks.</p>
+        </div>
+        <div class="step-vis">
+          <div class="term">
+            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
+<pre><span class="t">15:00:41</span> logging in as hacan359 with the saved token
+<span class="t">15:00:41</span> logged in as Hacan359
+<span class="t">15:00:41</span> 3 known games loaded from C:\Users\User\AppData\Local\xerabora\games
+<span class="t">15:00:41</span> listening on UDP port 18194, waiting for the console<span class="cursor" aria-hidden="true"></span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Boot OPL-RA and test the link</h3>
+          <p>On the console: Apps → <strong>OPL+RA</strong>. It looks and behaves like OPL 1.2.0. Highlight a game, press <kbd>△</kbd> for its menu and choose <strong>RA: test PC connection</strong>. A notice tells you whether xerabora answered, from which address and how fast.</p>
+          <p>Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, notifications are on.</p>
+        </div>
+        <div class="step-vis">
+          <div class="term console">
+            <div class="term__bar"><i></i><i></i><i></i><span>PS2 · OPL+RA · game menu</span></div>
+<pre><span class="dim">  Need for Speed: Underground 2</span>
+
+  Settings
+  Compatibility
+<span class="sel">  RA: test PC connection</span>
+  RA: check game support
+  Remove all settings
+  Rename
+  Delete
+
+<span class="notice">  PC client found at 192.168.1.10 xerabora/1.0.0</span>
+<span class="notice">  Reply in 3 ms, console at 192.168.1.142</span></pre>
+          </div>
+          <div class="term">
+            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
+<pre><span class="t">15:02:34</span> console found at 192.168.1.142:18195</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Check game support</h3>
+          <p>Same menu, <strong>RA: check game support</strong>. The console hashes the image the RetroAchievements way and asks the PC. The PC asks the RA server, builds the <em>watch list</em> (every memory address the achievement set reads) and sends it back. The notice shows the title and the counts: total, unlocked, and how many cannot unlock on real hardware yet.</p>
+          <p>Once checked, the game gets an <code>RA</code> prefix in the list and a badge on the cover. You do this once per game.</p>
+        </div>
+        <div class="step-vis">
+          <div class="term">
+            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
+<pre><span class="t">15:02:36</span> remembered SLUS_210.65 = f45e0a19d50c42dbf2870fa34ae708f4
+<span class="t">15:02:36</span> asking RetroAchievements about image f45e0a19d50c42dbf2870fa34ae708f4
+<span class="t">15:02:36</span> <span class="i">game identified: Need for Speed: Underground 2 (id 5613)</span>
+<span class="t">15:02:36</span> watch list: 490 addresses, 1351 bytes per snapshot
+<span class="t">15:02:36</span> watch list ready for the console: 490 addresses, 1976 bytes
+<span class="t">15:02:36</span> console asked about f45e0a19…: ready, 1976 bytes
+<span class="t">15:02:37</span> console asked about f45e0a19…: ready, 1976 bytes</pre>
+          </div>
+          <span class="cap">The console asks a few times while it collects the list in chunks. Normal.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Start the game</h3>
+          <p>Launch it from OPL as usual. When the game opens its controller, the in-game hooks attach. The console finds the PC with one broadcast, waits about thirty seconds for the game to finish loading, then starts streaming.</p>
+          <p>The PC reports the first complete snapshot and how many achievements it is tracking. From here on it is playing.</p>
+        </div>
+        <div class="step-vis">
+          <div class="term">
+            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
+<pre><span class="t">15:02:41</span> console found at 192.168.1.142:18195
+<span class="t">15:02:42</span> console found at 192.168.1.142:18195
+<span class="t">15:03:12</span> <span class="i">console connected</span>
+<span class="t">15:03:12</span> console started SLUS_210.65
+<span class="t">15:03:12</span> first complete snapshot: 2 parts, 1351 bytes, 490 addresses
+<span class="t">15:03:12</span> achievements: 76 total, 0 unlocked, 0 cannot unlock here (pointer chains)</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-text">
+          <span class="n"></span>
+          <h3>Play</h3>
+          <p>Every minute the PC prints a line of statistics: sixty snapshots a second, how many the console skipped because its DMA was busy, how many arrived incomplete. Then the line you were waiting for. The PC plays a short sound, and the unlock reaches your profile a moment later.</p>
+          <p>Lose the network for five seconds and the PC says so. When the stream returns, it picks up where it was.</p>
+        </div>
+        <div class="step-vis">
+          <div class="term">
+            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
+<pre><span class="t">15:04:19</span> 3600 snapshots | 400 skipped by console | 0 repeated | 1 incomplete
+<span class="t">15:05:25</span> 7200 snapshots | 738 skipped by console | 0 repeated | 1 incomplete
+<span class="c">…</span>
+<span class="t">15:12:03</span> 28800 snapshots | 3013 skipped by console | 0 repeated | 1 incomplete
+<span class="t">15:13:08</span>
+<span class="u-line"><span class="t">15:13:08</span> <span class="u">Achievement unlocked: Yo Noobie (2 points)</span></span>
+<span class="t">15:13:08</span>     Win an Outrun during the Tutorial
+<span class="t">15:13:08</span>
+<span class="t">15:13:09</span> 32400 snapshots | 3387 skipped by console | 0 repeated | 1 incomplete
+<span class="t">15:13:43</span> <span class="w">warning: console connection lost: no packets for 5 seconds</span></pre>
+          </div>
+          <span class="cap">The last line: we switched the console off. A session ends like that.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="tested">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Verified on hardware</span>
+      <h2>We tested two ways to run it. The rest, nobody has.</h2>
+      <p>We checked this page on a real console, with games on a USB stick or the original disc in the drive. OPL knows other ways of storing games, and we have not tried the RA additions with any of them.</p>
+    </div>
+    <div class="verified">
+      <div class="vcard ok">
+        <span class="eyebrow">Verified</span>
+        <h3>USB stick</h3>
+        <p>Plain <code>.iso</code> images in <code>DVD</code> or <code>CD</code>. Hashing, the watch list, telemetry and in-game unlocks: the session in the walkthrough ran this way.</p>
+      </div>
+      <div class="vcard ok">
+        <span class="eyebrow">Verified</span>
+        <h3>Original disc</h3>
+        <p>Check and launch from OPL's main menu. Runs and unlocks; one game so far. Experimental, see below.</p>
+      </div>
+      <div class="vcard warn">
+        <span class="eyebrow">Untested</span>
+        <h3>SMB share, internal HDD, UL and ZSO images</h3>
+        <p>Nobody has run the RA additions from these yet. Expect the image check to fail, and expect problems we have not seen. If you try one anyway, the PC window prints what we would need to know.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="disc">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <span class="eyebrow">From the original disc</span>
+        <h2 style="margin:0.6rem 0 1rem">No image needed.</h2>
+        <p>Put the disc in, press <kbd>START</kbd> for OPL's main menu and choose <strong>RA: check disc support</strong>, then <strong>RA: launch disc</strong>. The check reads the disc through the console's own drive and asks the PC the same way it does for an image. The launch boots the disc under OPL's in-game hooks, so telemetry and unlocks work as they do from USB.</p>
+        <p>You give up OPL's virtual memory cards, per-game compatibility patches and cheats. They live in the part of OPL that emulates the drive, and a real disc does not use it.</p>
+      </div>
+      <div class="callout">
+        <span class="eyebrow">Experimental</span>
+        <p>Disc mode has run with Shadow of the Colossus only. A game it cannot boot may hang the console hard: black screen, and the reset button does nothing. Power off and back on to recover. Transformers: The Game is one known case; from USB it runs fine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Known limits</span>
+      <h2>Read before you try.</h2>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>Softcore only</h3>
+        <p>OPL can write to game memory through its cheat engine, so the client does not claim hardcore. The RA team decides whether a real-hardware client can qualify; we cannot grant it ourselves.</p>
+      </div>
+      <div>
+        <h3>Flat addresses only</h3>
+        <p>The console reads the addresses on the watch list and follows no pointers. Achievements that dereference a pointer stay active but cannot unlock, and the PC counts them for you. Most PS2 sets lose few or none.</p>
+      </div>
+      <div>
+        <h3>Same subnet</h3>
+        <p>The console learns the PC's MAC address from the discovery reply. It hears a PC behind a router but cannot answer it. A PC in a container works with host networking only.</p>
+      </div>
+      <div>
+        <h3>Plain ISO or the disc</h3>
+        <p>The image check reads <code>.iso</code> files named <code>Title.iso</code> or the OPL Manager way (<code>SLUS_123.45.Title.iso</code>) in <code>DVD</code> or <code>CD</code> on a USB stick, and the disc in the drive. UL/USBExtreme, ZSO and the internal HDD are not hashed yet; telemetry itself does not care where the game runs from.</p>
+      </div>
+      <div>
+        <h3>Hooks need libpad</h3>
+        <p>Telemetry starts when the game opens its controller through libpad, which is how OPL's in-game hooks attach. A game with unusual input code may never start sending, and the PC then shows no snapshots.</p>
+      </div>
+      <div>
+        <h3>An alpha</h3>
+        <p>A hobby experiment, run from a USB stick on two consoles. Use it at your own risk.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions people ask first.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Does it change the game?</summary>
+        <p>No. The in-game core reads memory and writes nothing into the game or the image. During development a debug build poked a value into a HUD counter; that code went away before alpha.3, and the release core is read-only.</p>
+      </details>
+      <details>
+        <summary>Is this cheating? Will RA accept the unlocks?</summary>
+        <p>The unlocks go through stock rcheevos in softcore mode, the same runtime the supported emulators use. We announced the project on the RetroAchievements forum and discussed it with the rcheevos maintainers. The client does not claim hardcore; that would need the RA team's approval.</p>
+      </details>
+      <details>
+        <summary>Which games work?</summary>
+        <p>Any PS2 game with an achievement set whose logic reads flat addresses, which covers most of them. The check in the game's menu tells you the counts for your game before you play: total, unlocked, and how many cannot unlock on real hardware yet.</p>
+      </details>
+      <details>
+        <summary>Do I need a network share or an internal HDD?</summary>
+        <p>Neither. A USB stick with your images is the tested setup. We have not tried a share or the internal HDD with the RA additions, so expect trouble there. The loader cannot hash HDD games yet: they sit on HDL partitions rather than in <code>.iso</code> files.</p>
+      </details>
+      <details>
+        <summary>I chose an RA menu item and nothing happened.</summary>
+        <p>Notifications are off. OPL ships with them disabled, and the RA items report through notices. Settings → Notifications → On, Save Changes, cold-boot the console.</p>
+      </details>
+      <details>
+        <summary>Why does the PC say "skipped by console"?</summary>
+        <p>The console skips a frame when the previous snapshot's DMA is still in flight, rather than stall the game. A few hundred per minute is normal. rcheevos evaluates the snapshots that arrive.</p>
+      </details>
+      <details>
+        <summary>Can another console use this?</summary>
+        <p>Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">the protocol</a>, and xerabora does the rest.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span></a>
+      <p style="margin-top:0.9rem">Built on Open PS2 Loader, rcheevos and ps2sdk, tested on a real console. The OPL fork keeps OPL's license (AFL 3.0); the PC client is MIT; rcheevos is MIT.</p>
+      <p style="margin-top:0.9rem">The OPL logo belongs to the Open PS2 Loader project and the RA mark to RetroAchievements; they appear here to show what this project connects.</p>
+    </div>
+    <div>
+      <h4>Code</h4>
+      <ul>
+        <li><a href="https://github.com/hacan359/xerabora">xerabora: client, protocol, docs</a></li>
+        <li><a href="https://github.com/hacan359/Open-PS2-Loader/tree/ra">OPL fork, branch <code>ra</code></a></li>
+        <li><a href="https://github.com/hacan359/xerabora/releases">Releases</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Read</h4>
+      <ul>
+        <li><a href="https://github.com/hacan359/xerabora/blob/main/docs/USAGE.md">Full usage guide</a></li>
+        <li><a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">Wire protocol</a></li>
+        <li><a href="https://retroachievements.org">RetroAchievements</a></li>
+        <li><a href="https://github.com/ps2homebrew/Open-PS2-Loader">Open PS2 Loader</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

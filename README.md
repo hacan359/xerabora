@@ -6,6 +6,10 @@
 
 RetroAchievements on a real PlayStation 2.
 
+**Project page:** [hacan359.github.io/xerabora](https://hacan359.github.io/xerabora/) —
+the setup as a walkthrough with the client's real log at every step:
+[How to start](https://hacan359.github.io/xerabora/#start).
+
 A fork of [Open PS2 Loader](https://github.com/ps2homebrew/Open-PS2-Loader)
 reads the running game's memory every frame and streams it over the
 network. A small program on your PC receives the stream, runs
@@ -68,7 +72,9 @@ Colossus only; a game it cannot boot may hang the console hard (black
 screen, the reset button does nothing) -- power the console off and back on
 to recover. Transformers: The Game is one known case.
 
-The full walkthrough is in [docs/USAGE.md](docs/USAGE.md).
+The full walkthrough is in [docs/USAGE.md](docs/USAGE.md); the same
+steps with what the PC prints at each one are on the
+[project page](https://hacan359.github.io/xerabora/#start).
 
 Softcore only. The console can write to game memory (OPL's cheat engine),
 so `xerabora` does not claim hardcore mode.
