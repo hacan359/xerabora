@@ -19,6 +19,12 @@ int config_save_credentials(const char *user, const char *token);
 /* Deletes the saved credentials. */
 void config_forget_credentials(void);
 
+/* The Web API key, kept apart from the login token: different door,
+   read-only, and the user pastes it from their RA profile settings.
+   Returns 1 when a key was read. */
+int config_load_apikey(char *key, size_t size);
+int config_save_apikey(const char *key);
+
 /* Path of the file with remembered serial-to-hash pairs. */
 int config_games_path(char *out, size_t size);
 

@@ -104,6 +104,19 @@ int snapshot_feed(const char *pkt, size_t len)
     if (off + vb > len || vb > RA_SNAP_MAX_BYTES)
         return 0;
 
+    /* The console's receive FIFO depth rides in every packet; a depth
+       that sticks above zero means frames arrive at the controller and
+       nobody drains them. Optional: old consoles may not send it. */
+    {
+        unsigned int rxq;
+
+        if (field_dec(pkt, " rxq=", 3, &rxq)) {
+            g_stats.rxq = rxq;
+            if (rxq > g_stats.rxq_max)
+                g_stats.rxq_max = rxq;
+        }
+    }
+
     g_stats.count = cnt;
     g_stats.parts = np;
 

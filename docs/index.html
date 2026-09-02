@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>xeRAbora · RetroAchievements on a real PlayStation 2</title>
-<meta name="description" content="RetroAchievements on a real PlayStation 2. A patched Open PS2 Loader and a PC client unlock achievements on the original console, from USB or the disc. No emulator.">
+<title>xeRAbora · RetroAchievements companion: what to chase next, live from a real console</title>
+<meta name="description" content="xeRAbora is a RetroAchievements companion app: your library, what to chase next by other players' median times, missable warnings, leaderboards and rank, plus a live view of a real console. PlayStation 2 first, through a patched Open PS2 Loader.">
 <link rel="canonical" href="https://hacan359.github.io/xerabora/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="xeRAbora">
 <meta property="og:url" content="https://hacan359.github.io/xerabora/">
-<meta property="og:title" content="xeRAbora: RetroAchievements on a real PlayStation 2">
-<meta property="og:description" content="Unlock RetroAchievements on the original PS2 console. A patched Open PS2 Loader and a PC client, games from USB or the disc, no emulator.">
+<meta property="og:title" content="xeRAbora: a RetroAchievements companion, live from a real PlayStation 2">
+<meta property="og:description" content="Your library, what to chase next, missable warnings, leaderboards and rank in one window, and a live view of the console. Unlock on the original PS2 through a patched Open PS2 Loader.">
 <meta property="og:image" content="https://hacan359.github.io/xerabora/banner.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="xeRAbora: RetroAchievements on a real PlayStation 2">
-<meta name="twitter:description" content="Unlock RetroAchievements on the original PS2 console. A patched Open PS2 Loader and a PC client, games from USB or the disc, no emulator.">
+<meta name="twitter:title" content="xeRAbora: a RetroAchievements companion, live from a real PlayStation 2">
+<meta name="twitter:description" content="Your library, what to chase next, missable warnings, leaderboards and rank in one window, and a live view of the console. Unlock on the original PS2 through a patched Open PS2 Loader.">
 <meta name="twitter:image" content="https://hacan359.github.io/xerabora/banner.png">
 <meta name="color-scheme" content="dark light">
 <script type="application/ld+json">
@@ -25,7 +25,7 @@
   "applicationCategory": "GameApplication",
   "operatingSystem": "PlayStation 2, Windows, Linux",
   "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from a USB stick or the disc, without an emulator.",
-  "softwareVersion": "0.1.0-alpha.3",
+  "softwareVersion": "0.1.0-alpha.4",
   "url": "https://hacan359.github.io/xerabora/",
   "downloadUrl": "https://github.com/hacan359/xerabora/releases/latest",
   "codeRepository": "https://github.com/hacan359/xerabora",
@@ -181,7 +181,12 @@
 
   /* ---- hero ---- */
   .hero { padding: 5rem 0 5.5rem; border-top: 0; }
-  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 3.5rem; align-items: center; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.2rem; justify-items: center; }
+  .hero-art { width: 100%; min-width: 0; }
+  #wordmark { display: block; width: 100%; height: auto; }
+  .hero-copy { text-align: center; max-width: 62ch; }
+  .hero-copy .lede { max-width: none; }
+  .hero-cta, .hero-meta { justify-content: center; }
   @media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; gap: 2.5rem; } }
   .hero-copy { display: grid; gap: 1.4rem; }
   .hero-copy h1 span { color: var(--gold); }
@@ -204,6 +209,45 @@
   .term .w { color: var(--term-warn); }
   .term .c { color: #5A6785; }
   .term .u { color: var(--term-unlock); font-weight: 600; }
+
+  .demo { margin-top: 1.8rem; border: 1px solid #1E2F52; border-radius: 8px; overflow: hidden; background: #04101c; }
+  .demo__bar { padding: 10px 14px; font-size: 0.82rem; color: #8FA3C7; background: #0D1A33; border-bottom: 1px solid #1E2F52; }
+  .demo__bar span { color: #E0A526; font-weight: 700; margin-right: 8px; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.7rem; }
+  .demo iframe { display: block; width: 100%; height: 780px; border: 0; background: #04101c; }
+  @media (max-width: 720px) { .demo iframe { height: 620px; } }
+
+  /* Mock-ups of the client's own page, in its colours whatever the theme. */
+  .app { background: #0B1528; border: 1px solid #1E2F52; border-radius: 6px; overflow: hidden; font-family: var(--font-mono); color: #E8EEF8; }
+  .app__bar { display: flex; align-items: center; gap: 12px; padding: 9px 14px; background: #0D1A33; border-bottom: 1px solid #1E2F52; font-size: 0.68rem; letter-spacing: 0.06em; color: #8FA3C7; }
+  .app__bar .brand-mini { font-weight: 700; font-size: 0.8rem; letter-spacing: 0; color: #E8EEF8; margin-right: 6px; }
+  .app__bar .brand-mini .r { color: #3D8BFF; } .app__bar .brand-mini .a { color: #E0A526; }
+  .app__bar .tab { padding: 3px 7px; } .app__bar .tab.on { background: #7FD6FF; color: #05101F; font-weight: 700; }
+  .app__bar .who { margin-left: auto; letter-spacing: 0; }
+  .app__status { display: flex; justify-content: space-between; gap: 12px; padding: 9px 14px; background: #0E1F3A; font-size: 0.78rem; color: #CFE3FF; }
+  .app__status .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: #5CF29A; box-shadow: 0 0 6px #5CF29A; vertical-align: 1px; }
+  .app__status .dot.off { background: #2C3E66; box-shadow: none; }
+  .app__label { margin: 12px 14px 4px; font-size: 0.58rem; letter-spacing: 0.1em; color: #6C7A9C; }
+  .app__panel { margin: 0 14px 10px; padding: 10px 12px; background: #10203A; border-left: 3px solid #6FE3FF; font-size: 0.84rem; }
+  .app__panel.muted { border-left-color: #2C3E66; color: #8FA3C7; }
+  .app__tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 0 14px 14px; }
+  .app__tiles .tile { background: #10203A; padding: 8px 10px; }
+  .app__tiles .tile b { display: block; font-size: 0.58rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #8FA3C7; margin-bottom: 3px; }
+  .app__tiles .tile span { font-size: 0.84rem; }
+  .app__toast { display: flex; align-items: center; gap: 12px; margin: 12px 14px 0; padding: 8px 12px; background: #E0A526; color: #1A1200; font-weight: 700; font-size: 0.9rem; }
+  .app__toast img { display: block; width: 40px; height: 40px; }
+  .app__card { display: flex; justify-content: space-between; gap: 12px; margin: 0 14px 8px; padding: 10px 12px; background: #10203A; border-left: 3px solid #6FE3FF; }
+  .app__card:last-child { margin-bottom: 14px; }
+  .app__card b { display: block; font-size: 0.95rem; margin-bottom: 3px; }
+  .app__card span { display: block; font-size: 0.78rem; color: #9FB7D8; }
+  .app__card em { font-style: normal; font-size: 0.72rem; color: #8FA3C7; text-align: right; white-space: nowrap; }
+  .app__card em strong { display: block; color: #6FE3FF; font-size: 0.82rem; margin-bottom: 2px; }
+  .app__card em u { text-decoration: none; color: #E0A526; }
+  .app__form { padding: 6px 14px 14px; }
+  .app__form label { display: block; margin: 10px 0 4px; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8FA3C7; }
+  .app__form .field { padding: 7px 10px; background: #071120; border: 1px solid #1E2F52; font-size: 0.82rem; }
+  .app__form .field em { font-style: normal; color: #6C7A9C; }
+  .app__btn { display: inline-block; margin-top: 12px; padding: 6px 12px; background: #7FD6FF; color: #05101F; font-weight: 700; font-size: 0.68rem; letter-spacing: 0.06em; }
+  .app__btn.ghost { background: transparent; color: #8FA3C7; border: 1px solid #2C3E66; }
   .term .u-line { background: var(--gold-soft); display: inline-block; width: 100%; box-shadow: inset 3px 0 0 var(--gold); padding-left: 10px; margin-left: -18px; padding-right: 18px; width: calc(100% + 36px); }
   .term .cursor { display: inline-block; width: 0.6em; height: 1.05em; background: var(--term-ink); vertical-align: -0.2em; margin-left: 2px; animation: blink 1.1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
@@ -305,11 +349,12 @@
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v0.1.0-alpha.3</small></a>
+    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v0.1.0-alpha.4</small></a>
     <nav class="links" aria-label="Sections">
       <a href="#how">How it works</a>
       <a href="#start">How to start</a>
       <a href="#tested">Verified</a>
+      <a href="#roadmap">Roadmap</a>
       <a href="#limits">Limits</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/hacan359/xerabora">GitHub</a>
@@ -322,33 +367,19 @@
 
 <section class="hero">
   <div class="wrap">
+    <div class="hero-art"><canvas id="wordmark" aria-label="xeRAbora"></canvas></div>
     <div class="hero-copy">
-      <div class="brand big" aria-label="xeRAbora"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span></div>
-      <h1>RetroAchievements on a <span>real</span> PlayStation&nbsp;2.</h1>
-      <p class="lede">Play on the original console and unlock achievements on your RetroAchievements account. A patched Open PS2 Loader on the PS2, a small client on your PC, games from a USB stick or the disc. No emulator, no changes to the game.</p>
+      <h1>Your RetroAchievements companion, live from a <span>real</span> console.</h1>
+      <p class="lede">One window for your library, what to chase next, the missables you are about to lose, the leaderboards and your rank. Plug in a console and it shows progress as it moves, an unlock the moment it happens, and a gold flash on the TV. PlayStation&nbsp;2 first, through a patched Open PS2 Loader.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download alpha.3</a>
+        <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download alpha.4</a>
         <a class="btn" href="#start">How to start</a>
       </div>
       <div class="hero-meta">
         <span><b>Softcore</b> only</span>
         <span><b>USB</b> and the original <b>disc</b></span>
-        <span><b>Windows</b> / <b>Linux</b> client</span>
+        <span><b>Windows</b> / <b>Linux</b>, one file</span>
       </div>
-    </div>
-    <div class="term" aria-label="xerabora log excerpt">
-      <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe · Need for Speed: Underground 2</span></div>
-<pre><span class="t">15:00:41</span> console connected
-<span class="t">15:00:41</span> console started SLUS_210.65
-<span class="t">15:00:41</span> game identified: Need for Speed: Underground 2 (id 5613)
-<span class="t">15:00:42</span> first complete snapshot: 2 parts, 1351 bytes, 490 addresses
-<span class="t">15:00:42</span> achievements: 76 total, 0 unlocked, 0 cannot unlock here
-<span class="t">15:04:19</span> 3600 snapshots | 400 skipped by console | 0 repeated | 1 incomplete
-<span class="t">15:05:25</span> 7200 snapshots | 738 skipped by console | 0 repeated | 1 incomplete
-<span class="c">…</span>
-<span class="u-line"><span class="t">15:13:08</span> <span class="u">Achievement unlocked: Yo Noobie (2 points)</span></span>
-<span class="t">15:13:08</span>     Win an Outrun during the Tutorial
-<span class="t">15:13:09</span> 32400 snapshots | 3387 skipped by console | 0 repeated | 1 incomplete<span class="cursor" aria-hidden="true"></span></pre>
     </div>
   </div>
 </section>
@@ -357,8 +388,8 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">How it works</span>
-      <h2>The console plays. The PC watches.</h2>
-      <p>Your PS2 runs the game as usual. While it plays, the loader sends the PC a copy of what the game keeps in memory. The PC compares that with the achievement rules and tells RetroAchievements when you earn one.</p>
+      <h2>The console plays, the PC watches, the TV flashes.</h2>
+      <p>Your PS2 runs the game as usual. While it plays, the loader sends the PC a copy of what the game keeps in memory. The PC compares that with the achievement rules, tells RetroAchievements when you earn one, and tells the console, which answers with a gold flash over the game.</p>
     </div>
     <div class="pipeline">
       <div class="node">
@@ -379,10 +410,38 @@
       <div class="node ra">
         <span class="where">retroachievements.org</span>
         <h3>Records the unlock</h3>
-        <p>The unlock lands on your profile like any other. Softcore, on a real console.</p>
+        <p>The unlock lands on your profile like any other. Softcore, on a real console. The page shows a toast, the console a gold flash.</p>
       </div>
     </div>
-    <p class="pipeline-note">Curious about the details? The wire between the two halves is a documented protocol (<a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">PROTOCOL.md</a>), and the <a href="https://github.com/hacan359/xerabora#how-it-works">README</a> goes into the internals.</p>
+    <p class="pipeline-note">The client knows nothing about the PS2 beyond the memory it receives. The wire between the two halves is a documented protocol (<a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">PROTOCOL.md</a>): an agent for another console reads its memory, computes the RetroAchievements hash and speaks it. The <a href="https://github.com/hacan359/xerabora#how-the-ps2-side-works">README</a> goes into the internals.</p>
+  </div>
+</section>
+
+<section id="client">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow gold">The client</span>
+      <h2>Your RetroAchievements, in one window.</h2>
+      <p>xeRAbora is a full client. It works without a console and without a login: the library, every game's achievements and the leaderboards come from your Web API key. Plug in the console and the same screens fill with numbers straight from the game's memory.</p>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>LIVE</h3>
+        <p>The running game as the console sees it: measured progress, UP NEXT by the median time other players took, live leaderboard trackers, and a CONSOLE panel with the link, the snapshot rate and the losses.</p>
+      </div>
+      <div>
+        <h3>LIBRARY, GAME, BOARDS</h3>
+        <p>Every game you have touched, on every system, with progress and awards. One set in full: the author's order, the intended path with missables flagged, the median unlock times. A game's leaderboards with the top entries.</p>
+      </div>
+      <div>
+        <h3>Made for streaming</h3>
+        <p>The interface is a page the client serves to itself on localhost, so OBS takes it as a browser source. <code>--obs</code> writes text labels and a <code>data.json</code> for everything else.</p>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="demo__bar"><span>Try it</span> This is the client's own page with a recorded session in place of the console. Click the tabs, open a game from LIBRARY, wait for the unlock.</div>
+      <iframe src="demo.html" title="xeRAbora, live demo of the client's page" loading="lazy"></iframe>
+    </div>
   </div>
 </section>
 
@@ -391,7 +450,7 @@
     <div class="section-head">
       <span class="eyebrow gold">How to start</span>
       <h2>From download to the first unlock.</h2>
-      <p>One evening, one USB stick. The log on the right comes from a real session: what the PC window printed at each step.</p>
+      <p>One evening, one USB stick. The panels on the right are what the client's page shows at each step, with the numbers from a real session.</p>
     </div>
 
     <div class="steps">
@@ -404,7 +463,7 @@
           <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> files on a USB stick or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
         </div>
         <div class="step-vis">
-          <pre class="files"><b>xerabora v0.1.0-alpha.3</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
+          <pre class="files"><b>xerabora v0.1.0-alpha.4</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
 ├─ <span class="new">OPL-RA.ELF</span>              console loader (OPL 1.2.0 + RA)
 ├─ OPL-RA-debug.ELF        same, with on-screen diagnostics
 ├─ <span class="new">xerabora.exe</span>            PC client, Windows
@@ -418,7 +477,7 @@
           <span class="n"></span>
           <h3>Put the loader next to your games</h3>
           <p><code>OPL-RA.ELF</code> is a full OPL build, so it goes wherever your OPL apps live. On a USB stick: an <code>APPS</code> folder, and one line in <code>conf_apps.cfg</code> in the root so it shows up under <strong>Apps</strong>. Your images stay in <code>DVD</code> and <code>CD</code> as always.</p>
-          <div class="tip"><b>Turn notifications on.</b> In OPL: Settings → Notifications → On, Save Changes, then cold-boot. OPL ships with them off. The RA menu items report through notices, so with them off you see nothing.</div>
+          <div class="tip"><b>Notifications.</b> The RA menu items report through on-screen notices whatever OPL's Notifications setting says. Turn it on (Settings → Notifications → On, Save Changes, cold-boot) if you also want OPL's own notices.</div>
         </div>
         <div class="step-vis">
           <pre class="files"><b>E:\</b>  <span class="c">(mass0:)</span>
@@ -436,17 +495,19 @@
         <div class="step-text">
           <span class="n"></span>
           <h3>Start xerabora on the PC</h3>
-          <p>Run it. It asks for your RetroAchievements username and password once, saves a login token in your profile (<code>%LOCALAPPDATA%\xerabora</code> or <code>~/.config/xerabora</code>) and never stores the password. Then it listens on UDP port 18194 and waits.</p>
-          <p>Leave the window open while you play; everything below shows up there. If Windows asks about the firewall, allow it on private networks.</p>
+          <p>Run it. The page opens in your browser. On SETTINGS, sign in with your RetroAchievements login and paste the Web API key from your RA profile settings; the token and the key are saved in your profile (<code>%LOCALAPPDATA%\xerabora</code> or <code>~/.config/xerabora</code>), the password is not. Then it listens on UDP port 18194 and waits.</p>
+          <p>Leave it running while you play. The LIVE tab shows everything below; the same lines go to <code>xerabora.log</code> next to the saved login. If Windows asks about the firewall, allow it on private networks.</p>
         </div>
         <div class="step-vis">
-          <div class="term">
-            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
-<pre><span class="t">15:00:41</span> logging in as hacan359 with the saved token
-<span class="t">15:00:41</span> logged in as Hacan359
-<span class="t">15:00:41</span> 3 known games loaded from C:\Users\User\AppData\Local\xerabora\games
-<span class="t">15:00:41</span> listening on UDP port 18194, waiting for the console<span class="cursor" aria-hidden="true"></span></pre>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab on">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
+            <div class="app__status"><span><i class="dot off"></i>waiting for the console on UDP 18194</span><span>&nbsp;</span></div>
+            <div class="app__form">
+              <label>RetroAchievements login</label><div class="field">hacan359 <em>· signed in, only the token is stored</em></div>
+              <label>Web API key</label><div class="field">••••••••••••••••••••••••••••••••</div>
+              <span class="app__btn">SAVE</span> <span class="app__btn ghost">QUIT XERABORA</span>
+            </div>
           </div>
+          <span class="cap">Both fields can wait: the library needs the key, an unlock needs the login.</span>
         </div>
       </div>
 
@@ -455,7 +516,7 @@
           <span class="n"></span>
           <h3>Boot OPL-RA and test the link</h3>
           <p>On the console: Apps → <strong>OPL+RA</strong>. It looks and behaves like OPL 1.2.0. Highlight a game, press <kbd>△</kbd> for its menu and choose <strong>RA: test PC connection</strong>. A notice tells you whether xerabora answered, from which address and how fast.</p>
-          <p>Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, notifications are on.</p>
+          <p>Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, the client is running.</p>
         </div>
         <div class="step-vis">
           <div class="term console">
@@ -473,9 +534,9 @@
 <span class="notice">  PC client found at 192.168.1.10 xerabora/1.0.0</span>
 <span class="notice">  Reply in 3 ms, console at 192.168.1.142</span></pre>
           </div>
-          <div class="term">
-            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
-<pre><span class="t">15:02:34</span> console found at 192.168.1.142:18195</pre>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
+            <div class="app__status"><span><i class="dot off"></i>console at 192.168.1.142 answered the link test</span><span>&nbsp;</span></div>
+            <div class="app__panel muted">start a game on the console, or browse your library above</div>
           </div>
         </div>
       </div>
@@ -488,15 +549,16 @@
           <p>Once checked, the game gets an <code>RA</code> prefix in the list and a badge on the cover. You do this once per game.</p>
         </div>
         <div class="step-vis">
-          <div class="term">
-            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
-<pre><span class="t">15:02:36</span> remembered SLUS_210.65 = f45e0a19d50c42dbf2870fa34ae708f4
-<span class="t">15:02:36</span> asking RetroAchievements about image f45e0a19d50c42dbf2870fa34ae708f4
-<span class="t">15:02:36</span> <span class="i">game identified: Need for Speed: Underground 2 (id 5613)</span>
-<span class="t">15:02:36</span> watch list: 490 addresses, 1351 bytes per snapshot
-<span class="t">15:02:36</span> watch list ready for the console: 490 addresses, 1976 bytes
-<span class="t">15:02:36</span> console asked about f45e0a19…: ready, 1976 bytes
-<span class="t">15:02:37</span> console asked about f45e0a19…: ready, 1976 bytes</pre>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
+            <div class="app__status"><span><i class="dot off"></i>console at 192.168.1.142, no game running</span><span>&nbsp;</span></div>
+            <div class="app__label">CONSOLE</div>
+            <div class="app__panel">Need for Speed: Underground 2 · 76 achievements · watch list sent</div>
+            <div class="app__tiles">
+              <div class="tile"><b>game</b><span>SLUS_210.65</span></div>
+              <div class="tile"><b>image</b><span>f45e0a19…</span></div>
+              <div class="tile"><b>watch list</b><span>490 addr · 1351 B · 2 parts</span></div>
+              <div class="tile"><b>cannot unlock here</b><span>0 of 76</span></div>
+            </div>
           </div>
           <span class="cap">The console asks a few times while it collects the list in chunks. Normal.</span>
         </div>
@@ -507,18 +569,23 @@
           <span class="n"></span>
           <h3>Start the game</h3>
           <p>Launch it from OPL as usual. When the game opens its controller, the in-game hooks attach. The console finds the PC with one broadcast, waits about thirty seconds for the game to finish loading, then starts streaming.</p>
-          <p>The PC reports the first complete snapshot and how many achievements it is tracking. From here on it is playing.</p>
+          <p>The LIVE tab lights up: console connected, the set, the first snapshot, and how many achievements cannot unlock on real hardware. From here on it is playing.</p>
         </div>
         <div class="step-vis">
-          <div class="term">
-            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
-<pre><span class="t">15:02:41</span> console found at 192.168.1.142:18195
-<span class="t">15:02:42</span> console found at 192.168.1.142:18195
-<span class="t">15:03:12</span> <span class="i">console connected</span>
-<span class="t">15:03:12</span> console started SLUS_210.65
-<span class="t">15:03:12</span> first complete snapshot: 2 parts, 1351 bytes, 490 addresses
-<span class="t">15:03:12</span> achievements: 76 total, 0 unlocked, 0 cannot unlock here (pointer chains)</pre>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
+            <div class="app__status"><span><i class="dot"></i>console live at 192.168.1.142</span><span>60 snapshots, 0 skipped</span></div>
+            <div class="app__label">CONSOLE</div>
+            <div class="app__panel">achievement set active, unlocks are tracked</div>
+            <div class="app__tiles">
+              <div class="tile"><b>link</b><span>192.168.1.142</span></div>
+              <div class="tile"><b>game</b><span>SLUS_210.65</span></div>
+              <div class="tile"><b>snapshots</b><span>60 · 53/s</span></div>
+              <div class="tile"><b>lost</b><span>0 skipped · 0 rep · 0 torn</span></div>
+              <div class="tile"><b>watch list</b><span>490 addr · 1351 B · 2 parts</span></div>
+              <div class="tile"><b>session</b><span>0:00:01</span></div>
+            </div>
           </div>
+          <span class="cap">Need for Speed: Underground 2, 0 of 76, and the first UP NEXT cards appear below this panel.</span>
         </div>
       </div>
 
@@ -526,24 +593,18 @@
         <div class="step-text">
           <span class="n"></span>
           <h3>Play</h3>
-          <p>Every minute the PC prints a line of statistics: sixty snapshots a second, how many the console skipped because its DMA was busy, how many arrived incomplete. Then the line you were waiting for. The PC plays a short sound, and the unlock reaches your profile a moment later.</p>
+          <p>The CONSOLE panel counts sixty snapshots a second, how many the console skipped because its DMA was busy, how many arrived incomplete. Then the moment you were waiting for: a toast on the page, a short sound, a gold flash over the game on the TV, and the unlock on your profile.</p>
           <p>Lose the network for five seconds and the PC says so. When the stream returns, it picks up where it was.</p>
         </div>
         <div class="step-vis">
-          <div class="term">
-            <div class="term__bar"><i></i><i></i><i></i><span>xerabora.exe</span></div>
-<pre><span class="t">15:04:19</span> 3600 snapshots | 400 skipped by console | 0 repeated | 1 incomplete
-<span class="t">15:05:25</span> 7200 snapshots | 738 skipped by console | 0 repeated | 1 incomplete
-<span class="c">…</span>
-<span class="t">15:12:03</span> 28800 snapshots | 3013 skipped by console | 0 repeated | 1 incomplete
-<span class="t">15:13:08</span>
-<span class="u-line"><span class="t">15:13:08</span> <span class="u">Achievement unlocked: Yo Noobie (2 points)</span></span>
-<span class="t">15:13:08</span>     Win an Outrun during the Tutorial
-<span class="t">15:13:08</span>
-<span class="t">15:13:09</span> 32400 snapshots | 3387 skipped by console | 0 repeated | 1 incomplete
-<span class="t">15:13:43</span> <span class="w">warning: console connection lost: no packets for 5 seconds</span></pre>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
+            <div class="app__status"><span><i class="dot"></i>console live at 192.168.1.142</span><span>32 400 snapshots, 3 387 skipped</span></div>
+            <div class="app__toast"><img src="https://media.retroachievements.org/Badge/609318.png" alt="" width="40" height="40"><span>Yo Noobie&nbsp;&nbsp;+2 pts</span></div>
+            <div class="app__label">UP NEXT · BY MEDIAN UNLOCK TIME</div>
+            <div class="app__card"><div><b>Bring My Car Back... Now!</b><span>Complete all three races available before going to Rachel's place</span></div><em>~0h43 · <u>missable</u></em></div>
+            <div class="app__card"><div><b>Making a Name</b><span>Complete Stage 1</span></div><em><strong>next in progression</strong>~1h14 · progression</em></div>
           </div>
-          <span class="cap">The last line: we switched the console off. A session ends like that.</span>
+          <span class="cap">On the TV the screen dips to gold and comes back. Lose the network for five seconds and the status bar says so.</span>
         </div>
       </div>
 
@@ -590,6 +651,42 @@
       <div class="callout">
         <span class="eyebrow">Experimental</span>
         <p>Disc mode has run with Shadow of the Colossus only. A game it cannot boot may hang the console hard: black screen, and the reset button does nothing. Power off and back on to recover. Transformers: The Game is one known case; from USB it runs fine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow gold">Where this is going</span>
+      <h2>A companion for wherever you play.</h2>
+      <p>The console side proved the idea. The plan is to grow the client into the thing you keep open next to any RetroAchievements session, and to give the PS2 agent the pieces it still lacks.</p>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>Pointer chains on the console</h3>
+        <p>The agent reads flat addresses today. Next it reads the pointer bases too and the client asks for the targets on the following frame, so the sets that dereference pointers unlock on real hardware as well.</p>
+      </div>
+      <div>
+        <h3>Guidance that does not depend on the source</h3>
+        <p>UP NEXT, missable warnings and progression order come from RetroAchievements data, so they work for any game you have started. The goal is a companion that guides you through a set whether you play on the console, on a PC, or in an emulator, so you miss nothing on the way to mastery.</p>
+      </div>
+      <div>
+        <h3>More agents, one protocol</h3>
+        <p>The protocol is small and documented. An agent for another console, or for an emulator that wants the same window, is a weekend of work, and the client does the rest.</p>
+      </div>
+      <div>
+        <h3>Louder unlocks</h3>
+        <p>The gold flash is the first notice on the TV. Controller rumble in step with it, a badge on screen, a mastery alert on the page, and Discord presence are on the list.</p>
+      </div>
+      <div>
+        <h3>For streams</h3>
+        <p>A compact overlay layout for OBS, live counters from the game's own values, and the leaderboard trackers beside the video.</p>
+      </div>
+      <div>
+        <h3>Hardcore</h3>
+        <p>RetroAchievements decides who qualifies. The question is with the RA team; until then, softcore, with the trackers running and no entries posted.</p>
       </div>
     </div>
   </div>
@@ -654,8 +751,8 @@
         <p>Neither. A USB stick with your images is the tested setup. We have not tried a share or the internal HDD with the RA additions, so expect trouble there. The loader cannot hash HDD games yet: they sit on HDL partitions rather than in <code>.iso</code> files.</p>
       </details>
       <details>
-        <summary>I chose an RA menu item and nothing happened.</summary>
-        <p>Notifications are off. OPL ships with them disabled, and the RA items report through notices. Settings → Notifications → On, Save Changes, cold-boot the console.</p>
+        <summary>The unlock showed on the page but the TV did not flash.</summary>
+        <p>Look for <code>console acknowledged unlock notice</code> in <code>xerabora.log</code>. If it is missing, the notice never reached the console: same subnet, and the client must be running while you play (it can be restarted mid-game). If it is there, the console got it; tell us the game.</p>
       </details>
       <details>
         <summary>Why does the PC say "skipped by console"?</summary>
@@ -663,7 +760,11 @@
       </details>
       <details>
         <summary>Can another console use this?</summary>
-        <p>Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">the protocol</a>, and xerabora does the rest.</p>
+        <p>Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">the protocol</a>, and xerabora does the rest: the library, the live view, the unlocks.</p>
+      </details>
+      <details>
+        <summary>Do I need the console at all?</summary>
+        <p>No. Without one, xeRAbora is a RetroAchievements client: your library, each game's achievements, leaderboards and profile from your Web API key. The console adds the live half.</p>
       </details>
     </div>
   </div>
@@ -698,5 +799,102 @@
   </div>
 </footer>
 
+<script>
+/* The wordmark, drawn pixel by pixel on a canvas. Pixels at the tail of
+   the word detach, fly off to the right and fade; the letter grows back. */
+(function () {
+  const CELLS = [[0,2,0],[1,2,0],[5,2,0],[6,2,0],[1,3,0],[2,3,0],[4,3,0],[5,3,0],[2,4,0],[3,4,0],[4,4,0],[1,5,0],[2,5,0],[4,5,0],[5,5,0],[0,6,0],[1,6,0],[5,6,0],[6,6,0],[9,2,0],[10,2,0],[11,2,0],[12,2,0],[13,2,0],[8,3,0],[9,3,0],[13,3,0],[14,3,0],[8,4,0],[9,4,0],[10,4,0],[11,4,0],[12,4,0],[13,4,0],[14,4,0],[8,5,0],[9,5,0],[9,6,0],[10,6,0],[11,6,0],[12,6,0],[13,6,0],[16,0,1],[17,0,1],[18,0,1],[19,0,1],[20,0,1],[21,0,1],[16,1,1],[17,1,1],[21,1,1],[22,1,1],[16,2,1],[17,2,1],[21,2,1],[22,2,1],[16,3,1],[17,3,1],[20,3,1],[21,3,1],[22,3,1],[16,4,1],[17,4,1],[18,4,1],[19,4,1],[20,4,1],[16,5,1],[17,5,1],[19,5,1],[20,5,1],[21,5,1],[16,6,1],[17,6,1],[20,6,1],[21,6,1],[22,6,1],[26,0,2],[27,0,2],[28,0,2],[25,1,2],[26,1,2],[28,1,2],[29,1,2],[24,2,2],[25,2,2],[29,2,2],[30,2,2],[24,3,2],[25,3,2],[29,3,2],[30,3,2],[24,4,2],[25,4,2],[26,4,2],[27,4,2],[28,4,2],[29,4,2],[30,4,2],[24,5,2],[25,5,2],[29,5,2],[30,5,2],[24,6,2],[25,6,2],[29,6,2],[30,6,2],[32,0,0],[33,0,0],[32,1,0],[33,1,0],[32,2,0],[33,2,0],[34,2,0],[35,2,0],[36,2,0],[37,2,0],[32,3,0],[33,3,0],[37,3,0],[38,3,0],[32,4,0],[33,4,0],[37,4,0],[38,4,0],[32,5,0],[33,5,0],[37,5,0],[38,5,0],[33,6,0],[34,6,0],[35,6,0],[36,6,0],[37,6,0],[41,2,0],[42,2,0],[43,2,0],[44,2,0],[45,2,0],[40,3,0],[41,3,0],[45,3,0],[46,3,0],[40,4,0],[41,4,0],[45,4,0],[46,4,0],[40,5,0],[41,5,0],[45,5,0],[46,5,0],[41,6,0],[42,6,0],[43,6,0],[44,6,0],[45,6,0],[49,2,0],[50,2,0],[52,2,0],[53,2,0],[54,2,0],[49,3,0],[50,3,0],[51,3,0],[49,4,0],[50,4,0],[49,5,0],[50,5,0],[49,6,0],[50,6,0],[57,2,0],[58,2,0],[59,2,0],[60,2,0],[61,2,0],[61,3,0],[62,3,0],[57,4,0],[58,4,0],[59,4,0],[60,4,0],[61,4,0],[62,4,0],[56,5,0],[57,5,0],[61,5,0],[62,5,0],[57,6,0],[58,6,0],[59,6,0],[60,6,0],[61,6,0],[62,6,0]];
+  const COLS = 64, ROWS = 8, START = 40;
+  const cv = document.getElementById('wordmark');
+  if (!cv || !cv.getContext) return;
+  const ctx = cv.getContext('2d');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let S = 10, ox = 0, oy = 0, W = 0, H = 0, dpr = 1;
+  const ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#E8EEF8';
+  const colors = () => [ink(), '#3D8BFF', '#E0A526'];
+  const cells = CELLS.map(c => ({ x: c[0], y: c[1], k: c[2], on: true, regrow: 0,
+    p: c[0] >= START ? 0.55 * Math.pow((c[0] - START) / (COLS - START), 1.3) : 0 }));
+  const flying = [];
+
+  function layout() {
+    const w = cv.clientWidth || cv.parentElement.clientWidth;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    S = Math.max(4, Math.floor(w / (COLS + 34)));
+    W = w; H = ROWS * S + 8 * S;
+    ox = 2 * S; oy = 4 * S;
+    cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+    cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function detach(c) {
+    c.on = false;
+    c.regrow = 1 + Math.random() * 2.5;
+    flying.push({ x: ox + c.x * S, y: oy + c.y * S, size: S, k: c.k,
+      vx: (25 + Math.random() * 90) * (0.5 + c.p) * S / 10, vy: (Math.random() - 0.5) * 60 * S / 10,
+      life: 0, ttl: 2.5 + Math.random() * 3 });
+  }
+
+  function step(dt) {
+    for (const c of cells) {
+      if (c.on) { if (c.p && Math.random() < c.p * dt * 0.35) detach(c); }
+      else if (flying.length < 400) { c.regrow -= dt; if (c.regrow <= 0) c.on = true; }
+    }
+    for (let i = flying.length - 1; i >= 0; i--) {
+      const f = flying[i];
+      f.life += dt;
+      f.x += f.vx * dt; f.y += f.vy * dt;
+      f.vy -= 6 * dt * S / 10;            /* a slow lift as it goes */
+      f.vx *= 1 - 0.12 * dt;
+      if (f.life > f.ttl || f.x > W + S) flying.splice(i, 1);
+    }
+  }
+
+  function draw() {
+    const col = colors();
+    ctx.clearRect(0, 0, W, H);
+    for (const c of cells) {
+      if (!c.on) continue;
+      ctx.fillStyle = col[c.k];
+      ctx.fillRect(ox + c.x * S, oy + c.y * S, S, S);
+    }
+    for (const f of flying) {
+      const t = f.life / f.ttl;
+      const size = Math.max(2, Math.round(f.size * (1 - 0.6 * t)));
+      ctx.globalAlpha = 1 - t * t;
+      ctx.fillStyle = col[f.k];
+      ctx.fillRect(Math.round(f.x), Math.round(f.y), size, size);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  let last = 0, running = false;
+  function frame(ts) {
+    if (!running) return;
+    const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
+    last = ts;
+    step(dt); draw();
+    requestAnimationFrame(frame);
+  }
+  function start() { if (running || still) return; running = true; last = performance.now(); requestAnimationFrame(frame); }
+  function stop() { running = false; }
+
+  layout();
+  if (still) {
+    /* A frozen frame: a few pixels already on their way. */
+    for (let i = 0; i < 60; i++) step(0.05);
+    for (const f of flying) f.life = Math.min(f.ttl * 0.6, f.life + 1.2);
+    draw();
+  } else {
+    for (let i = 0; i < 40; i++) step(0.05);
+    draw();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(es => es[0].isIntersecting ? start() : stop(), { threshold: 0.05 }).observe(cv);
+    } else start();
+  }
+  addEventListener('resize', () => { layout(); draw(); });
+  new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
 </body>
 </html>

@@ -27,6 +27,11 @@ typedef int sock_t;
 /* Console setup: UTF-8 output on Windows. */
 void platform_console_init(void);
 
+/* Windows builds are window-subsystem programs. Attach to the starting
+   terminal so text commands print there; `force` (--console) opens a
+   console window regardless. */
+void platform_attach_console(int force);
+
 /* Installs a Ctrl-C / SIGTERM handler that sets *flag to 1. */
 void platform_on_stop(volatile int *flag);
 
@@ -47,6 +52,10 @@ int platform_read_password(char *out, size_t size);
 /* Waits until the socket is readable. Returns 1 when readable, 0 on
    timeout, -1 on error. */
 int platform_wait_readable(sock_t sock, int timeout_ms);
+
+/* Wait on two sockets at once: telemetry and the UI listener. Returns a
+   bitmask, 1 for the first, 2 for the second; 0 on timeout, -1 on error. */
+int platform_wait_readable2(sock_t a, sock_t b, int timeout_ms);
 
 /* Human-readable text for the last socket error. */
 const char *platform_sock_error(void);

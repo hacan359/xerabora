@@ -113,6 +113,17 @@ const char *console_hash_for(const char *serial)
     return NULL;
 }
 
+/* ---- The console's address, from discovery or any later packet, so the
+   client can speak first (an unlock notice) through the socket its
+   telemetry arrives on. */
+static struct sockaddr_in g_console;
+/* The subnet broadcast (/24 assumed): in play the console answers no ARP,
+   Windows marks it Unreachable and unicasts die on the PC. Everything
+   pushed goes out both ways. */
+static struct sockaddr_in g_console_bcast;
+static int g_console_known = 0;
+static sock_t g_console_sock = SOCK_INVALID;
+
 /* ---- Replies ---------------------------------------------------------- */
 
 static size_t pad_reply(char *buf, size_t len, size_t cap)
@@ -199,7 +210,55 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
         n = snprintf(reply, sizeof(reply), "RAO1 OK %s/%s", XERABORA_NAME, XERABORA_VERSION);
         send_reply(sock, reply, (size_t)n, sizeof(reply), &to);
         log_info("console found at %s:%d", ip, port);
+        g_console = to;
+        g_console_bcast = to;
+        g_console_bcast.sin_addr.s_addr |= htonl(0xFF); /* /24 assumed */
+        /* The unicast dies on the PC when Windows has the console's
+           neighbor entry as Unreachable (it stopped answering ARP once
+           the game booted). The broadcast copy needs no ARP. */
+        send_reply(sock, reply, (size_t)n, sizeof(reply), &g_console_bcast);
+        g_console_known = 1;
+        g_console_sock = sock;
         return 2;
+    }
+
+    if (strncmp(pkt, "RAH1 ", 5) == 0 || strncmp(pkt, "RAK1 ", 5) == 0 ||
+        strncmp(pkt, "RAK2 ", 5) == 0)
+        console_learn(sock, from);
+
+    if (strncmp(pkt, "RAH1 ", 5) == 0) {
+        /* The console's ten-second heartbeat: what its receive side has
+           seen since the game started. Zero datagrams while the client
+           is sending names the broken link. */
+        unsigned rx = 0, rau = 0, rab = 0;
+        char mask[16] = "", done[4] = "";
+
+        sscanf(pkt + 5, "%u %u %u %15s %3s", &rx, &rau, &rab, mask, done);
+        log_info("console heartbeat: %u datagrams in, %u unlock notices, %u badge chunks, mask %s, badge done %s",
+                 rx, rau, rab, mask, done);
+        return 1;
+    }
+
+    if (strncmp(pkt, "RAK2 ", 5) == 0) {
+        /* The console's word on the badge: where its EE buffer is and
+           what the SIF DMA returned. Sent once, when the sixteenth
+           chunk completes the picture. */
+        char ee[16] = "", dma[16] = "";
+
+        sscanf(pkt + 5, "%15s %15s", ee, dma);
+        log_info("console assembled the badge (EE buffer %s, DMA %s)", ee, dma);
+        return 1;
+    }
+
+    if (strncmp(pkt, "RAK1 ", 5) == 0) {
+        /* The console's word on an unlock notice: which one, where its
+           EE buffer is, and what the DMA returned. */
+        unsigned seq = 0;
+        char ee[16] = "", dma[16] = "";
+
+        sscanf(pkt + 5, "%u %15s %15s", &seq, ee, dma);
+        log_info("console acknowledged unlock notice %u (EE buffer %s, DMA %s)", seq, ee, dma);
+        return 1;
     }
 
     if (strncmp(pkt, "RAQ1 ", 5) == 0) {
@@ -267,4 +326,59 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
     }
 
     return 0;
+}
+
+/* ---- Unlock notice ------------------------------------------------------ */
+
+void console_learn(sock_t sock, const struct sockaddr_in *from)
+{
+    if (g_console_known && g_console.sin_addr.s_addr == from->sin_addr.s_addr &&
+        g_console.sin_port == from->sin_port)
+        return;
+    g_console = *from;
+    g_console_bcast = *from;
+    g_console_bcast.sin_addr.s_addr |= htonl(0xFF); /* /24 assumed */
+    g_console_known = 1;
+    g_console_sock = sock;
+    log_info("console at %s:%d, learned from its own packets",
+             inet_ntoa(from->sin_addr), ntohs(from->sin_port));
+}
+
+int console_notify_unlock(unsigned id, unsigned points)
+{
+    char msg[64];
+    int n;
+
+    if (!g_console_known || g_console_sock == SOCK_INVALID) {
+        log_warn("no console address yet, the unlock notice stays here");
+        return 0;
+    }
+
+    n = snprintf(msg, sizeof(msg), "RAU1 %u %u", id, points);
+    send_reply(g_console_sock, msg, (size_t)n, sizeof(msg), &g_console);
+    send_reply(g_console_sock, msg, (size_t)n, sizeof(msg), &g_console_bcast);
+    return 1;
+}
+
+/* ---- Badge push: one 512-byte slice per datagram behind an 11-byte fixed-
+   width header ("RAB1 03 16 "), so the IOP parses two digit fields. Lab
+   feature. */
+int console_send_badge_chunk(const unsigned char *px, int idx)
+{
+    char msg[16 + XERABORA_BADGE_CHUNK];
+    int n;
+
+    if (!g_console_known || g_console_sock == SOCK_INVALID)
+        return 0;
+    if (idx < 0 || idx >= XERABORA_BADGE_CHUNKS)
+        return 0;
+
+    n = snprintf(msg, sizeof(msg), "RAB1 %02d %02d ", idx, XERABORA_BADGE_CHUNKS);
+    memcpy(msg + n, px + (size_t)idx * XERABORA_BADGE_CHUNK, XERABORA_BADGE_CHUNK);
+    /* Not send_reply: padding would put garbage behind the pixels. */
+    sendto(g_console_sock, msg, n + XERABORA_BADGE_CHUNK, 0,
+           (const struct sockaddr *)&g_console, sizeof(g_console));
+    sendto(g_console_sock, msg, n + XERABORA_BADGE_CHUNK, 0,
+           (const struct sockaddr *)&g_console_bcast, sizeof(g_console_bcast));
+    return 1;
 }

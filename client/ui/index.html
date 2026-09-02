@@ -1,0 +1,869 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>xerabora</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+  :root {
+    --bg: #04101c; --bg2: #123a63; --panel: rgba(20,62,100,.42);
+    --panel-lit: rgba(20,62,100,.68); --line: #1d4670;
+    --text: #cfe6f7; --dim: #5e93bd; --dimmer: #3d6f96;
+    --accent: #7fd4ff; --green: #66ffb2; --amber: #ffb84d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: radial-gradient(90% 60% at 30% 0%, var(--bg2) 0%, #071627 62%, var(--bg) 100%);
+    background-attachment: fixed; color: var(--text);
+    font: 21px/1.3 'VT323', 'Courier New', monospace; min-height: 100vh;
+  }
+  .px { font-family: 'Press Start 2P', monospace; }
+  a { color: var(--accent); }
+
+  header { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(4,16,28,.75); position: sticky; top: 0; z-index: 5; }
+  header .name { font-size: 10px; color: #fff; }
+  nav { display: flex; gap: 2px; margin-left: 14px; }
+  nav button {
+    font-family: 'Press Start 2P', monospace; font-size: 9px; background: none;
+    border: 0; color: var(--dim); padding: 9px 11px; cursor: pointer;
+  }
+  nav button.on { background: var(--accent); color: #04101c; }
+  .right { margin-left: auto; }
+  .muted { color: var(--dim); }
+  .dimmer { color: var(--dimmer); }
+
+  .link { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); background: rgba(10,33,54,.55); }
+  .dot { width: 8px; height: 8px; background: var(--dimmer); flex: none; }
+  .dot.on { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+  main { padding: 14px; }
+  .head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+  .head img { width: 84px; image-rendering: pixelated; background: #0a2136; border: 1px solid var(--line); flex: none; }
+  .head h1 { font-size: 13px; margin: 0 0 10px; color: #fff; line-height: 1.6; }
+  .bar { height: 12px; border: 1px solid var(--line); background: #0a2136; position: relative; }
+  .bar > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #2f8fd6, var(--accent)); display: block; transition: width .25s; }
+
+  .row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; background: var(--panel); margin-bottom: 4px; }
+  .row.done { background: var(--panel-lit); border-left: 2px solid var(--green); }
+  .row.near { border-left: 2px solid var(--accent); }
+  .row.na { border-left: 2px solid #7a5e26; background: rgba(122,94,38,.12); }
+  .row img { width: 34px; height: 34px; image-rendering: pixelated; background: #0a2136; flex: none; }
+  .row .body { flex: 1; min-width: 0; }
+  .row .t { color: #fff; }
+  .row .d { color: var(--dim); font-size: 19px; }
+  .row .m { width: 130px; flex: none; text-align: right; }
+  .mini { height: 6px; background: #0a2136; position: relative; margin-top: 5px; }
+  .mini > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); display: block; transition: width .25s; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px; margin-bottom: 14px; }
+  .stats .cell { background: var(--panel); padding: 7px 10px; min-width: 0; }
+  .stats .cell .k { font-size: 15px; color: var(--dimmer); }
+  .stats .cell .v { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+  .card { border: 1px solid var(--line); background: rgba(10,33,54,.5); cursor: pointer; }
+  .card:hover { border-color: var(--accent); }
+  .card .art { height: 104px; background: #0a2136; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--line); }
+  .card .art img { max-height: 104px; image-rendering: pixelated; }
+  .card .meta { padding: 9px; }
+  .card .name { color: #fff; margin-bottom: 7px; height: 2.4em; overflow: hidden; }
+  .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); color: var(--dim); padding: 3px 10px; font-size: 16px; cursor: pointer; }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
+
+  .row.big { padding: 13px 12px; }
+  .row.big img { width: 52px; height: 52px; }
+  .row.big .t { font-size: 27px; }
+  .row.big .d { font-size: 21px; }
+  .row.big .m { width: 170px; }
+  .row.clickable { cursor: pointer; }
+  .award { font-size: 14px; padding: 1px 6px; border: 1px solid; }
+  .award.gold { color: var(--amber); border-color: var(--amber); }
+  .award.green { color: var(--green); border-color: var(--green); }
+  .award.blue { color: var(--accent); border-color: var(--accent); }
+
+  h2 { font-size: 9px; color: var(--dim); margin: 18px 0 10px; font-weight: normal; }
+
+  .set { max-width: 480px; }
+  .set label { display: block; color: var(--dim); font-size: 16px; margin: 10px 0 4px; }
+  .set .note { color: var(--dim); font-size: 17px; margin: 6px 0 0; }
+  .set .msg { font-size: 17px; margin-top: 8px; min-height: 1.3em; }
+  input.f { background: #0a2136; border: 1px solid var(--line); color: var(--text); font: inherit; padding: 6px 9px; width: 100%; box-sizing: border-box; }
+  input.f:focus { border-color: var(--accent); outline: none; }
+  button.act { font-family: 'Press Start 2P', monospace; font-size: 9px; background: var(--accent); color: #04101c; border: 0; padding: 10px 14px; cursor: pointer; margin-top: 12px; }
+  button.act:disabled { background: var(--dimmer); cursor: default; }
+  footer { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+
+  #toast {
+    position: fixed; right: 16px; bottom: 16px; display: none; align-items: center; gap: 14px;
+    background: linear-gradient(160deg, rgba(47,143,214,.95), rgba(12,45,76,.96));
+    border: 2px solid var(--accent); padding: 14px 16px; box-shadow: 0 0 40px rgba(127,212,255,.35);
+    animation: in .25s ease-out; z-index: 10;
+  }
+  #toast img { width: 48px; height: 48px; image-rendering: pixelated; }
+  @keyframes in { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
+</style>
+
+<header>
+  <span class="px name">xe<span style="color:var(--accent)">R</span><span style="color:#ffcc33">A</span>bora</span>
+  <span class="dimmer" id="ver" style="font-size:15px"></span>
+  <nav>
+    <button class="on" data-tab="live">LIVE</button>
+    <button data-tab="library">LIBRARY</button>
+    <button data-tab="game">GAME</button>
+    <button data-tab="boards">BOARDS</button>
+    <button data-tab="settings">SETTINGS</button>
+  </nav>
+  <span class="right dimmer" id="who"></span>
+</header>
+
+<div class="link">
+  <span class="dot" id="dot"></span>
+  <span id="linktext">waiting for the console</span>
+  <span class="right dimmer" id="linkstats"></span>
+</div>
+
+<main>
+  <div id="tab-live"></div>
+  <div id="tab-library" hidden></div>
+  <div id="tab-game" hidden></div>
+  <div id="tab-boards" hidden></div>
+  <div id="tab-settings" hidden></div>
+</main>
+
+<footer>
+  <span class="chip on">SOFTCORE</span>
+  <span class="chip">FLASH</span>
+  <span class="chip">RUMBLE</span>
+  <span class="right dimmer" id="clock"></span>
+</footer>
+
+<div id="toast">
+  <img id="toastimg" alt="">
+  <div>
+    <div class="px" style="font-size:10px;color:#fff;margin-bottom:8px">ACHIEVEMENT UNLOCKED</div>
+    <div id="toasttext" style="color:#fff"></div>
+  </div>
+</div>
+
+<script>
+const BADGE = 'https://media.retroachievements.org/Badge/';
+const MEDIA = 'https://media.retroachievements.org';
+let tab = 'live', lastUnlock = 0, library = null, libraryAt = 0, libFilter = 'all', gameId = 0, gameCache = {};
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function hms(s) {
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return h + ':' + String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+}
+
+function pct(a, b) { return b ? Math.round(a * 100 / b) : 0; }
+
+/* ---- CONSOLE: what the terminal log always said, on the page ------------ */
+
+/* Snapshots per second, from the frame counter's own movement. */
+let rate = { frames: 0, at: 0, v: 0 };
+function snapRate(frames) {
+  const now = performance.now();
+  if (!rate.at || frames < rate.frames) { rate.frames = frames; rate.at = now; rate.v = 0; }
+  else if (now - rate.at >= 1000) {
+    rate.v = Math.round((frames - rate.frames) * 1000 / (now - rate.at));
+    rate.frames = frames; rate.at = now;
+  }
+  return rate.v;
+}
+
+function framesText(c) {
+  const r = snapRate(c.frames || 0);
+  return c.frames ? c.frames.toLocaleString() + (r ? ' · ' + r + '/s' : '')
+                  : (c.packets || 0).toLocaleString() + ' packets';
+}
+
+function lostText(c) {
+  return (c.gaps || 0) + ' skipped · ' + (c.dupes || 0) + ' rep · ' + (c.torn || 0) + ' torn';
+}
+
+const STATUS = {
+  'active':         ['achievement set active, unlocks are tracked', 1],
+  'no-hash':        ["image not identified &mdash; run 'RA: check game support' in the game's OPL menu", 0],
+  'telemetry-only': ['telemetry only &mdash; no achievement set could be loaded for this image', 0],
+  'stale':          ["console watch list is out of date &mdash; run 'RA: check game support' again", 0]
+};
+
+function consolePanel(s) {
+  const c = s.console;
+  if (!c.connected && !c.packets) return '';
+
+  const st = STATUS[c.status];
+  const w = c.watch || {};
+  const cell = (k, v) => '<div class="cell"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
+
+  return '<h2>CONSOLE</h2>' +
+    (st ? '<div class="row ' + (st[1] ? 'done' : 'na') + '"><div class="body"><div class="t">' +
+          st[0] + '</div></div></div>' : '') +
+    '<div class="stats">' +
+    cell('LINK', c.connected ? esc(c.ip) : '<span class="dimmer">lost</span>') +
+    cell('GAME', esc(s.game.serial) || '&mdash;') +
+    cell('SNAPSHOTS', '<span id="cv-frames">' + framesText(c) + '</span>') +
+    cell('LOST', '<span id="cv-lost">' + lostText(c) + '</span>') +
+    cell('WATCH LIST', w.addresses ? w.addresses + ' addr &middot; ' + w.bytes + ' B &middot; ' + w.parts + ' parts'
+                                   : '&mdash;') +
+    cell('SESSION', '<span id="cv-session">' + (c.seconds ? hms(c.seconds) : '&mdash;') + '</span>') +
+    '</div>' +
+    (s.game.hash ? '<div class="dimmer" style="font-size:16px;margin:-8px 0 14px">hash ' +
+                   esc(s.game.hash) + '</div>' : '');
+}
+
+/* ---- LIVE: the console's own session, straight from rc_client ---------- */
+
+/* Medians for the running game, one fetch per game. The Web API has no
+   played-time; the latest median among earned achievements stands in
+   for the player's position. */
+let liveMeta = { id: 0, byId: null, loading: false };
+
+function loadLiveMeta(id) {
+  if (liveMeta.loading || !id) return;
+  liveMeta.loading = true;
+  fetch('/game?id=' + id).then(r => r.json()).then(g => {
+    const byId = {};
+    for (const a of g.achievements || [])
+      byId[a.id] = { median: a.median || 0, type: a.type || '' };
+    liveMeta = { id, byId, icon: g.icon || '', loading: false };
+    gameCache[id] = g; /* the GAME tab profits from the same fetch */
+    liveSig = '';      /* one re-render, now with the medians in */
+    if (tab === 'live' && lastState) renderLive(lastState);
+  }).catch(() => { liveMeta.loading = false; });
+}
+
+function renderLive(s) {
+  const list = s.game.achievements || [];
+  const done = list.filter(a => a.state === 2).length;
+
+  if (!list.length) {
+    document.getElementById('tab-live').innerHTML =
+      consolePanel(s) +
+      '<div class="muted">' + (s.console.connected
+        ? 'console connected, waiting for a game with achievements'
+        : 'start a game on the console, or browse your library above') + '</div>';
+    return;
+  }
+
+  if (s.game.id && liveMeta.id !== s.game.id)
+    loadLiveMeta(s.game.id);
+  const meta = liveMeta.id === s.game.id ? liveMeta.byId : null;
+
+  /* UP NEXT: locked achievements with medians just past the position,
+     drawn big; below them the ones an average player had by now. */
+  const medOf = a => meta ? ((meta[a.id] || {}).median || 0) : 0;
+  const missed = meta ? possiblyMissed(list, medOf) : new Set();
+
+  let ahead = '';
+  if (meta) {
+    const med = medOf;
+    const position = Math.max(0, ...list.filter(a => a.state === 2).map(med));
+    const picked = upNextPick(list, med);
+    const next = picked.next;
+
+    const bigRow = a => '<div class="row big near">' +
+      '<img src="' + BADGE + a.badge + '_lock.png" alt="">' +
+      '<div class="body"><div class="t">' + esc(a.title) + '</div>' +
+      '<div class="d">' + esc(a.description) + '</div>' +
+      (a.percent > 0 ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + (a.percent * 100) + '%"></i></div>' : '') +
+      '</div><div class="m">' +
+      (a.measured ? '<span style="color:var(--accent)" data-live-m="' + a.id + '">' + esc(a.measured) + '</span>' : '') +
+      (a === picked.prog ? '<div style="color:var(--accent)">next in progression</div>' : '') +
+      (missed.has(a.id) ? '<div style="color:var(--amber)">possibly skipped</div>'
+       : med(a) <= position ? '<div style="color:var(--amber)">usually done by now</div>' : '') +
+      '<div class="dimmer" style="font-size:16px">~' + medianText(med(a)) + typeTag(a) + '</div></div></div>';
+
+    ahead = next.length ? '<h2>UP NEXT &middot; BY MEDIAN UNLOCK TIME</h2>' + next.map(bigRow).join('') : '';
+  }
+
+  const trackers = (s.game.tracking || []).length
+    ? '<h2>TRACKING NOW</h2>' + s.game.tracking.map(t =>
+        '<div class="row near"><div class="body"><div class="t">' + esc(t.title) + '</div></div>' +
+        '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + t.id + '">' +
+        esc(t.value) + '</div></div>'
+      ).join('')
+    : '';
+
+  document.getElementById('tab-live').innerHTML =
+    consolePanel(s) +
+    '<div class="head">' +
+    (meta && liveMeta.icon ? '<img src="' + MEDIA + liveMeta.icon + '" alt="">' : '') +
+    '<div style="flex:1">' +
+    '<h1>' + esc(s.game.title || s.game.serial) + '</h1>' +
+    '<div class="bar"><i style="width:' + pct(done, list.length) + '%"></i></div>' +
+    '<div style="display:flex;margin-top:8px"><span class="muted">' + esc(s.game.serial) + '</span>' +
+    '<span class="right">' + done + ' / ' + list.length + '</span></div></div></div>' +
+    ahead + trackers +
+    ((ahead || trackers) ? '<h2>ALL ACHIEVEMENTS</h2>' : '') +
+    list.map(a => {
+      const isDone = a.state === 2;
+      const near = !isDone && a.percent > 0;
+      /* state 3 means rc_client disabled it: on hardware that is a
+         pointer read the console cannot follow. */
+      const na = a.state === 3;
+      return '<div class="row' + (isDone ? ' done' : na ? ' na' : near ? ' near' : '') + '">' +
+        '<img src="' + BADGE + a.badge + (isDone ? '' : '_lock') + '.png" alt="">' +
+        '<div class="body"><div class="t">' + esc(a.title) + '</div>' +
+        '<div class="d">' + esc(a.description) + '</div>' +
+        (near ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + (a.percent * 100) + '%"></i></div>' : '') +
+        '</div><div class="m">' +
+        (isDone ? '<span style="color:var(--green)">unlocked</span>'
+         : na ? '<span style="color:var(--amber)">not on hardware</span>'
+         : a.measured ? '<span style="color:var(--accent)" data-live-m="' + a.id + '">' + esc(a.measured) + '</span>'
+         : '<span class="dimmer">locked</span>') +
+        '<div class="dimmer" style="font-size:16px">' + a.points + ' pts' + typeTag(a) +
+        (missed.has(a.id) ? ' &middot; <span style="color:var(--amber)">possibly skipped</span>' : '') +
+        '</div></div></div>';
+    }).join('');
+}
+
+/* ---- LIBRARY: every system, from the Web API --------------------------- */
+
+let libConsoles = new Set(); /* empty = every console */
+let libConsolesOpen = false;
+
+/* HighestAwardKind: mastered/completed are the hardcore and softcore
+   full clears, beaten comes in the same two flavours. */
+function awardBadge(g) {
+  const a = g.award || '';
+  if (a === 'mastered') return '<span class="award gold">MASTERED</span>';
+  if (a === 'completed') return '<span class="award green">COMPLETED · SC</span>';
+  if (a === 'beaten-hardcore') return '<span class="award blue">BEATEN</span>';
+  if (a === 'beaten-softcore') return '<span class="award blue">BEATEN · SC</span>';
+  return '';
+}
+
+async function renderLibrary() {
+  const el = document.getElementById('tab-library');
+
+  /* Two minutes, the same as the client's own cache of the Web API. */
+  if (!library || Date.now() - libraryAt > 120000) {
+    if (!library) el.innerHTML = '<div class="muted">loading your library...</div>';
+    try {
+      library = (await (await fetch('/library')).json()).games || [];
+      libraryAt = Date.now();
+    } catch (e) {
+      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      return;
+    }
+  }
+
+  const isMastered = g => g.mastered || (g.total > 0 && g.awarded >= g.total);
+  const shown = library.filter(g => {
+    const okStatus =
+      libFilter === 'all' ? true :
+      libFilter === 'new' ? g.awarded === 0 :
+      libFilter === 'progress' ? g.awarded > 0 && g.awarded < g.total && !(g.award || '').startsWith('beaten') :
+      libFilter === 'beaten' ? (g.award || '').startsWith('beaten') :
+      isMastered(g);
+    return okStatus && (libConsoles.size === 0 || libConsoles.has(g.console));
+  });
+
+  /* Consoles fold behind one chip; several can be on at once, none
+     on means all. */
+  const perConsole = {};
+  for (const g of library) perConsole[g.console] = (perConsole[g.console] || 0) + 1;
+  const consoles = Object.keys(perConsole).sort();
+  const conLabel = libConsoles.size === 0 ? 'ALL CONSOLES'
+                                          : libConsoles.size + ' CONSOLE' + (libConsoles.size > 1 ? 'S' : '');
+
+  el.innerHTML =
+    '<div class="filters">' +
+    [['all', 'ALL ' + library.length], ['new', 'NOT STARTED'], ['progress', 'IN PROGRESS'],
+     ['beaten', 'BEATEN'], ['mastered', 'MASTERED']]
+      .map(([k, t]) => '<span class="chip' + (libFilter === k ? ' on' : '') +
+                       '" data-filter="' + k + '">' + t + '</span>').join('') +
+    '<span class="chip' + (libConsoles.size ? ' on' : '') + '" data-consoles-toggle="1">' +
+    conLabel + ' ' + (libConsolesOpen ? '&#9652;' : '&#9662;') + '</span>' +
+    '</div>' +
+    (libConsolesOpen
+      ? '<div class="filters">' +
+        consoles.map(c => '<span class="chip' + (libConsoles.has(c) ? ' on' : '') +
+                          '" data-console="' + esc(c) + '">' + esc(c).toUpperCase() +
+                          ' <span class="dimmer">' + perConsole[c] + '</span></span>').join('') +
+        '</div>'
+      : '') +
+    '<div class="grid">' +
+    shown.map(g =>
+      '<div class="card" data-game="' + g.id + '">' +
+      '<div class="art">' +
+      (g.icon ? '<img src="' + MEDIA + esc(g.icon) + '" loading="lazy" onerror="this.remove()" alt="">' : '') +
+      '</div>' +
+      '<div class="meta"><div class="name">' + esc(g.title) + '</div>' +
+      '<div class="bar" style="height:8px"><i style="width:' + pct(g.awarded, g.total) + '%"></i></div>' +
+      '<div style="display:flex;margin-top:6px;font-size:16px;align-items:center;gap:6px">' +
+      '<span class="muted">' + g.awarded + ' / ' + g.total +
+      (g.hardcore > 0 && g.hardcore < g.awarded ? ' <span class="dimmer">(' + g.hardcore + ' hc)</span>' : '') +
+      '</span>' +
+      '<span class="right">' + (awardBadge(g) ||
+        '<span class="dimmer">' + esc(g.console) + '</span>') + '</span></div></div></div>').join('') +
+    '</div>' +
+    (shown.length ? '' : '<div class="muted">nothing matches these filters</div>');
+}
+
+/* ---- GAME: one set in full, from the Web API --------------------------- */
+
+/* The three orders CLIENT.md records: the author's order, the intended
+   path (progression, then win condition, missables last), and the
+   median unlock time -- the order players take the set in. */
+let gameSort = 'author', gameFilter = 'all';
+
+/* Missables sort last: the path reads "do these in order, and mind
+   the ones you can lose", per CLIENT.md. Untyped rows sit between. */
+const TYPE_RANK = { progression: 0, win_condition: 1, missable: 3 };
+
+/* The Web API hands type as a string, the live state as rc_client's
+   number; both normalize to the lowercase string or ''. */
+const TYPE_NAMES = ['', 'missable', 'progression', 'win_condition'];
+
+function achType(a) {
+  return typeof a.type === 'number' ? (TYPE_NAMES[a.type] || '')
+                                    : (a.type || '').toLowerCase();
+}
+
+/* UP NEXT picker: the nearest locked achievements by median time, but
+   the next progression/win achievement always holds a slot - optional
+   unlocks running ahead of the story must not push it off the list. */
+function upNextPick(list, med) {
+  const byMed = (x, y) => med(x) - med(y);
+  const locked = list.filter(a => a.state === 1 && med(a) > 0);
+  const spine = locked.filter(a =>
+    achType(a) === 'progression' || achType(a) === 'win_condition').sort(byMed);
+  const next = locked.sort(byMed).slice(0, 4);
+
+  if (spine.length && !next.includes(spine[0])) {
+    next[next.length - 1] = spine[0];
+    next.sort(byMed);
+  }
+  return { next, prog: spine.length ? spine[0] : null };
+}
+
+/* A locked missable whose median sits before a story point the player
+   has already cleared was probably lost on the way. */
+function possiblyMissed(list, med) {
+  const passed = Math.max(0, ...list.filter(a => a.state === 2 &&
+    (achType(a) === 'progression' || achType(a) === 'win_condition')).map(med));
+  const out = new Set();
+
+  for (const a of list)
+    if (a.state === 1 && achType(a) === 'missable' && med(a) > 0 && med(a) <= passed)
+      out.add(a.id);
+  return out;
+}
+
+function typeTag(a) {
+  const t = achType(a);
+  return t ? ' &middot; <span' + (t === 'missable' ? ' style="color:var(--amber)"' : '') +
+             '>' + esc(t.replace('_', ' ')) + '</span>'
+           : '';
+}
+
+function medianText(s) {
+  return Math.floor(s / 3600) + 'h' + String(Math.floor(s % 3600 / 60)).padStart(2, '0');
+}
+
+function sortAchievements(list) {
+  const byAuthor = (a, b) => a.order - b.order;
+
+  if (gameSort === 'median')
+    /* Never-unlocked-by-anyone (median 0) goes to the end. */
+    return list.sort((a, b) =>
+      (a.median > 0 ? a.median : Infinity) - (b.median > 0 ? b.median : Infinity) || byAuthor(a, b));
+  if (gameSort === 'type')
+    return list.sort((a, b) =>
+      (TYPE_RANK[achType(a)] ?? 2) - (TYPE_RANK[achType(b)] ?? 2) || byAuthor(a, b));
+  return list.sort(byAuthor);
+}
+
+async function renderGame() {
+  const el = document.getElementById('tab-game');
+
+  if (!gameId) {
+    el.innerHTML = '<div class="muted">pick a game in the library</div>';
+    return;
+  }
+
+  if (!gameCache[gameId]) {
+    el.innerHTML = '<div class="muted">loading...</div>';
+    try {
+      gameCache[gameId] = await (await fetch('/game?id=' + gameId)).json();
+    } catch (e) {
+      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      return;
+    }
+  }
+
+  const g = gameCache[gameId];
+  const list = sortAchievements((g.achievements || []).filter(a =>
+    gameFilter === 'all' ? true :
+    gameFilter === 'locked' ? !a.earned :
+    gameFilter === 'unlocked' ? !!a.earned :
+    achType(a) === gameFilter));
+
+  const chips = (pairs, cur, attr) => '<div class="filters">' +
+    pairs.map(([k, t]) => '<span class="chip' + (cur === k ? ' on' : '') +
+                          '" ' + attr + '="' + k + '">' + t + '</span>').join('') + '</div>';
+
+  /* Time cost of the set: beaten = latest median on the intended
+     path, full = latest median of all. */
+  const meds = (g.achievements || []).filter(a => a.median > 0);
+  const est = rows => rows.length ? Math.max(...rows.map(a => a.median)) : 0;
+  const estBeaten = est(meds.filter(a => achType(a) === 'progression' || achType(a) === 'win_condition'));
+  const estFull = est(meds);
+
+  el.innerHTML =
+    '<div class="head">' +
+    (g.icon ? '<img src="' + MEDIA + g.icon + '" alt="">' : '') +
+    '<div style="flex:1"><h1>' + esc(g.title) + '</h1>' +
+    '<div class="muted" style="margin-bottom:10px">' + esc(g.console) + ' &middot; ' +
+    (g.achievements || []).length + ' achievements' +
+    (estFull ? ' &middot; <span style="color:var(--accent)">' +
+               (estBeaten ? 'beaten ~' + medianText(estBeaten) + ' &middot; ' : '') +
+               'full set ~' + medianText(estFull) + '</span>' +
+               ' <span class="dimmer">by median unlocks</span>' : '') +
+    '</div>' +
+    '<div class="bar"><i style="width:' + pct(g.awarded, g.total) + '%"></i></div>' +
+    '<div style="display:flex;margin-top:8px"><span class="muted">' +
+    '<a href="https://retroachievements.org/game/' + g.id + '" target="_blank">on retroachievements.org</a>' +
+    '</span><span class="right">' + g.awarded + ' / ' + g.total + '</span></div></div></div>' +
+    chips([['all', 'ALL'], ['locked', 'LOCKED'], ['unlocked', 'UNLOCKED'],
+           ['missable', 'MISSABLE'], ['progression', 'PROGRESSION'],
+           ['win_condition', 'WIN CONDITION']], gameFilter, 'data-gfilter') +
+    chips([['author', 'AUTHOR ORDER'], ['type', 'PROGRESSION PATH'],
+           ['median', 'MEDIAN TIME']], gameSort, 'data-gsort') +
+    list.map(a => {
+      const done = !!a.earned;
+      return '<div class="row' + (done ? ' done' : '') + '">' +
+        '<img src="' + BADGE + a.badge + (done ? '' : '_lock') + '.png" alt="">' +
+        '<div class="body"><div class="t">' + esc(a.title) + '</div>' +
+        '<div class="d">' + esc(a.description) + '</div></div>' +
+        '<div class="m">' +
+        (done ? '<span style="color:var(--green)">' + esc(a.earned.slice(0, 10)) + '</span>'
+              : '<span class="dimmer">locked</span>') +
+        '<div class="dimmer" style="font-size:16px">' + a.points + ' pts' +
+        typeTag(a) +
+        (a.median > 0 ? ' &middot; ~' + medianText(a.median) : '') + '</div></div></div>';
+    }).join('');
+}
+
+/* ---- BOARDS: leaderboards, with the live tracker on top ---------------- */
+
+let boardsCache = {}, tracking = [], openBoards = new Set();
+
+async function renderBoards() {
+  const el = document.getElementById('tab-boards');
+  const id = gameId || 0;
+
+  if (!id) {
+    el.innerHTML = '<div class="muted">pick a game in the library</div>';
+    return;
+  }
+
+  if (!boardsCache[id]) {
+    el.innerHTML = '<div class="muted">loading...</div>';
+    try {
+      boardsCache[id] = (await (await fetch('/boards?id=' + id)).json()).boards || [];
+    } catch (e) {
+      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      return;
+    }
+  }
+
+  const boards = boardsCache[id];
+
+  el.innerHTML =
+    (tracking.length
+      ? '<h2>TRACKING NOW &middot; FROM CONSOLE MEMORY</h2>' +
+        tracking.map(t =>
+          '<div class="row near"><div class="body"><div class="t">' + esc(t.title) + '</div></div>' +
+          '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + t.id + '">' +
+          esc(t.value) + '</div></div>'
+        ).join('')
+      : '') +
+    '<h2>' + boards.length + ' LEADERBOARDS &middot; CLICK ONE TO EXPAND</h2>' +
+    boards.map(b => {
+      /* Closed row: one line, name and record. The click opens the
+         description and the record holder. */
+      const open = openBoards.has(b.id);
+      return '<div class="row clickable' + (open ? ' near' : '') + '" data-board="' + b.id + '">' +
+        '<div class="body"><div class="t">' + (open ? '&#9662; ' : '&#9656; ') + esc(b.title) + '</div>' +
+        (open ? '<div class="d">' + esc(b.description) + '</div>' : '') +
+        '</div><div class="m">' +
+        (b.topScore ? '<span style="color:var(--accent)">' + esc(b.topScore) + '</span>' +
+                      (open ? '<div class="dimmer" style="font-size:16px">' + esc(b.topUser) + '</div>' : '')
+                    : '<span class="dimmer">no entries</span>') +
+        '</div></div>';
+    }).join('');
+}
+
+/* ---- SETTINGS: both credentials live here, not in a terminal ----------- */
+
+let lastState = null;
+
+async function postForm(url, data) {
+  const r = await fetch(url, { method: 'POST', body: new URLSearchParams(data) });
+  return r.json();
+}
+
+/* Rendered on demand, never from the live stream: a push that redrew
+   this tab would wipe whatever is being typed into it. */
+function renderSettings() {
+  const li = (lastState && lastState.login) || { ok: false, user: '', webapi: false };
+
+  document.getElementById('tab-settings').innerHTML =
+    '<div class="set">' +
+    '<h2>RETROACHIEVEMENTS ACCOUNT</h2>' +
+    (li.ok
+      ? '<div>signed in as <span style="color:var(--green)">' + esc(li.user) + '</span></div>' +
+        '<div class="note">unlocks from the console are credited to this account</div>' +
+        '<button class="act" id="btn-logout">SIGN OUT</button>'
+      : '<div class="note">the account your unlocks are credited to; only a login token is stored</div>' +
+        '<form id="form-login">' +
+        '<label>username</label><input class="f" name="user" autocomplete="username">' +
+        '<label>password</label><input class="f" name="password" type="password" autocomplete="current-password">' +
+        '<button class="act">SIGN IN</button></form>') +
+    '<div class="msg" id="login-msg"></div>' +
+
+    '<h2 style="margin-top:26px">WEB API KEY</h2>' +
+    '<div class="note">a read-only key that fills the library, leaderboards and profile. ' +
+    'Get it at <a href="https://retroachievements.org/settings" target="_blank">retroachievements.org/settings</a>, ' +
+    'section "Keys", and paste it here.</div>' +
+    '<form id="form-apikey">' +
+    '<label>key ' + (li.webapi ? '<span style="color:var(--green)">(saved, paste to replace)</span>' : '') +
+    '</label><input class="f" name="key" autocomplete="off">' +
+    '<button class="act">SAVE KEY</button></form>' +
+    '<div class="msg" id="apikey-msg"></div>' +
+
+    '<h2 style="margin-top:26px">CLIENT</h2>' +
+    '<div class="note">the client has no window of its own: closing this tab leaves it ' +
+    'running and unlocking. This button is how it exits.</div>' +
+    '<button class="act" id="btn-quit">QUIT XERABORA</button>' +
+    '</div>';
+
+  const msg = (id, text, good) => {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.style.color = good ? 'var(--green)' : 'var(--amber)';
+  };
+
+  const loginForm = document.getElementById('form-login');
+  if (loginForm) loginForm.onsubmit = async e => {
+    e.preventDefault();
+    const btn = loginForm.querySelector('button');
+    btn.disabled = true;
+    msg('login-msg', 'signing in...', true);
+    try {
+      const r = await postForm('/login', {
+        user: loginForm.user.value.trim(), password: loginForm.password.value });
+      if (r.ok) {
+        lastState = await (await fetch('/state', { cache: 'no-store' })).json();
+        renderSettings();
+        apply(lastState);
+      } else { msg('login-msg', r.error || 'failed', false); btn.disabled = false; }
+    } catch (err) { msg('login-msg', 'could not reach the client', false); btn.disabled = false; }
+  };
+
+  const quitBtn = document.getElementById('btn-quit');
+  if (quitBtn) quitBtn.onclick = async () => {
+    if (!confirm('Quit xerabora? Console telemetry and unlocks stop.')) return;
+    try { await postForm('/quit', {}); } catch (err) {}
+    document.body.innerHTML =
+      '<div class="muted" style="padding:60px;text-align:center;font-size:20px">' +
+      'xerabora is closed. This tab can be closed too.</div>';
+  };
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) logoutBtn.onclick = async () => {
+    try { await postForm('/logout', {}); } catch (err) {}
+    if (lastState) lastState.login = { ok: false, user: '', webapi: li.webapi };
+    renderSettings();
+  };
+
+  const keyForm = document.getElementById('form-apikey');
+  keyForm.onsubmit = async e => {
+    e.preventDefault();
+    const btn = keyForm.querySelector('button');
+    btn.disabled = true;
+    msg('apikey-msg', 'saving...', true);
+    try {
+      const r = await postForm('/apikey', { key: keyForm.key.value.trim() });
+      if (r.ok) {
+        if (lastState && lastState.login) lastState.login.webapi = true;
+        library = null;      /* refetched with the new key */
+        loadProfile();
+        renderSettings();
+        msg('apikey-msg', 'saved', true);
+      } else { msg('apikey-msg', r.error || 'failed', false); btn.disabled = false; }
+    } catch (err) { msg('apikey-msg', 'could not reach the client', false); btn.disabled = false; }
+  };
+}
+
+/* ---- Wiring ------------------------------------------------------------ */
+
+function show(name) {
+  tab = name;
+  for (const t of ['live', 'library', 'game', 'boards', 'settings'])
+    document.getElementById('tab-' + t).hidden = t !== name;
+  for (const b of document.querySelectorAll('nav button'))
+    b.classList.toggle('on', b.dataset.tab === name);
+  if (name === 'library') renderLibrary();
+  if (name === 'game') renderGame();
+  if (name === 'boards') renderBoards();
+  if (name === 'settings') renderSettings();
+}
+
+document.addEventListener('click', e => {
+  const nav = e.target.closest('nav button');
+  if (nav) return show(nav.dataset.tab);
+
+  const chip = e.target.closest('[data-filter]');
+  if (chip) { libFilter = chip.dataset.filter; return renderLibrary(); }
+
+  const ct = e.target.closest('[data-consoles-toggle]');
+  if (ct) { libConsolesOpen = !libConsolesOpen; return renderLibrary(); }
+
+  const con = e.target.closest('[data-console]');
+  if (con) {
+    const c = con.dataset.console;
+    libConsoles.has(c) ? libConsoles.delete(c) : libConsoles.add(c);
+    return renderLibrary();
+  }
+
+  const bd = e.target.closest('[data-board]');
+  if (bd) {
+    const id = +bd.dataset.board;
+    openBoards.has(id) ? openBoards.delete(id) : openBoards.add(id);
+    return renderBoards();
+  }
+
+  const gf = e.target.closest('[data-gfilter]');
+  if (gf) { gameFilter = gf.dataset.gfilter; return renderGame(); }
+
+  const gs = e.target.closest('[data-gsort]');
+  if (gs) { gameSort = gs.dataset.gsort; return renderGame(); }
+
+  const card = e.target.closest('[data-game]');
+  if (card) { gameId = +card.dataset.game; return show('game'); }
+});
+
+/* The live feed. The client pushes a state whenever a snapshot lands,
+   so the numbers move at the game's rate rather than a poll timer's.
+   The browser reconnects on its own if the client restarts; the poll
+   below stays as the fallback for whatever is not pushed. */
+function stream() {
+  const es = new EventSource('/events');
+  es.onmessage = e => {
+    try {
+      const d = JSON.parse(e.data);
+      if (d.delta) applyDelta(d); else apply(d);
+    } catch (err) {}
+  };
+}
+
+function setVals(sel, txt) {
+  for (const el of document.querySelectorAll(sel)) el.textContent = txt;
+}
+
+/* The numbers that move every frame, poured into the existing layout:
+   the DOM stays put, so CSS transitions play instead of being
+   torn down sixty times a second. */
+function updateLiveNumbers(c, live, trk) {
+  if (c) {
+    const fr = document.getElementById('cv-frames');
+    if (fr) fr.textContent = framesText(c);
+    const lo = document.getElementById('cv-lost');
+    if (lo) lo.textContent = lostText(c);
+    const se = document.getElementById('cv-session');
+    if (se) se.textContent = c.seconds ? hms(c.seconds) : '-';
+    document.getElementById('linkstats').textContent =
+      c.frames ? c.frames.toLocaleString() + ' snapshots, ' + (c.gaps || 0) + ' skipped'
+      : c.packets ? c.packets.toLocaleString() + ' packets' : '';
+    document.getElementById('clock').textContent = c.seconds ? hms(c.seconds) : '';
+  }
+  for (const a of live || []) {
+    if (a.m) setVals('[data-live-m="' + a.id + '"]', a.m);
+    for (const el of document.querySelectorAll('[data-live-p="' + a.id + '"]'))
+      el.style.width = (a.p * 100) + '%';
+  }
+  for (const t of trk || []) setVals('[data-tr="' + t.id + '"]', t.v);
+}
+
+function applyDelta(d) {
+  updateLiveNumbers(d.console, d.live, d.tracking);
+}
+
+/* A full state redraws a tab only when its structure changed: a new
+   game, an unlock, a tracker appearing. Otherwise the numbers are
+   updated in place, same as a delta. */
+let liveSig = '', boardsSig = '';
+
+function apply(s) {
+    const c = s.console;
+
+    lastState = s;
+    if (s.version) document.getElementById('ver').textContent = 'v' + s.version;
+    const li = s.login || { ok: true };
+    document.getElementById('dot').className = 'dot' + (c.connected ? ' on' : '');
+    document.getElementById('linktext').innerHTML =
+      !li.ok ? '<span style="color:var(--amber)">not signed in to RetroAchievements &mdash; ' +
+               'open SETTINGS to sign in</span>'
+      : c.connected ? 'console live at ' + esc(c.ip) : 'waiting for the console';
+
+    tracking = s.game.tracking || [];
+    const list = s.game.achievements || [];
+
+    if (tab === 'live') {
+      const sig = [s.game.serial, c.connected, c.status || '', s.game.title || '',
+                   (c.watch && c.watch.addresses) || 0,
+                   list.map(a => a.id + ':' + a.state).join(','),
+                   tracking.map(t => t.id).join(',')].join('|');
+      if (sig !== liveSig) { liveSig = sig; renderLive(s); }
+    }
+    if (tab === 'boards' && tracking.length) {
+      const bsig = tracking.map(t => t.id).join(',');
+      if (bsig !== boardsSig) { boardsSig = bsig; renderBoards(); }
+    }
+    updateLiveNumbers(c,
+      list.map(a => ({ id: a.id, m: a.measured, p: a.percent })),
+      tracking.map(t => ({ id: t.id, v: t.value })));
+
+    const u = s.unlocks && s.unlocks[0];
+    if (u && u.id !== lastUnlock && u.ago < 12) {
+      lastUnlock = u.id;
+      delete gameCache[s.game.id];
+      if (tab === 'game' && gameId === s.game.id) renderGame();
+      /* The shelf changed too; give the server a moment to record it. */
+      library = null;
+      if (tab === 'library') setTimeout(renderLibrary, 3000);
+      const t = document.getElementById('toast');
+      document.getElementById('toastimg').src = BADGE + (u.badge || '') + '.png';
+      document.getElementById('toasttext').textContent = u.title + '  +' + u.points + ' pts';
+      t.style.display = 'flex';
+      setTimeout(() => { t.style.display = 'none'; }, 6000);
+    }
+}
+
+async function tick() {
+  try {
+    apply(await (await fetch('/state', { cache: 'no-store' })).json());
+  } catch (e) { /* the client went away; keep trying */ }
+  setTimeout(tick, 2000);
+}
+
+function loadProfile() {
+  fetch('/profile').then(r => r.json()).then(p => {
+    document.getElementById('who').textContent =
+      p.user ? p.user + ' · ' + p.points.toLocaleString() + ' points' : 'no Web API key, see SETTINGS';
+  }).catch(() => {});
+}
+
+loadProfile();
+show('live');
+stream();
+tick();
+</script>

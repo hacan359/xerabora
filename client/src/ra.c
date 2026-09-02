@@ -4,10 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "console.h"
+#include "rc_client_internal.h"
 #include "http.h"
 #include "log.h"
 #include "platform.h"
 #include "sound.h"
+#include "webui.h"
 #include "version.h"
 #include "watchlist.h"
 
@@ -69,15 +72,34 @@ static void on_event(const rc_client_event_t *event, rc_client_t *client)
 
     switch (event->type) {
         case RC_CLIENT_EVENT_ACHIEVEMENT_TRIGGERED:
+            if (event->achievement->id >= WEBUI_WARNING_ACH_ID) {
+                log_warn("%s: %s", event->achievement->title,
+                         event->achievement->description);
+                break;
+            }
             log_info("");
             log_info("Achievement unlocked: %s (%u points)",
                      event->achievement->title, event->achievement->points);
             log_info("    %s", event->achievement->description);
             log_info("");
             sound_play(SOUND_ACHIEVEMENT);
+            console_notify_unlock(event->achievement->id, event->achievement->points);
+            webui_note_unlock(event->achievement->id, event->achievement->title,
+                              event->achievement->badge_name, event->achievement->points);
+            webui_write_obs(client);
             break;
         case RC_CLIENT_EVENT_GAME_COMPLETED:
             log_info("All achievements of this game unlocked");
+            break;
+        case RC_CLIENT_EVENT_LEADERBOARD_STARTED:
+            log_info("leaderboard attempt: %s", event->leaderboard->title);
+            break;
+        case RC_CLIENT_EVENT_LEADERBOARD_FAILED:
+            log_info("leaderboard attempt dropped: %s", event->leaderboard->title);
+            break;
+        case RC_CLIENT_EVENT_LEADERBOARD_SUBMITTED:
+            log_info("leaderboard result %s: %s (softcore, not posted to the site)",
+                     event->leaderboard->tracker_value, event->leaderboard->title);
             break;
         case RC_CLIENT_EVENT_SERVER_ERROR:
             log_error("server: %s", event->server_error->error_message);
@@ -117,6 +139,10 @@ rc_client_t *ra_create(void)
     /* Softcore. The console side can write to game memory (cheat
        engine), so claiming hardcore would be dishonest. */
     rc_client_set_hardcore_enabled(client, 0);
+    /* Softcore normally deactivates leaderboards. Keep them running for
+       the live trackers; rc_client still refuses to submit entries in
+       softcore, so nothing reaches the site. No public setter in v12.4. */
+    client->state.allow_leaderboards_in_softcore = 1;
 
     rc_client_set_event_handler(client, on_event);
     if (log_trace_enabled())

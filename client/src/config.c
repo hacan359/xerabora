@@ -70,6 +70,55 @@ int config_save_credentials(const char *user, const char *token)
     return 0;
 }
 
+static int config_apikey_path(char *out, size_t size)
+{
+    char dir[512];
+
+    if (platform_config_dir(dir, sizeof(dir)) != 0)
+        return -1;
+    snprintf(out, size, "%s" SEP "apikey", dir);
+    return 0;
+}
+
+int config_load_apikey(char *key, size_t size)
+{
+    char path[600];
+    FILE *f;
+
+    if (config_apikey_path(path, sizeof(path)) != 0)
+        return 0;
+    f = fopen(path, "r");
+    if (f == NULL)
+        return 0;
+    if (fgets(key, (int)size, f) == NULL) {
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+    key[strcspn(key, "\r\n")] = '\0';
+    return key[0] != '\0';
+}
+
+int config_save_apikey(const char *key)
+{
+    char path[600];
+    FILE *f;
+
+    if (key == NULL || key[0] == '\0')
+        return -1;
+    if (config_apikey_path(path, sizeof(path)) != 0)
+        return -1;
+    f = fopen(path, "w");
+    if (f == NULL)
+        return -1;
+    fprintf(f, "%s\n", key);
+    fclose(f);
+#ifndef _WIN32
+    chmod(path, 0600);
+#endif
+    return 0;
+}
+
 int config_games_path(char *out, size_t size)
 {
     char dir[512];

@@ -55,6 +55,19 @@ void platform_console_init(void)
 #endif
 }
 
+void platform_attach_console(int force)
+{
+#ifdef _WIN32
+    if (AttachConsole(ATTACH_PARENT_PROCESS) || (force && AllocConsole())) {
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+        freopen("CONIN$", "r", stdin);
+    }
+#else
+    (void)force;
+#endif
+}
+
 int platform_net_init(void)
 {
 #ifdef _WIN32
@@ -176,6 +189,37 @@ int platform_wait_readable(sock_t sock, int timeout_ms)
     if (r < 0)
         return -1;
     return r > 0 ? 1 : 0;
+}
+
+int platform_wait_readable2(sock_t a, sock_t b, int timeout_ms)
+{
+    fd_set set;
+    struct timeval tv;
+    sock_t high = a;
+    int r, mask = 0;
+
+    FD_ZERO(&set);
+    if (a != SOCK_INVALID)
+        FD_SET(a, &set);
+    if (b != SOCK_INVALID) {
+        FD_SET(b, &set);
+        if (b > high)
+            high = b;
+    }
+
+    tv.tv_sec = timeout_ms / 1000;
+    tv.tv_usec = (timeout_ms % 1000) * 1000;
+    r = select((int)high + 1, &set, NULL, NULL, &tv);
+    if (r < 0)
+        return -1;
+    if (r == 0)
+        return 0;
+
+    if (a != SOCK_INVALID && FD_ISSET(a, &set))
+        mask |= 1;
+    if (b != SOCK_INVALID && FD_ISSET(b, &set))
+        mask |= 2;
+    return mask;
 }
 
 const char *platform_sock_error(void)

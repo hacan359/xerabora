@@ -40,8 +40,18 @@
 #include "ra_watch.h"
 
 #define XERABORA_DEFAULT_PORT 18194
+
+/* The interface page, on loopback only. Away from the console ports so
+   a browser reload can never look like a console talking. */
+#define XERABORA_UI_PORT 18280
 #define XERABORA_CHUNK 896
 #define XERABORA_REPLY_ALIGN 64
 #define XERABORA_REPLY_MIN 128
+
+/* The unlock badge pushed to the console: 64x64 PSMCT16 pixels, 8 KB,
+   in "RAB1 <idx> <total> " datagrams of 512 raw bytes each. */
+#define XERABORA_BADGE_BYTES 8192
+#define XERABORA_BADGE_CHUNK 512
+#define XERABORA_BADGE_CHUNKS (XERABORA_BADGE_BYTES / XERABORA_BADGE_CHUNK)
 
 #endif

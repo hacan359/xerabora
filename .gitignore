@@ -23,3 +23,7 @@ client/xerabora.exe
 
 # Build outputs copied to the repo root by local builds
 /*.ELF
+
+# raylib for the window build: fetched and built by tools/build-raylib.sh
+third_party/raylib-src/
+third_party/raylib-build/

@@ -24,4 +24,14 @@ const char *console_hash_for(const char *serial);
 int console_serve(sock_t sock, const char *pkt, size_t len,
                   const struct sockaddr_in *from, rc_client_t *client);
 
+/* Tell the console an achievement unlocked, so it can show a notice over
+   the game. Goes to the address discovery recorded; returns 0 when no
+   console has been discovered yet. */
+int console_notify_unlock(unsigned id, unsigned points);
+int console_send_badge_chunk(const unsigned char *px, int idx);
+
+/* Any packet from the console names its address: a client started while
+   the game already runs sees no discovery, only telemetry. */
+void console_learn(sock_t sock, const struct sockaddr_in *from);
+
 #endif

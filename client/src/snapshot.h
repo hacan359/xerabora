@@ -16,6 +16,8 @@ struct snapshot_stats
     unsigned int parts;     /* parts per snapshot, from the last packet */
     unsigned int bytes;     /* value bytes in the last complete snapshot */
     unsigned int count;     /* watch list entries reported by the console */
+    unsigned int rxq;       /* console's receive FIFO depth, last packet */
+    unsigned int rxq_max;   /* and the highest seen this session */
 };
 
 /* Extracts the game serial from a packet header. Returns 1 on success. */

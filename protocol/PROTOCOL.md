@@ -99,6 +99,37 @@ in a trailer word placed after the values. A reader takes `seq` from the
 header, copies the values, then checks the trailer against the header; a
 mismatch means the snapshot changed mid-copy and is dropped.
 
+## Unlock notice
+
+    PC -> console   RAU1 <achievement-id> <points>
+
+Sent when rcheevos unlocks an achievement, to the address the console
+gave in `RAP1`. It is the one message the client sends unprompted, so
+the console must keep listening on that port after discovery. What the
+console does with it is its own business -- the reference PS2 agent
+shows a brief notice over the game. It may arrive more than once for the
+same unlock; the console should show one notice per message it acts on
+and may ignore repeats within a second. A console that does not
+implement notices ignores it.
+
+    console -> PC   RAK1 <seq> <detail...>
+
+Optional acknowledgement, sent back to the datagram's source. `seq`
+counts the notices the console has acted on; what follows is agent
+specific and meant for a log (the PS2 agent reports the address of its
+EE-side buffer and the SIF DMA result). The client logs the line.
+
+    console -> PC   RAH1 <datagrams> <notices> <chunks> <mask> <done>
+
+Optional heartbeat, every ten seconds, with what the agent's receive
+side has seen since the game started. The client logs it; no heartbeat
+means the agent's send path is down, zero datagrams while the client is
+sending means nothing reaches the agent.
+
+`RAB1` and `RAK2` (a badge picture pushed to the console) exist in the
+reference agent and client as an experiment, off by default, and are
+not part of the protocol yet.
+
 ## What an agent must do
 
 1. Answer `RAP1` with `RAO1`.
@@ -107,6 +138,7 @@ mismatch means the snapshot changed mid-copy and is dropped.
 3. Fetch the watch list with `RAG1` and keep it.
 4. Every frame, read the listed addresses and stream them as `RA15`
    snapshots in watch-list order.
+5. Optionally, keep the discovery port open and act on `RAU1`.
 
 The hash must match what RetroAchievements expects for that console. The
 memory addresses and the hashing scheme are the only console-specific

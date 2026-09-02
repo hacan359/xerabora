@@ -48,22 +48,51 @@ RC_SRC := \
 	$(RC)/src/rc_util.c \
 	$(RC)/src/rc_version.c
 
-SRC := src/main.c src/config.c src/console.c src/log.c src/platform.c \
-       src/ra.c src/snapshot.c src/sound.c src/sounds_data.c src/watchlist.c
+SRC := src/main.c src/badge_data.c src/config.c src/console.c src/discord.c src/log.c \
+       src/platform.c src/ra.c src/raweb.c src/snapshot.c src/sound.c src/sounds_data.c \
+       src/ui_page.c src/watchlist.c src/webui.c
 
 all: xerabora
 
 xerabora: $(SRC) src/http_curl.c $(RC_SRC) $(HDRS)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^) -lcurl -lm
 
+# ---- The window build ---------------------------------------------------
+# raylib is not vendored: tools/build-raylib.sh fetches a pinned release
+# and leaves a static library in third_party/raylib-build/<target>/.
+# Both window targets link that. Without it, the plain targets above
+# still build the terminal client, which is the one the hardware work
+# uses.
+RAYLIB_WIN := ../third_party/raylib-build/windows
+RAYLIB_LIN := ../third_party/raylib-build/linux
+
+GUI_SRC := $(SRC) src/ui.c
+
+windows-gui: $(GUI_SRC) src/http_winhttp.c $(RC_SRC) $(HDRS)
+	$(WINCC) $(CFLAGS) -DXERABORA_GUI -I$(RAYLIB_WIN) -D_WIN32_WINNT=0x0601 -static \
+		-o xerabora.exe $(filter %.c,$^) $(RAYLIB_WIN)/libraylib.a \
+		-lws2_32 -lwinhttp -lwinmm -lshell32 -lgdi32 -lopengl32 -lm -lpthread
+
+linux-gui: $(GUI_SRC) src/http_curl.c $(RC_SRC) $(HDRS)
+	$(CC) $(CFLAGS) -DXERABORA_GUI -I$(RAYLIB_LIN) -o xerabora $(filter %.c,$^) \
+		$(RAYLIB_LIN)/libraylib.a -lcurl -lm -lpthread -ldl -lX11
+
 WINCC ?= x86_64-w64-mingw32-gcc
+WINDRES ?= x86_64-w64-mingw32-windres
 
 windows: xerabora.exe
 
-xerabora.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS)
-	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -o $@ $(filter %.c,$^) -lws2_32 -lwinhttp -lwinmm -lm -lpthread
+# The icon and the file properties Explorer shows.
+xerabora_res.o: xerabora.rc xerabora.ico
+	$(WINDRES) -O coff -o $@ $<
+
+# -mwindows: a double click opens the page and no console window; the
+# program attaches to a terminal when started from one, and --console
+# opens a console on demand.
+xerabora.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS) xerabora_res.o
+	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -mwindows -o $@ $(filter %.c,$^) xerabora_res.o -lws2_32 -lwinhttp -lwinmm -lshell32 -lm -lpthread
 
 clean:
-	rm -f xerabora xerabora.exe
+	rm -f xerabora xerabora.exe xerabora_res.o
 
 .PHONY: all windows clean

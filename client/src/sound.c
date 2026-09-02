@@ -116,7 +116,7 @@ void sound_init(int enabled)
 #ifndef _WIN32
     g_player = find_player();
     if (g_player == NULL)
-        log_warn("no audio player found (paplay, aplay, pw-play); sounds fall back to the terminal bell");
+        log_detail("no audio player found (paplay, aplay, pw-play); sounds fall back to the terminal bell");
 #endif
 }
 

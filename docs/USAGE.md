@@ -144,7 +144,7 @@ console's own driver, hashes them and asks the PC, exactly like the
 image check. Run it once per disc; the watch list is then in memory (and
 saved next to your other games when a USB stick or share is available).
 
-- `Could not read SYSTEM.CNF from the disc` — the drive gave up on that
+- `Could not read SYSTEM.CNF from the disc`: the drive gave up on that
   disc. If the console does not boot it from its own browser either, it is
   the disc or the laser, not the software.
 - `No disc in the drive` / `The disc tray is open` — as it says.
@@ -170,21 +170,37 @@ USB are unaffected.
 Start the game normally from OPL. The in-game hook begins streaming
 memory snapshots to the PC after a short delay. Keep the PC client
 running: it evaluates the snapshots and unlocks achievements on the
-server as you earn them, exactly like an emulator. The client window
-logs each unlock.
+server as you earn them, exactly like an emulator. An unlock shows on
+the client's page and, on the console, as a short gold flash over the
+game. The client may be started or restarted while the game runs; it
+picks the console up from its stream.
 
-Achievements that depend on pointer chains are not supported on the
-console and are disabled automatically (the client logs how many).
+Achievements that read through pointer chains stay active but cannot
+unlock on the console (such a read returns 0); the client reports how
+many.
 
 ## The PC client
 
-First run asks for your RetroAchievements login and password once; the
-token is then saved (`%LOCALAPPDATA%\xerabora` on Windows,
-`~/.config/xerabora` on Linux). Useful flags:
+Start it and it opens its page in your browser. Sign in on the
+**SETTINGS** tab and paste the Web API key from your RetroAchievements
+profile settings ("Keys"): the login is for unlocks, the key fills the
+library, leaderboards and profile. Both are saved in your user profile
+(`%LOCALAPPDATA%\xerabora` on Windows, `~/.config/xerabora` on Linux).
 
-- `--logout` — forget the saved token.
-- `--port N` — listen on a different UDP port (default 18194).
-- `XERABORA_PASSWORD` — environment variable for non-interactive login.
+The page has five tabs: **LIVE** (the running game, UP NEXT by median
+unlock time, the CONSOLE panel), **LIBRARY**, **GAME**, **BOARDS**
+(leaderboards with live trackers; softcore, so no entries are posted)
+and **SETTINGS** (login, key, QUIT). Everything the client does is also
+in `xerabora.log` next to the saved login. One copy runs at a time; a
+second start opens the running copy's page.
+
+Useful flags:
+
+- `--console`: open a console window for this run (Windows).
+- `--logout`: forget the saved token.
+- `--port N`: listen on a different UDP port (default 18194).
+- `--obs DIR`: write stream labels and `data.json` for OBS.
+- `--ui-file PATH`: serve the page from a file, for working on it.
 
 On Windows the client needs an inbound firewall rule for UDP (the
 installer/first run usually prompts; if broadcasts never arrive, add an
@@ -200,7 +216,7 @@ RA menu item, independent of any SMB share:
   share exists, a second copy there).
 - The diagnostic log falls back to `RA/hashes.txt` on the USB device
   when there is no share.
-- With no SMB session, the console actually has *more* free network
+- With no SMB session, the console has *more* free network
   sockets, not fewer.
 
 Requirement is only a configured ETH adapter with an IP. If you boot
@@ -217,6 +233,8 @@ an address (DHCP is enough).
 | "could not open a network socket" | ETH device off/misconfigured, or no cable/link. |
 | Client shows nothing when you press a menu item | Windows firewall blocking inbound UDP to `xerabora.exe`. |
 | Achievements don't unlock in game | Client must stay running; run "check game support" once first so the watch list is loaded. |
+| Unlock on the page, no flash on the console | Look for `console acknowledged unlock notice` in `xerabora.log`. Missing: the notice never reached the console, check that both are on the same subnet. Present: the console got it; report the game. |
+| Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it on its SETTINGS tab, or end it in Task Manager. |
 
 ## Notes and limits
 
