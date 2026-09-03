@@ -194,6 +194,15 @@ and **SETTINGS** (login, key, QUIT). Everything the client does is also
 in `xerabora.log` next to the saved login. One copy runs at a time; a
 second start opens the running copy's page.
 
+**On a phone or a second screen.** The page is served to this PC only
+until you press "OPEN TO THE NETWORK" on the SETTINGS tab. The tab then
+shows an address such as `http://192.168.1.5:18280/`; type it into any
+phone, tablet or PC on the same Wi-Fi and add the page to the home
+screen. Other devices watch everything; the login, the key, the network
+switch and QUIT work only from the PC that runs the client. On Windows,
+allow `xerabora.exe` through the firewall when it asks (private
+networks). The setting is remembered between runs.
+
 Useful flags:
 
 - `--console`: open a console window for this run (Windows).

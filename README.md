@@ -47,6 +47,9 @@ involved.
 - **Stream-ready.** The interface is a page the client serves to itself
   on `localhost`, so OBS takes it as a browser source; `--obs DIR`
   writes labels and `data.json` as well.
+- **On a phone.** One switch in SETTINGS opens the same page to your
+  Wi-Fi: a phone or tablet shows the tracker while you play, and the
+  PC keeps the controls.
 - **One file.** A single executable for Windows or Linux, nothing to
   install. Login is optional: the library and the boards work on a Web
   API key alone; unlocking needs the account.

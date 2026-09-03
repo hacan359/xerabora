@@ -648,14 +648,19 @@ int main(int argc, char **argv)
 
             webui_set_webapi(config_load_apikey(k, sizeof(k)));
         }
+        webui_set_lan(config_load_lan());
         only = webui_start(XERABORA_UI_PORT);
         if (only == SOCK_INVALID)
             return 1;
         webui_open_browser(webui_port());
         platform_on_stop(&g_stop);
         while (!g_stop && !webui_quit_requested()) {
-            if (platform_wait_readable(only, 500) == 1)
+            if (platform_wait_readable(only, 500) == 1) {
                 webui_serve(only, NULL);
+                only = webui_rebind(only);
+                if (only == SOCK_INVALID)
+                    break;
+            }
         }
         webui_stop(only);
         return 0;
@@ -700,6 +705,7 @@ int main(int argc, char **argv)
        used to end the program here, which looked like a program that does
        not open. */
     if (ui_wanted) {
+        webui_set_lan(config_load_lan());
         ui = webui_start(ui_port);
         if (ui != SOCK_INVALID) {
             ui_port = webui_port();
@@ -822,6 +828,7 @@ int main(int argc, char **argv)
         }
         if (ready & 2) {
             webui_serve(ui, client);
+            ui = webui_rebind(ui);
             if (!(ready & 1))
                 continue;
         }

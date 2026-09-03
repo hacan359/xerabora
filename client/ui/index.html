@@ -1,5 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>xerabora</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
@@ -610,10 +611,27 @@ async function postForm(url, data) {
   return r.json();
 }
 
+/* Opened from another device: the page shows everything, but the
+   settings and the off switch belong to the PC the client runs on. */
+const REMOTE = !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(location.hostname);
+
 /* Rendered on demand, never from the live stream: a push that redrew
    this tab would wipe whatever is being typed into it. */
 function renderSettings() {
   const li = (lastState && lastState.login) || { ok: false, user: '', webapi: false };
+  const lan = (lastState && lastState.lan) || { on: false, url: '' };
+
+  if (REMOTE) {
+    document.getElementById('tab-settings').innerHTML =
+      '<div class="set">' +
+      '<h2>OTHER DEVICES</h2>' +
+      '<div>this page is open from <span style="color:var(--green)">' + esc(location.host) + '</span></div>' +
+      '<div class="note">account, Web API key, the network switch and QUIT are changed on the PC ' +
+      'that runs xerabora; from here you watch.</div>' +
+      (li.ok ? '<div style="margin-top:14px">signed in as <span style="color:var(--green)">' + esc(li.user) + '</span></div>' : '') +
+      '</div>';
+    return;
+  }
 
   document.getElementById('tab-settings').innerHTML =
     '<div class="set">' +
@@ -638,6 +656,20 @@ function renderSettings() {
     '</label><input class="f" name="key" autocomplete="off">' +
     '<button class="act">SAVE KEY</button></form>' +
     '<div class="msg" id="apikey-msg"></div>' +
+
+    '<h2 style="margin-top:26px">OTHER DEVICES</h2>' +
+    (lan.on
+      ? '<div>open to the network' + (lan.url
+          ? ': <a href="' + esc(lan.url) + '" style="color:var(--green)">' + esc(lan.url) + '</a>'
+          : ' (no network address found yet)') + '</div>' +
+        '<div class="note">type that address into a phone or tablet on the same Wi-Fi and add the page ' +
+        'to the home screen. Other devices watch; settings and QUIT stay here. ' +
+        'On Windows, allow xerabora through the firewall when it asks.</div>' +
+        '<button class="act" id="btn-lan">CLOSE TO THIS PC</button>'
+      : '<div class="note">the page is reachable from this PC only. Open it to the network and any ' +
+        'phone, tablet or second PC on the same Wi-Fi can watch this tracker.</div>' +
+        '<button class="act" id="btn-lan">OPEN TO THE NETWORK</button>') +
+    '<div class="msg" id="lan-msg"></div>' +
 
     '<h2 style="margin-top:26px">CLIENT</h2>' +
     '<div class="note">the client has no window of its own: closing this tab leaves it ' +
@@ -675,6 +707,20 @@ function renderSettings() {
     document.body.innerHTML =
       '<div class="muted" style="padding:60px;text-align:center;font-size:20px">' +
       'xerabora is closed. This tab can be closed too.</div>';
+  };
+
+  const lanBtn = document.getElementById('btn-lan');
+  if (lanBtn) lanBtn.onclick = async () => {
+    lanBtn.disabled = true;
+    msg('lan-msg', lan.on ? 'closing...' : 'opening...', true);
+    try {
+      const r = await postForm('/lan', { on: lan.on ? '0' : '1' });
+      if (!r.ok) { msg('lan-msg', r.error || 'failed', false); lanBtn.disabled = false; return; }
+      /* The listener reopens on the next request; give it a moment. */
+      await new Promise(res => setTimeout(res, 700));
+      lastState = await (await fetch('/state', { cache: 'no-store' })).json();
+      renderSettings();
+    } catch (err) { msg('lan-msg', 'could not reach the client', false); lanBtn.disabled = false; }
   };
 
   const logoutBtn = document.getElementById('btn-logout');

@@ -1,7 +1,8 @@
 /*
   The interface, served by the client to itself: a loopback listener, the
   page compiled into the executable, JSON and SSE endpoints. One file, no
-  runtime, real text layout, and OBS gets a browser source. Loopback only.
+  runtime, real text layout, and OBS gets a browser source. Loopback
+  unless the user opens it to the network; settings posts stay local.
 */
 #ifndef XERABORA_WEBUI_H
 #define XERABORA_WEBUI_H
@@ -16,6 +17,17 @@ sock_t webui_start(int port);
 
 /* The port it settled on, which may not be the one asked for. */
 int webui_port(void);
+
+/* Open the page to other devices on the network (bind every interface)
+   or keep it to this machine. Set before webui_start; a change from
+   the page takes effect through webui_rebind. */
+void webui_set_lan(int on);
+int webui_lan(void);
+
+/* Called from the main loop after webui_serve: when the page switched
+   the network setting, the listener is closed and opened again on the
+   same port with the new binding. Returns the listener to use next. */
+sock_t webui_rebind(sock_t listener);
 
 /* Serve the page from this file instead of the built-in copy: the
    edit-refresh loop for working on the interface (--ui-file). */

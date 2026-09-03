@@ -156,6 +156,44 @@ int webui_port(void)
     return g_port;
 }
 
+static int g_lan;
+static int g_rebind;
+
+void webui_set_lan(int on)
+{
+    g_lan = on ? 1 : 0;
+}
+
+int webui_lan(void)
+{
+    return g_lan;
+}
+
+/* The address another device would type. A connected UDP socket does
+   not send anything; it only picks the interface that routes to the
+   console, or to the internet when no console has been seen yet. */
+static void lan_address(char *out, size_t size)
+{
+    struct sockaddr_in to, me;
+    socklen_t len = sizeof(me);
+    sock_t s;
+
+    out[0] = '\0';
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    if (s == SOCK_INVALID)
+        return;
+    memset(&to, 0, sizeof(to));
+    to.sin_family = AF_INET;
+    to.sin_port = htons(9);
+    to.sin_addr.s_addr = g.console_ip[0] != '\0' ? inet_addr(g.console_ip) : INADDR_NONE;
+    if (to.sin_addr.s_addr == INADDR_NONE)
+        to.sin_addr.s_addr = inet_addr("1.1.1.1");
+    if (connect(s, (struct sockaddr *)&to, sizeof(to)) == 0 &&
+        getsockname(s, (struct sockaddr *)&me, &len) == 0)
+        snprintf(out, size, "%s", inet_ntoa(me.sin_addr));
+    sock_close(s);
+}
+
 sock_t webui_start(int port)
 {
     struct sockaddr_in addr;
@@ -183,14 +221,21 @@ sock_t webui_start(int port)
 
         memset(&addr, 0, sizeof(addr));
         addr.sin_family = AF_INET;
-        /* Loopback, deliberately: the interface is for this machine. A
-           stream overlay on another PC would need an explicit choice,
-           not an accident of binding to every interface. */
-        addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+        /* Loopback unless the user asked for the network: the page
+           carries the settings and the off switch, so opening it to
+           every interface is a choice, not an accident. */
+        addr.sin_addr.s_addr = htonl(g_lan ? INADDR_ANY : INADDR_LOOPBACK);
         addr.sin_port = htons((unsigned short)port);
 
         if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) == 0 && listen(s, 8) == 0) {
             g_port = port;
+            if (g_lan) {
+                char ip[48];
+
+                lan_address(ip, sizeof(ip));
+                if (ip[0] != '\0')
+                    log_info("interface open to the network at http://%s:%d/", ip, port);
+            }
             return s;
         }
 
@@ -199,6 +244,22 @@ sock_t webui_start(int port)
 
     log_warn("no free port for the interface near %d; running without it", port - 5);
     return SOCK_INVALID;
+}
+
+sock_t webui_rebind(sock_t listener)
+{
+    int port;
+
+    if (!g_rebind)
+        return listener;
+    g_rebind = 0;
+    port = g_port;
+    if (listener != SOCK_INVALID)
+        sock_close(listener);
+    listener = webui_start(port);
+    if (listener == SOCK_INVALID)
+        log_warn("the interface could not be reopened on port %d", port);
+    return listener;
 }
 
 /* When set, GET / serves this file from disk instead of the built-in
@@ -289,6 +350,19 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                   g.packets, g.frames, g.gaps, g.dupes, g.torn,
                   g.watch_parts, g.watch_bytes, g.watch_addresses,
                   g.started != 0 ? (long)(time(NULL) - g.started) : 0L);
+
+    {
+        char ip[48] = "", url[80] = "";
+
+        if (g_lan) {
+            lan_address(ip, sizeof(ip));
+            if (ip[0] != '\0')
+                snprintf(url, sizeof(url), "http://%s:%d/", ip, g_port);
+        }
+        p += snprintf(p, (size_t)(end - p), "\"lan\":{\"on\":%s,", g_lan ? "true" : "false");
+        json_field(&p, end, "url", url);
+        p += snprintf(p, (size_t)(end - p), "},");
+    }
 
     /* The RA game id lets the page pull the same game's Web API payload
        (types, median times) and lay it over the live list. */
@@ -775,6 +849,21 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
         return 1;
     }
 
+    if (strncmp(req, "POST /lan", 9) == 0) {
+        char on[8] = "";
+
+        form_field(body, "on", on, sizeof(on));
+        g_lan = on[0] == '1';
+        if (config_save_lan(g_lan) != 0)
+            log_warn("could not save the network setting; it holds until exit");
+        g_rebind = 1;
+        log_info(g_lan ? "interface opened to the network from the page"
+                       : "interface closed to the network from the page");
+        n = snprintf(out, sizeof(out), "{\"ok\":true}");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
     if (strncmp(req, "POST /quit", 10) == 0) {
         g_quit = 1;
         log_info("quit requested from the page");
@@ -877,6 +966,20 @@ void webui_serve(sock_t listener, rc_client_t *client)
     if (strncmp(req, "POST ", 5) == 0) {
         char *body = strstr(req, "\r\n\r\n");
 
+        /* Another device may watch; only this machine changes the
+           settings or turns the client off. */
+        if (from.sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {
+            const char *fb = "{\"ok\":false,\"error\":\"settings change only on the PC running xerabora\"}";
+            char head[160];
+            int hn = snprintf(head, sizeof(head),
+                              "HTTP/1.1 403 Forbidden\r\nContent-Type: application/json; charset=utf-8\r\n"
+                              "Content-Length: %d\r\nConnection: close\r\n\r\n", (int)strlen(fb));
+
+            send_all(c, head, hn);
+            send_all(c, fb, (int)strlen(fb));
+            sock_close(c);
+            return;
+        }
         if (body == NULL || !serve_settings(c, req, body + 4, client)) {
             const char *nf = "not found";
 

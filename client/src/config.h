@@ -25,6 +25,11 @@ void config_forget_credentials(void);
 int config_load_apikey(char *key, size_t size);
 int config_save_apikey(const char *key);
 
+/* Whether the interface page is open to other devices on the network.
+   Off by default: the page carries the settings and the off switch. */
+int config_load_lan(void);
+int config_save_lan(int on);
+
 /* Path of the file with remembered serial-to-hash pairs. */
 int config_games_path(char *out, size_t size);
 
