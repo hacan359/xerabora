@@ -75,6 +75,9 @@ int platform_net_init(void)
 
     return WSAStartup(MAKEWORD(2, 2), &wsa) == 0 ? 0 : -1;
 #else
+    /* A page closed by the browser is found out at the next write;
+       without this that write ends the process. */
+    signal(SIGPIPE, SIG_IGN);
     return 0;
 #endif
 }

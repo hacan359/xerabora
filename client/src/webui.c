@@ -271,16 +271,48 @@ void webui_set_ui_file(const char *path)
     snprintf(g_ui_file, sizeof(g_ui_file), "%s", path != NULL ? path : "");
 }
 
-/* The page that asked for the live stream, if any. One is enough: a
-   second tab gets the poll, which is fine for a second tab. */
-static sock_t g_stream = SOCK_INVALID;
+/* The pages that asked for the live stream: the PC, a phone, an OBS
+   source. With one slot the browsers took turns stealing the stream
+   from each other every few seconds. A fifth page replaces the oldest. */
+#define WEBUI_STREAMS 4
+static sock_t g_streams[WEBUI_STREAMS] = {SOCK_INVALID, SOCK_INVALID, SOCK_INVALID, SOCK_INVALID};
+static int g_stream_next;
 static unsigned long g_stream_sent;
+
+static int stream_count(void)
+{
+    int i, n = 0;
+
+    for (i = 0; i < WEBUI_STREAMS; i++)
+        if (g_streams[i] != SOCK_INVALID)
+            n++;
+    return n;
+}
+
+static void stream_add(sock_t c)
+{
+    int i;
+
+    for (i = 0; i < WEBUI_STREAMS; i++) {
+        if (g_streams[i] == SOCK_INVALID) {
+            g_streams[i] = c;
+            return;
+        }
+    }
+    sock_close(g_streams[g_stream_next]);
+    g_streams[g_stream_next] = c;
+    g_stream_next = (g_stream_next + 1) % WEBUI_STREAMS;
+}
 
 void webui_stop(sock_t listener)
 {
-    if (g_stream != SOCK_INVALID) {
-        sock_close(g_stream);
-        g_stream = SOCK_INVALID;
+    int i;
+
+    for (i = 0; i < WEBUI_STREAMS; i++) {
+        if (g_streams[i] != SOCK_INVALID) {
+            sock_close(g_streams[i]);
+            g_streams[i] = SOCK_INVALID;
+        }
     }
     if (listener != SOCK_INVALID)
         sock_close(listener);
@@ -992,18 +1024,15 @@ void webui_serve(sock_t listener, rc_client_t *client)
 
     if (strncmp(req, "GET /events", 11) == 0) {
         /* The stream stays open; everything else about this connection
-           is done here. A previous stream is dropped: one page at a
-           time gets the live feed. */
+           is done here. */
         const char *head =
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/event-stream\r\n"
             "Cache-Control: no-store\r\n"
             "Connection: keep-alive\r\n\r\n";
 
-        if (g_stream != SOCK_INVALID)
-            sock_close(g_stream);
         send_all(c, head, (int)strlen(head));
-        g_stream = c;
+        stream_add(c);
         g.dirty = 1; /* a fresh page needs the full layout first */
         webui_push(client);
         return; /* deliberately not closed */
@@ -1105,7 +1134,7 @@ void webui_push(rc_client_t *client)
     int len, n;
     time_t now;
 
-    if (g_stream == SOCK_INVALID)
+    if (stream_count() == 0)
         return;
 
     body = malloc(256 * 1024);
@@ -1127,13 +1156,23 @@ void webui_push(rc_client_t *client)
 
     /* A dead page shows up as a failed write; drop it and let the
        browser reconnect on its own. */
-    if (send(g_stream, head, n, 0) <= 0 ||
-        send(g_stream, body, len, 0) <= 0 ||
-        send(g_stream, "\n\n", 2, 0) <= 0) {
-        sock_close(g_stream);
-        g_stream = SOCK_INVALID;
-    } else {
-        g_stream_sent++;
+    {
+        int i;
+
+        for (i = 0; i < WEBUI_STREAMS; i++) {
+            sock_t s = g_streams[i];
+
+            if (s == SOCK_INVALID)
+                continue;
+            if (send(s, head, n, 0) <= 0 ||
+                send(s, body, len, 0) <= 0 ||
+                send(s, "\n\n", 2, 0) <= 0) {
+                sock_close(s);
+                g_streams[i] = SOCK_INVALID;
+            } else {
+                g_stream_sent++;
+            }
+        }
     }
 
     free(body);
