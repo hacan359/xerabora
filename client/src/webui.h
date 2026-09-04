@@ -59,6 +59,10 @@ void webui_set_login(int ok, const char *user);
    which of the two credentials is still missing. */
 void webui_set_webapi(int ok);
 
+/* Something structural changed outside the console path (the followed
+   game, its rich presence line): the next push is a full state. */
+void webui_mark_dirty(void);
+
 void webui_set_console(const char *ip, int connected);
 void webui_set_game(const char *serial, const char *hash, const char *title);
 void webui_note_unlock(unsigned id, const char *title, const char *badge, unsigned points);

@@ -30,6 +30,11 @@ int config_save_apikey(const char *key);
 int config_load_lan(void);
 int config_save_lan(int on);
 
+/* Whether the client follows the account's play on other devices
+   through the Web API. On by default: it costs a key and nothing else. */
+int config_load_follow(void);
+int config_save_follow(int on);
+
 /* Path of the file with remembered serial-to-hash pairs. */
 int config_games_path(char *out, size_t size);
 

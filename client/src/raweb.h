@@ -23,8 +23,21 @@ struct raweb_profile
     unsigned rank;
     unsigned total_ranked;  /* how many players are ranked at all */
     char last_game[96];
+    unsigned last_game_id;      /* LastGameID: the game the account is in */
     char rich_presence[192];
 };
+
+/* The slow summary call, used once a minute for the two things the
+   profile lacks: whether the account is online right now, and when
+   the rich presence line was last updated. */
+struct raweb_summary
+{
+    int online;
+    char rich_presence_date[32];
+    unsigned last_game_id;
+    char last_game_console[40];
+};
+int raweb_summary(struct raweb_summary *out);
 
 /* One game in the library, from GetUserCompletionProgress. */
 struct raweb_game

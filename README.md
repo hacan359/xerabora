@@ -50,6 +50,10 @@ involved.
 - **On a phone.** One switch in SETTINGS opens the same page to your
   Wi-Fi: a phone or tablet shows the tracker while you play, and the
   PC keeps the controls.
+- **Any emulator.** With the console off, LIVE follows your account
+  through the Web API: the game you are in on any emulator with
+  RetroAchievements, your unlocks as they land, UP NEXT and the missable
+  warnings. No hooks, no setup beyond the key.
 - **One file.** A single executable for Windows or Linux, nothing to
   install. Login is optional: the library and the boards work on a Web
   API key alone; unlocking needs the account.

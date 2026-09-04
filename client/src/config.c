@@ -160,6 +160,47 @@ int config_save_lan(int on)
     return 0;
 }
 
+static int config_follow_path(char *out, size_t size)
+{
+    char dir[512];
+
+    if (platform_config_dir(dir, sizeof(dir)) != 0)
+        return -1;
+    snprintf(out, size, "%s" SEP "follow", dir);
+    return 0;
+}
+
+int config_load_follow(void)
+{
+    char path[600], line[8] = "";
+    FILE *f;
+
+    if (config_follow_path(path, sizeof(path)) != 0)
+        return 1;
+    f = fopen(path, "r");
+    if (f == NULL)
+        return 1; /* no file: on */
+    if (fgets(line, (int)sizeof(line), f) == NULL)
+        line[0] = '\0';
+    fclose(f);
+    return line[0] != '0';
+}
+
+int config_save_follow(int on)
+{
+    char path[600];
+    FILE *f;
+
+    if (config_follow_path(path, sizeof(path)) != 0)
+        return -1;
+    f = fopen(path, "w");
+    if (f == NULL)
+        return -1;
+    fprintf(f, "%d\n", on ? 1 : 0);
+    fclose(f);
+    return 0;
+}
+
 int config_games_path(char *out, size_t size)
 {
     char dir[512];

@@ -8,6 +8,7 @@
 #include <time.h>
 
 #include "config.h"
+#include "follow.h"
 #include "log.h"
 #include "ra.h"
 #include "raweb.h"
@@ -80,6 +81,11 @@ void webui_set_webapi(int ok)
 {
     g.dirty = 1;
     g.has_webapi = ok;
+}
+
+void webui_mark_dirty(void)
+{
+    g.dirty = 1;
 }
 
 void webui_set_console(const char *ip, int connected)
@@ -355,6 +361,13 @@ static void json_field(char **p, char *end, const char *key, const char *value)
     json_str(p, end, value);
 }
 
+/* The console is the live source when it is connected and rc_client
+   holds a game for it. */
+static int console_has_game(rc_client_t *client)
+{
+    return g.connected && client != NULL && rc_client_get_game_info(client) != NULL;
+}
+
 /* The whole state as one object. Small enough to build in a buffer;
    the achievement list is the only part that can grow, and it is
    capped by the set size. */
@@ -394,6 +407,69 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
         p += snprintf(p, (size_t)(end - p), "\"lan\":{\"on\":%s,", g_lan ? "true" : "false");
         json_field(&p, end, "url", url);
         p += snprintf(p, (size_t)(end - p), "},");
+    }
+
+    /* Following: the account's play elsewhere, from the Web API. It
+       shows on LIVE only while the console is not the source. */
+    {
+        const struct follow_state *f = follow_get();
+        int active = follow_active(console_has_game(client));
+        time_t now = time(NULL);
+
+        p += snprintf(p, (size_t)(end - p), "\"follow\":{\"on\":%s,\"active\":%s,\"game_id\":%u,",
+                      f->on ? "true" : "false", active ? "true" : "false", f->game_id);
+        json_field(&p, end, "rp", f->rich_presence);
+        p += snprintf(p, (size_t)(end - p), ",");
+        json_field(&p, end, "rp_date", f->rich_presence_date);
+        p += snprintf(p, (size_t)(end - p),
+                      ",\"online\":%s,\"rp_ago\":%ld,\"since\":%ld,\"polled_ago\":%ld,\"failures\":%d,\"session\":[",
+                      f->online ? "true" : "false",
+                      f->rp_changed != 0 ? (long)(now - f->rp_changed) : -1L,
+                      f->game_since != 0 ? (long)(now - f->game_since) : 0L,
+                      f->polled != 0 ? (long)(now - f->polled) : -1L, f->failures);
+        for (i = 0; i < f->session_count && end - p > 256; i++) {
+            if (i > 0)
+                p += snprintf(p, (size_t)(end - p), ",");
+            p += snprintf(p, (size_t)(end - p), "{\"id\":%u,", f->session[i].id);
+            json_field(&p, end, "title", f->session[i].title);
+            p += snprintf(p, (size_t)(end - p), ",");
+            json_field(&p, end, "badge", f->session[i].badge);
+            p += snprintf(p, (size_t)(end - p), ",\"points\":%u,\"hardcore\":%s,\"ago\":%ld}",
+                          f->session[i].points, f->session[i].hardcore ? "true" : "false",
+                          (long)(now - f->session[i].at));
+        }
+        p += snprintf(p, (size_t)(end - p), "]},");
+
+        if (active) {
+            p += snprintf(p, (size_t)(end - p), "\"game\":{\"id\":%u,\"serial\":\"\",\"hash\":\"\",", f->game_id);
+            json_field(&p, end, "title", f->game.title);
+            p += snprintf(p, (size_t)(end - p), ",");
+            json_field(&p, end, "console", f->game.console);
+            p += snprintf(p, (size_t)(end - p), ",");
+            json_field(&p, end, "icon", f->game.image_icon);
+            p += snprintf(p, (size_t)(end - p), ",\"source\":\"web\",\"achievements\":[");
+            for (i = 0; i < f->ach_count && end - p > 512; i++) {
+                const struct raweb_achievement *a = &f->ach[i];
+                int done = a->date_earned[0] != '\0';
+                unsigned type = strcmp(a->type, "missable") == 0 ? 1
+                              : strcmp(a->type, "progression") == 0 ? 2
+                              : strcmp(a->type, "win_condition") == 0 ? 3 : 0;
+
+                if (i > 0)
+                    p += snprintf(p, (size_t)(end - p), ",");
+                p += snprintf(p, (size_t)(end - p), "{\"id\":%u,", a->id);
+                json_field(&p, end, "title", a->title);
+                p += snprintf(p, (size_t)(end - p), ",");
+                json_field(&p, end, "description", a->description);
+                p += snprintf(p, (size_t)(end - p), ",");
+                json_field(&p, end, "badge", a->badge);
+                p += snprintf(p, (size_t)(end - p),
+                              ",\"measured\":\"\",\"points\":%u,\"state\":%u,\"percent\":0,\"type\":%u,\"bucket\":%u}",
+                              a->points, done ? 2u : 1u, type, done ? 2u : 1u);
+            }
+            p += snprintf(p, (size_t)(end - p), "],\"tracking\":[]},");
+            goto unlocks;
+        }
     }
 
     /* The RA game id lets the page pull the same game's Web API payload
@@ -488,6 +564,7 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
     }
     p += snprintf(p, (size_t)(end - p), "]},");
 
+unlocks:
     p += snprintf(p, (size_t)(end - p), "\"unlocks\":[");
     for (i = 0; i < g.unlock_count && end - p > 256; i++) {
         if (i > 0)
@@ -833,6 +910,7 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
                 snprintf(user, sizeof(user), "%s", g.user);
             raweb_set_credentials(user, key);
             webui_set_webapi(1);
+            follow_reset();
             /* The page refetches at once, past yesterday's cache. */
             g_me_at = 0;
             g_lib_at = 0;
@@ -891,6 +969,20 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
         g_rebind = 1;
         log_info(g_lan ? "interface opened to the network from the page"
                        : "interface closed to the network from the page");
+        n = snprintf(out, sizeof(out), "{\"ok\":true}");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
+    if (strncmp(req, "POST /follow", 12) == 0) {
+        char on[8] = "";
+
+        form_field(body, "on", on, sizeof(on));
+        follow_set_enabled(on[0] == '1');
+        if (config_save_follow(on[0] == '1') != 0)
+            log_warn("could not save the follow setting; it holds until exit");
+        g.dirty = 1;
+        log_info(on[0] == '1' ? "following turned on from the page" : "following turned off from the page");
         n = snprintf(out, sizeof(out), "{\"ok\":true}");
         respond(c, "application/json; charset=utf-8", out, n);
         return 1;

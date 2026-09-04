@@ -217,6 +217,43 @@ function consolePanel(s) {
                    esc(s.game.hash) + '</div>' : '');
 }
 
+/* FOLLOWING: the account's play on another device, as the Web API
+   sees it. No measured progress and no trackers here; the unlocks,
+   UP NEXT and the missable warnings work the same. */
+function followPanel(s) {
+  const f = s.follow;
+  if (!f || !f.active) return '';
+  const cell = (k, v) => '<div class="cell"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
+  const seen = f.online ? '<span style="color:var(--green)">playing now</span>'
+             : f.rp_date ? esc(f.rp_date) : f.rp_ago >= 0 ? ago(f.rp_ago) + ' ago' : '&mdash;';
+  const session = (f.session || []).length
+    ? '<h2>THIS SESSION</h2>' + f.session.map(u =>
+        '<div class="row done"><img src="' + BADGE + u.badge + '.png" alt="">' +
+        '<div class="body"><div class="t">' + esc(u.title) + '</div>' +
+        '<div class="d">' + ago(u.ago) + ' ago' + (u.hardcore ? ' &middot; hardcore' : '') + '</div></div>' +
+        '<div class="m"><span style="color:var(--green)">+' + u.points + '</span></div></div>').join('')
+    : '';
+  return '<h2>FOLLOWING</h2>' +
+    '<div class="row done"><div class="body"><div class="t">' +
+    esc(f.rp || 'no rich presence line yet') + '</div></div></div>' +
+    '<div class="stats">' +
+    cell('PLATFORM', esc(s.game.console || '&mdash;')) +
+    cell('LAST SEEN', seen) +
+    cell('SOURCE', 'RetroAchievements &middot; every 20 s') +
+    cell('POLLED', f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '&mdash;') +
+    cell('SESSION', f.since ? hms(f.since) : '&mdash;') +
+    cell('UNLOCKS', (f.session || []).length) +
+    '</div>' +
+    (f.failures ? '<div class="note" style="color:var(--amber)">the Web API is not answering; retrying</div>' : '') +
+    session;
+}
+
+function ago(sec) {
+  if (sec < 60) return sec + ' s';
+  if (sec < 3600) return Math.floor(sec / 60) + ' min';
+  return Math.floor(sec / 3600) + ' h ' + Math.floor((sec % 3600) / 60) + ' min';
+}
+
 /* ---- LIVE: the console's own session, straight from rc_client ---------- */
 
 /* Medians for the running game, one fetch per game. The Web API has no
@@ -243,11 +280,15 @@ function renderLive(s) {
   const done = list.filter(a => a.state === 2).length;
 
   if (!list.length) {
+    const f = s.follow || {};
     document.getElementById('tab-live').innerHTML =
       consolePanel(s) +
       '<div class="muted">' + (s.console.connected
         ? 'console connected, waiting for a game with achievements'
-        : 'start a game on the console, or browse your library above') + '</div>';
+        : f.on && (s.login || {}).webapi
+          ? 'following your RetroAchievements activity: start a game on the console, or in any ' +
+            'emulator with RetroAchievements on, and it shows up here within half a minute'
+          : 'start a game on the console, or browse your library above') + '</div>';
     return;
   }
 
@@ -291,13 +332,14 @@ function renderLive(s) {
     : '';
 
   document.getElementById('tab-live').innerHTML =
-    consolePanel(s) +
+    followPanel(s) + consolePanel(s) +
     '<div class="head">' +
-    (meta && liveMeta.icon ? '<img src="' + MEDIA + liveMeta.icon + '" alt="">' : '') +
+    (meta && liveMeta.icon ? '<img src="' + MEDIA + liveMeta.icon + '" alt="">'
+     : s.game.icon ? '<img src="' + MEDIA + s.game.icon + '" alt="">' : '') +
     '<div style="flex:1">' +
     '<h1>' + esc(s.game.title || s.game.serial) + '</h1>' +
     '<div class="bar"><i style="width:' + pct(done, list.length) + '%"></i></div>' +
-    '<div style="display:flex;margin-top:8px"><span class="muted">' + esc(s.game.serial) + '</span>' +
+    '<div style="display:flex;margin-top:8px"><span class="muted">' + esc(s.game.serial || s.game.console || '') + '</span>' +
     '<span class="right">' + done + ' / ' + list.length + '</span></div></div></div>' +
     ahead + trackers +
     ((ahead || trackers) ? '<h2>ALL ACHIEVEMENTS</h2>' : '') +
@@ -620,6 +662,7 @@ const REMOTE = !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(location.hos
 function renderSettings() {
   const li = (lastState && lastState.login) || { ok: false, user: '', webapi: false };
   const lan = (lastState && lastState.lan) || { on: false, url: '' };
+  const fo = (lastState && lastState.follow) || { on: false };
 
   if (REMOTE) {
     document.getElementById('tab-settings').innerHTML =
@@ -656,6 +699,18 @@ function renderSettings() {
     '</label><input class="f" name="key" autocomplete="off">' +
     '<button class="act">SAVE KEY</button></form>' +
     '<div class="msg" id="apikey-msg"></div>' +
+
+    '<h2 style="margin-top:26px">FOLLOW MY PLAY</h2>' +
+    (fo.on
+      ? '<div>on: LIVE shows the game you are in on any emulator with RetroAchievements, ' +
+        'and the unlocks as they land</div>' +
+        '<div class="note">from the Web API, every 20 seconds. The console takes over when it is connected. ' +
+        'No measured progress here; that needs a memory source.</div>' +
+        '<button class="act" id="btn-follow">STOP FOLLOWING</button>'
+      : '<div class="note">off. Turn it on and LIVE follows your account: the game you are in on any ' +
+        'emulator with RetroAchievements, and the unlocks as they land.</div>' +
+        '<button class="act" id="btn-follow">FOLLOW MY PLAY</button>') +
+    '<div class="msg" id="follow-msg"></div>' +
 
     '<h2 style="margin-top:26px">OTHER DEVICES</h2>' +
     (lan.on
@@ -707,6 +762,18 @@ function renderSettings() {
     document.body.innerHTML =
       '<div class="muted" style="padding:60px;text-align:center;font-size:20px">' +
       'xerabora is closed. This tab can be closed too.</div>';
+  };
+
+  const followBtn = document.getElementById('btn-follow');
+  if (followBtn) followBtn.onclick = async () => {
+    followBtn.disabled = true;
+    try {
+      const r = await postForm('/follow', { on: fo.on ? '0' : '1' });
+      if (!r.ok) { msg('follow-msg', r.error || 'failed', false); followBtn.disabled = false; return; }
+      lastState = await (await fetch('/state', { cache: 'no-store' })).json();
+      renderSettings();
+      liveSig = '';
+    } catch (err) { msg('follow-msg', 'could not reach the client', false); followBtn.disabled = false; }
   };
 
   const lanBtn = document.getElementById('btn-lan');
@@ -854,11 +921,15 @@ function apply(s) {
     lastState = s;
     if (s.version) document.getElementById('ver').textContent = 'v' + s.version;
     const li = s.login || { ok: true };
-    document.getElementById('dot').className = 'dot' + (c.connected ? ' on' : '');
+    const f = s.follow || {};
+    document.getElementById('dot').className = 'dot' + ((c.connected || f.active) ? ' on' : '');
     document.getElementById('linktext').innerHTML =
-      !li.ok ? '<span style="color:var(--amber)">not signed in to RetroAchievements &mdash; ' +
-               'open SETTINGS to sign in</span>'
-      : c.connected ? 'console live at ' + esc(c.ip) : 'waiting for the console';
+      c.connected ? 'console live at ' + esc(c.ip)
+      : f.active ? 'following ' + esc(s.game.title || '') + (f.online ? ' &middot; playing now' : '') +
+                   ' via RetroAchievements'
+      : !li.ok ? '<span style="color:var(--amber)">not signed in to RetroAchievements &mdash; ' +
+                 'open SETTINGS to sign in</span>'
+      : 'waiting for the console';
 
     tracking = s.game.tracking || [];
     const list = s.game.achievements || [];
@@ -867,7 +938,9 @@ function apply(s) {
       const sig = [s.game.serial, c.connected, c.status || '', s.game.title || '',
                    (c.watch && c.watch.addresses) || 0,
                    list.map(a => a.id + ':' + a.state).join(','),
-                   tracking.map(t => t.id).join(',')].join('|');
+                   tracking.map(t => t.id).join(','),
+                   f.active ? [f.game_id, f.rp, f.online, f.failures, (f.session || []).length].join('|') : ''
+                  ].join('|');
       if (sig !== liveSig) { liveSig = sig; renderLive(s); }
     }
     if (tab === 'boards' && tracking.length) {

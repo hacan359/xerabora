@@ -287,6 +287,7 @@ int raweb_profile(struct raweb_profile *out)
     obj_str(&j, 0, "User", out->user, sizeof(out->user));
     obj_str(&j, 0, "Motto", out->motto, sizeof(out->motto));
     obj_str(&j, 0, "RichPresenceMsg", out->rich_presence, sizeof(out->rich_presence));
+    out->last_game_id = obj_uint(&j, 0, "LastGameID");
     out->points = obj_uint(&j, 0, "TotalPoints");
     out->softcore_points = obj_uint(&j, 0, "TotalSoftcorePoints");
     out->rank = obj_uint(&j, 0, "Rank");
@@ -294,6 +295,28 @@ int raweb_profile(struct raweb_profile *out)
 
     json_free(&j);
     return out->user[0] != '\0';
+}
+
+int raweb_summary(struct raweb_summary *out)
+{
+    struct json j;
+    char status[16] = "";
+    int game;
+
+    memset(out, 0, sizeof(*out));
+    if (!json_get_user(&j, "API_GetUserSummary.php", "g=0&a=0"))
+        return 0;
+
+    obj_str(&j, 0, "Status", status, sizeof(status));
+    out->online = strcmp(status, "Online") == 0;
+    obj_str(&j, 0, "RichPresenceMsgDate", out->rich_presence_date, sizeof(out->rich_presence_date));
+    out->last_game_id = obj_uint(&j, 0, "LastGameID");
+    game = obj_get(&j, 0, "LastGame");
+    if (game >= 0)
+        obj_str(&j, game, "ConsoleName", out->last_game_console, sizeof(out->last_game_console));
+
+    json_free(&j);
+    return 1;
 }
 
 /* Both library calls answer with rows of the same shape; only the

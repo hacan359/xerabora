@@ -20,6 +20,7 @@
 #include "config.h"
 #include "console.h"
 #include "discord.h"
+#include "follow.h"
 #include "http.h"
 #include "log.h"
 #include "platform.h"
@@ -649,6 +650,7 @@ int main(int argc, char **argv)
             webui_set_webapi(config_load_apikey(k, sizeof(k)));
         }
         webui_set_lan(config_load_lan());
+        follow_set_enabled(config_load_follow());
         only = webui_start(XERABORA_UI_PORT);
         if (only == SOCK_INVALID)
             return 1;
@@ -661,6 +663,8 @@ int main(int argc, char **argv)
                 if (only == SOCK_INVALID)
                     break;
             }
+            follow_tick(0);
+            webui_push(NULL);
         }
         webui_stop(only);
         return 0;
@@ -704,6 +708,7 @@ int main(int argc, char **argv)
     /* The interface comes up before the login on purpose: a rejected token
        used to end the program here, which looked like a program that does
        not open. */
+    follow_set_enabled(config_load_follow());
     if (ui_wanted) {
         webui_set_lan(config_load_lan());
         ui = webui_start(ui_port);
@@ -835,6 +840,10 @@ int main(int argc, char **argv)
         if (ready == 0) {
             link_idle(1000);
             rc_client_idle(client); /* retries of queued unlocks */
+            /* No console packet this second: following gets its turn,
+               and a page sees the result on the next push. */
+            follow_tick(game_up);
+            webui_push(client);
             discord_tick();
             test_unlock_tick();
             badge_tick();

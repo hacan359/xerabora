@@ -194,6 +194,17 @@ and **SETTINGS** (login, key, QUIT). Everything the client does is also
 in `xerabora.log` next to the saved login. One copy runs at a time; a
 second start opens the running copy's page.
 
+**Following your play on other devices.** With a Web API key saved,
+LIVE also follows your account when the console is off: start a game in
+any emulator that has RetroAchievements turned on, and within half a
+minute the page shows that game, your unlocks in it, UP NEXT by median
+unlock time and the missable warnings, with a FOLLOWING panel that has
+the rich presence line and when the server last heard from you. New
+unlocks land as a toast and a sound. The client asks the Web API every
+20 seconds; the console takes over whenever it is connected. There is no
+measured progress in this mode, that needs a memory source. The switch
+is FOLLOW MY PLAY on the SETTINGS tab, on by default.
+
 **On a phone or a second screen.** The page is served to this PC only
 until you press "OPEN TO THE NETWORK" on the SETTINGS tab. The tab then
 shows an address such as `http://192.168.1.5:18280/`; type it into any
