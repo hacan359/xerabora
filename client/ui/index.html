@@ -238,10 +238,10 @@ function followPanel(s) {
     esc(f.rp || 'no rich presence line yet') + '</div></div></div>' +
     '<div class="stats">' +
     cell('PLATFORM', esc(s.game.console || '&mdash;')) +
-    cell('LAST SEEN', seen) +
+    cell('LAST SEEN', '<span id="fv-seen">' + seen + '</span>') +
     cell('SOURCE', 'RetroAchievements &middot; every 20 s') +
-    cell('POLLED', f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '&mdash;') +
-    cell('SESSION', f.since ? hms(f.since) : '&mdash;') +
+    cell('POLLED', '<span id="fv-polled">' + (f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '&mdash;') + '</span>') +
+    cell('SESSION', '<span id="fv-session">' + (f.since ? hms(f.since) : '&mdash;') + '</span>') +
     cell('UNLOCKS', (f.session || []).length) +
     '</div>' +
     (f.failures ? '<div class="note" style="color:var(--amber)">the Web API is not answering; retrying</div>' : '') +
@@ -727,8 +727,8 @@ function renderSettings() {
     '<div class="msg" id="lan-msg"></div>' +
 
     '<h2 style="margin-top:26px">CLIENT</h2>' +
-    '<div class="note">the client has no window of its own: closing this tab leaves it ' +
-    'running and unlocking. This button is how it exits.</div>' +
+    '<div class="note">the client has no window of its own. It exits by itself about 15 seconds ' +
+    'after its last page is closed, on the PC or a phone; this button exits at once.</div>' +
     '<button class="act" id="btn-quit">QUIT XERABORA</button>' +
     '</div>';
 
@@ -950,6 +950,15 @@ function apply(s) {
     updateLiveNumbers(c,
       list.map(a => ({ id: a.id, m: a.measured, p: a.percent })),
       tracking.map(t => ({ id: t.id, v: t.value })));
+    if (f.active) {
+      const po = document.getElementById('fv-polled');
+      if (po) po.textContent = f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '\u2014';
+      const se = document.getElementById('fv-session');
+      if (se) se.textContent = f.since ? hms(f.since) : '\u2014';
+      const sn = document.getElementById('fv-seen');
+      if (sn && !f.online && !f.rp_date && f.rp_ago >= 0) sn.textContent = ago(f.rp_ago) + ' ago';
+      document.getElementById('clock').textContent = f.since ? hms(f.since) : '';
+    }
 
     const u = s.unlocks && s.unlocks[0];
     if (u && u.id !== lastUnlock && u.ago < 12) {

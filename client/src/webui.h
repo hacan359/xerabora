@@ -81,6 +81,11 @@ void webui_set_stats(unsigned long frames, unsigned long gaps,
                      unsigned long dupes, unsigned long torn,
                      unsigned parts, unsigned bytes, unsigned addresses);
 
+/* True once a page has been open and none has been heard from for
+   `grace_seconds`: the last page was closed. The main loop then exits,
+   so a windowless client does not outlive its only window. */
+int webui_page_gone(int grace_seconds);
+
 /* Set by POST /quit from the settings screen; the main loop ends the
    same way Ctrl-C does. The page is the only visible surface of a
    windowless process, so it carries the off switch too. */

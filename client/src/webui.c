@@ -296,6 +296,20 @@ static sock_t g_streams[WEBUI_STREAMS] = {SOCK_INVALID, SOCK_INVALID, SOCK_INVAL
 static int g_stream_next;
 static unsigned long g_stream_sent;
 
+/* When a browser last talked to us: any request, or a live stream still
+   accepting writes. Once a page has been seen, a long silence means the
+   last page was closed. */
+static time_t g_page_contact;
+static int g_page_seen;
+static int stream_count(void);
+
+int webui_page_gone(int grace_seconds)
+{
+    if (!g_page_seen || stream_count() > 0)
+        return 0;
+    return time(NULL) - g_page_contact > grace_seconds;
+}
+
 static int stream_count(void)
 {
     int i, n = 0;
@@ -1063,6 +1077,8 @@ void webui_serve(sock_t listener, rc_client_t *client)
     c = accept(listener, (struct sockaddr *)&from, &fromlen);
     if (c == SOCK_INVALID)
         return;
+    g_page_contact = time(NULL);
+    g_page_seen = 1;
 
     /* One request: headers, plus the body of a settings POST, which may
        need a second read. Anything larger than this buffer is cut short and
@@ -1274,6 +1290,7 @@ void webui_push(rc_client_t *client)
                 g_streams[i] = SOCK_INVALID;
             } else {
                 g_stream_sent++;
+                g_page_contact = time(NULL);
             }
         }
     }

@@ -192,7 +192,10 @@ unlock time, the CONSOLE panel), **LIBRARY**, **GAME**, **BOARDS**
 (leaderboards with live trackers; softcore, so no entries are posted)
 and **SETTINGS** (login, key, QUIT). Everything the client does is also
 in `xerabora.log` next to the saved login. One copy runs at a time; a
-second start opens the running copy's page.
+second start opens the running copy's page. The page is the client's
+only window: about 15 seconds after the last page is closed, on the PC,
+a phone or in OBS, the client exits by itself. Keep one open while you
+play; QUIT on SETTINGS exits at once.
 
 **Following your play on other devices.** With a Web API key saved,
 LIVE also follows your account when the console is off: start a game in

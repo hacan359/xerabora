@@ -21,6 +21,10 @@
 #include "console.h"
 #include "discord.h"
 #include "follow.h"
+
+/* Seconds without any page before the client takes the last page as
+   closed and exits. A reload reconnects within one or two. */
+#define PAGE_GONE_GRACE 15
 #include "http.h"
 #include "log.h"
 #include "platform.h"
@@ -665,6 +669,10 @@ int main(int argc, char **argv)
             }
             follow_tick(0);
             webui_push(NULL);
+            if (webui_page_gone(PAGE_GONE_GRACE)) {
+                log_info("the page was closed; exiting");
+                break;
+            }
         }
         webui_stop(only);
         return 0;
@@ -844,6 +852,10 @@ int main(int argc, char **argv)
                and a page sees the result on the next push. */
             follow_tick(game_up);
             webui_push(client);
+            if (ui != SOCK_INVALID && webui_page_gone(PAGE_GONE_GRACE)) {
+                log_info("the page was closed; exiting");
+                break;
+            }
             discord_tick();
             test_unlock_tick();
             badge_tick();
