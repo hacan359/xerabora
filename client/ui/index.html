@@ -101,6 +101,31 @@
   }
   #toast img { width: 48px; height: 48px; image-rendering: pixelated; }
   @keyframes in { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
+
+  /* Phones: the tabs move to a bar along the bottom, the library gets two
+     covers a row, and the fixed-width columns give way. */
+  @media (max-width: 600px) {
+    header { gap: 10px; padding: 10px 12px; }
+    #who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+    nav {
+      position: fixed; left: 0; right: 0; bottom: 0; margin: 0; z-index: 6;
+      background: rgba(4,16,28,.97); border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    nav button { flex: 1; padding: 14px 0 12px; font-size: 8px; }
+    main { padding: 12px 12px 90px; }
+    footer { display: none; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .card .art, .card .art img { height: 92px; max-height: 92px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .row { gap: 10px; padding: 8px; }
+    .row .m { width: 92px; }
+    .row.big .m { width: 104px; }
+    .row.big .t { font-size: 22px; }
+    .row.big .d { font-size: 18px; }
+    .head img { width: 64px; }
+    #toast { left: 12px; right: 12px; bottom: 76px; }
+  }
 </style>
 
 <header>
