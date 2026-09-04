@@ -40,8 +40,9 @@ involved.
 - **Boards.** A game's leaderboards with the top entries.
 - **Live.** With a console connected: the running game as the console
   sees it, measured progress (3 of 10), UP NEXT by median unlock time,
-  live leaderboard trackers straight from console memory, and a CONSOLE
-  panel with the link, the snapshot rate and the losses.
+  live leaderboard trackers straight from console memory, points earned
+  and total, and a CONSOLE panel with the link, the snapshot rate and
+  the losses.
 - **Unlocks** land on your profile the moment they happen, with a toast
   on the page, a sound on the PC and a gold flash on the console.
 - **Stream-ready.** The interface is a page the client serves to itself
@@ -162,10 +163,12 @@ steps are on the [project page](https://hacan359.github.io/xerabora/#start).
 ## The PC client, in detail
 
 The interface is a page the client serves to itself on `localhost`,
-compiled into the executable. On Windows a double click opens the page
-and no console window; `--console` opens one, and everything is also
-written to `xerabora.log` next to the saved login. One copy runs at a
-time: a second double click opens the running copy's page.
+compiled into the executable, and to the local network when you open it
+on SETTINGS. On Windows a double click opens the page and no console
+window; `--console` opens one, and everything is also written to
+`xerabora.log` next to the saved login. One copy runs at a time: a
+second double click opens the running copy's page. The client exits by
+itself about 15 seconds after its last page is closed.
 
 Softcore only. The console can write to game memory (OPL's cheat engine),
 so `xerabora` does not claim hardcore mode. Leaderboard trackers run and
