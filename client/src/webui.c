@@ -43,6 +43,7 @@ static struct
     unsigned watch_bytes;
     unsigned watch_addresses;
     time_t started;
+    time_t ended;   /* when the link was lost; 0 while it is up */
 
     /* Set when the page's layout is out of date (new game, unlock, status
        change): the next push carries the full state. In between, one small
@@ -93,9 +94,22 @@ void webui_set_console(const char *ip, int connected)
     g.dirty = 1;
     if (ip != NULL)
         snprintf(g.console_ip, sizeof(g.console_ip), "%s", ip);
-    if (connected && !g.connected)
+    if (connected && !g.connected) {
         g.started = time(NULL);
+        g.ended = 0;
+    } else if (!connected && g.connected) {
+        g.ended = time(NULL);
+    }
     g.connected = connected;
+}
+
+/* The session clock: from the connect to now, or to the moment the
+   link was lost. */
+static long session_seconds(void)
+{
+    if (g.started == 0)
+        return 0;
+    return (long)((g.ended != 0 ? g.ended : time(NULL)) - g.started);
 }
 
 void webui_set_game(const char *serial, const char *hash, const char *title)
@@ -419,7 +433,7 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                   ",\"watch\":{\"parts\":%u,\"bytes\":%u,\"addresses\":%u},\"seconds\":%ld},",
                   g.packets, g.frames, g.gaps, g.dupes, g.torn,
                   g.watch_parts, g.watch_bytes, g.watch_addresses,
-                  g.started != 0 ? (long)(time(NULL) - g.started) : 0L);
+                  session_seconds());
 
     {
         char ip[48] = "", url[80] = "";
@@ -618,7 +632,7 @@ static int build_delta(char *buf, size_t size, rc_client_t *client)
                   "{\"delta\":1,\"console\":{\"frames\":%lu,\"gaps\":%lu,\"dupes\":%lu,"
                   "\"torn\":%lu,\"seconds\":%ld}",
                   g.frames, g.gaps, g.dupes, g.torn,
-                  g.started != 0 ? (long)(time(NULL) - g.started) : 0L);
+                  session_seconds());
 
     p += snprintf(p, (size_t)(end - p), ",\"live\":[");
     if (client != NULL) {
@@ -1356,7 +1370,7 @@ void webui_write_obs(rc_client_t *client)
     obs_file("last-points.txt", "%s", g.unlock_count > 0 ? "" : "");
     if (g.unlock_count > 0)
         obs_file("last-points.txt", "+%u", g.unlocks[0].points);
-    obs_file("session.txt", "%ld min", g.started != 0 ? (long)(time(NULL) - g.started) / 60 : 0L);
+    obs_file("session.txt", "%ld min", session_seconds() / 60);
     obs_file("console.txt", "%s", g.connected ? "connected" : "waiting");
 
     /* And the whole state, for a layout that would rather do its own

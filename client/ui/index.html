@@ -228,6 +228,9 @@ const STATUS = {
 function consolePanel(s) {
   const c = s.console;
   if (!c.connected && !c.packets) return '';
+  /* The console is gone and the account's play elsewhere has LIVE:
+     the panel steps aside, the session clock stopped at the loss. */
+  if (!c.connected && (s.follow || {}).active) return '';
 
   const st = STATUS[c.status];
   const w = c.watch || {};
