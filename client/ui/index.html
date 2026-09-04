@@ -44,7 +44,7 @@
   .head h1, .row .t, .row .d, .link span, .cell .v { overflow-wrap: anywhere; }
   .head img { width: 84px; image-rendering: pixelated; background: #0a2136; border: 1px solid var(--line); flex: none; }
   .head h1 { font-size: 13px; margin: 0 0 10px; color: #fff; line-height: 1.6; }
-  .bar { height: 12px; border: 1px solid var(--line); background: #0a2136; position: relative; }
+  .bar { height: 12px; border: 1px solid var(--line); background: #0a2136; position: relative; overflow: hidden; }
   .bar > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #2f8fd6, var(--accent)); display: block; transition: width .25s; }
 
   .row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; background: var(--panel); margin-bottom: 4px; }
@@ -56,7 +56,7 @@
   .row .t { color: #fff; }
   .row .d { color: var(--dim); font-size: 19px; }
   .row .m { width: 130px; flex: none; text-align: right; }
-  .mini { height: 6px; background: #0a2136; position: relative; margin-top: 5px; }
+  .mini { height: 6px; background: #0a2136; position: relative; margin-top: 5px; overflow: hidden; }
   .mini > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); display: block; transition: width .25s; }
 
   .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px; margin-bottom: 14px; }
@@ -344,7 +344,7 @@ function renderLive(s) {
       '<img src="' + BADGE + a.badge + '_lock.png" alt="">' +
       '<div class="body"><div class="t">' + esc(a.title) + '</div>' +
       '<div class="d">' + esc(a.description) + '</div>' +
-      (a.percent > 0 ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + (a.percent * 100) + '%"></i></div>' : '') +
+      (a.percent > 0 ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + pctClamp(a.percent) + '%"></i></div>' : '') +
       '</div><div class="m">' +
       (a.measured ? '<span style="color:var(--accent)" data-live-m="' + a.id + '">' + esc(a.measured) + '</span>' : '') +
       (a === picked.prog ? '<div style="color:var(--accent)">next in progression</div>' : '') +
@@ -385,7 +385,7 @@ function renderLive(s) {
         '<img src="' + BADGE + a.badge + (isDone ? '' : '_lock') + '.png" alt="">' +
         '<div class="body"><div class="t">' + esc(a.title) + '</div>' +
         '<div class="d">' + esc(a.description) + '</div>' +
-        (near ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + (a.percent * 100) + '%"></i></div>' : '') +
+        (near ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + pctClamp(a.percent) + '%"></i></div>' : '') +
         '</div><div class="m">' +
         (isDone ? '<span style="color:var(--green)">unlocked</span>'
          : na ? '<span style="color:var(--amber)">not on hardware</span>'
@@ -910,6 +910,9 @@ function stream() {
   };
 }
 
+/* rc_client's measured_percent is already 0..100. */
+function pctClamp(v) { return Math.max(0, Math.min(100, +v || 0)); }
+
 function setVals(sel, txt) {
   for (const el of document.querySelectorAll(sel)) el.textContent = txt;
 }
@@ -933,7 +936,7 @@ function updateLiveNumbers(c, live, trk) {
   for (const a of live || []) {
     if (a.m) setVals('[data-live-m="' + a.id + '"]', a.m);
     for (const el of document.querySelectorAll('[data-live-p="' + a.id + '"]'))
-      el.style.width = (a.p * 100) + '%';
+      el.style.width = pctClamp(a.p) + '%';
   }
   for (const t of trk || []) setVals('[data-tr="' + t.id + '"]', t.v);
 }
