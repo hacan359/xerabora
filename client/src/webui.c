@@ -223,6 +223,17 @@ sock_t webui_start(int port)
 
             setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on));
         }
+#else
+        /* Windows lets a wildcard bind succeed next to another copy's
+           loopback bind on the same port; the browser then reaches
+           whichever copy owns 127.0.0.1. Exclusive use makes the second
+           bind fail, so this copy moves to the next port and finds the
+           first one the normal way. */
+        {
+            int on = 1;
+
+            setsockopt(s, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (const char *)&on, sizeof(on));
+        }
 #endif
 
         memset(&addr, 0, sizeof(addr));
