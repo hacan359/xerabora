@@ -11,6 +11,7 @@
     --accent: #7fd4ff; --green: #66ffb2; --amber: #ffb84d;
   }
   * { box-sizing: border-box; }
+  html, body { max-width: 100%; overflow-x: hidden; }
   body {
     margin: 0; background: radial-gradient(90% 60% at 30% 0%, var(--bg2) 0%, #071627 62%, var(--bg) 100%);
     background-attachment: fixed; color: var(--text);
@@ -32,11 +33,15 @@
   .dimmer { color: var(--dimmer); }
 
   .link { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); background: rgba(10,33,54,.55); }
+  .link span { min-width: 0; }
+  .bar { max-width: 100%; }
   .dot { width: 8px; height: 8px; background: var(--dimmer); flex: none; }
   .dot.on { background: var(--green); box-shadow: 0 0 10px var(--green); }
 
   main { padding: 14px; }
-  .head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+  .head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; min-width: 0; }
+  .head > div { min-width: 0; }
+  .head h1, .row .t, .row .d, .link span, .cell .v { overflow-wrap: anywhere; }
   .head img { width: 84px; image-rendering: pixelated; background: #0a2136; border: 1px solid var(--line); flex: none; }
   .head h1 { font-size: 13px; margin: 0 0 10px; color: #fff; line-height: 1.6; }
   .bar { height: 12px; border: 1px solid var(--line); background: #0a2136; position: relative; }
@@ -124,6 +129,8 @@
     .row.big .t { font-size: 22px; }
     .row.big .d { font-size: 18px; }
     .head img { width: 64px; }
+    .head h1 { font-size: 11px; }
+    #linkstats { display: none; }
     #toast { left: 12px; right: 12px; bottom: 76px; }
   }
 </style>
