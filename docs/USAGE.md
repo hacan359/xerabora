@@ -33,11 +33,27 @@ is configured anywhere — the console finds the client by broadcast.
 3. `OPL-RA.ELF` installed as an app in OPL (see below).
 4. The PC client running on a machine on the **same LAN/subnet**, logged
    in to your RetroAchievements account.
-5. Your game images (ISO) on a USB stick (the tested path). A share works too; the internal HDD is untested.
+5. Your game images (`.iso`) on a USB stick, or the original disc in the
+   drive. These two we have tested, and they are the ones to play from.
+   A game with an achievement set does not run from a network share yet;
+   a game without one does. The internal HDD is untested.
 
-A network share is **not required** — USB alone works (see "Running from
-USB only" below). The share only makes watch-list storage and diagnostic
-logs more reliable.
+A network share is not required (see "Running from USB only" below). It
+is fine for the loader itself, `conf_apps.cfg`, the watch lists and the
+diagnostic logs; keep the images you play with achievements on the stick.
+
+## Achievements in five steps
+
+1. Start `xerabora` on the PC and sign in on SETTINGS.
+2. Boot `OPL-RA.ELF` on the console.
+3. Highlight the game, press △, choose **RA: test PC connection**. The
+   notice names the PC that answered.
+4. Same menu, **RA: check game support**. Do this once per game, before
+   you start it. The notice shows the title and the achievement counts.
+5. Start the game. Play. Unlocks land on the page and on your profile.
+
+Skip step 4 and the game starts as plain OPL: no telemetry, and the
+client shows nothing for it. The rest of this guide explains each step.
 
 ## Installing OPL-RA.ELF
 
@@ -125,7 +141,10 @@ answered. Use it to confirm the network path before playing.
 
 Hashes the selected image and asks the PC whether RetroAchievements
 knows it. This also downloads the watch list the console needs, so run
-it once per game before playing (the list is cached afterwards).
+it once per game, before you start it (the list is saved next to the
+game afterwards). A game you never checked, or one RetroAchievements
+does not know, starts as plain OPL: no telemetry, and the client shows
+nothing for it. That is by design, not a fault.
 
 - Supported: `<game title>: N achievements` — you are ready to play.
 - Unsupported: `RetroAchievements does not know this image`.
@@ -167,8 +186,10 @@ USB are unaffected.
 
 ## Playing and unlocking
 
-Start the game normally from OPL. The in-game hook begins streaming
-memory snapshots to the PC after a short delay. Keep the PC client
+Start the game normally from OPL. If you checked it (above), the in-game
+hook begins streaming memory snapshots to the PC after a short delay; if
+you did not, or RetroAchievements does not know the game, it runs as
+plain OPL and the client stays quiet. Keep the PC client
 running: it evaluates the snapshots and unlocks achievements on the
 server as you earn them, exactly like an emulator. An unlock shows on
 the client's page and, on the console, as a short gold flash over the
@@ -273,7 +294,9 @@ an address (DHCP is enough).
 | "test" works, "check" says no answer | Client not running, or not on the same subnet. |
 | "could not open a network socket" | ETH device off/misconfigured, or no cable/link. |
 | Client shows nothing when you press a menu item | Windows firewall blocking inbound UDP to `xerabora.exe`. |
+| Game starts, client shows nothing | You did not run "check game support" on it, or RetroAchievements does not know the image. Check it once; if the notice says the image is unknown, the game plays without achievements. |
 | Achievements don't unlock in game | Client must stay running; run "check game support" once first so the watch list is loaded. |
+| Game from a share stops loading after about a minute | A game with an achievement set does not run from a share yet. Put the image on a USB stick or use the disc. |
 | Unlock on the page, no flash on the console | Look for `console acknowledged unlock notice` in `xerabora.log`. Missing: the notice never reached the console, check that both are on the same subnet. Present: the console got it; report the game. |
 | Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it on its SETTINGS tab, or end it in Task Manager. |
 
@@ -284,6 +307,10 @@ an address (DHCP is enough).
 - Images may be named `Title.iso` or the OPL Manager way,
   `SLUS_123.45.Title.iso`. ZSO/UL images and ELFs outside the image root
   are not covered.
+- A game with an achievement set does not run from a network share yet:
+  it boots, the console connects, and about a minute in it stops
+  loading. The telemetry and the SMB stream share one network
+  controller. Games without a set run from a share as before.
 - Games that load their own network modules (DEV9/SMAP) may take the
   interface away from the telemetry when launched from a disc; from USB
   the same games are fine.

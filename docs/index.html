@@ -451,6 +451,7 @@
       <span class="eyebrow gold">How to start</span>
       <h2>From download to the first unlock.</h2>
       <p>One evening, one USB stick. The panels on the right are what the client's page shows at each step, with the numbers from a real session.</p>
+      <p>An unlock needs three things, in this order: xerabora signed in on the PC, the game checked once from its menu, then the game started. Step 5 is the one people skip.</p>
     </div>
 
     <div class="steps">
@@ -463,7 +464,7 @@
           <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> files on a USB stick or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
         </div>
         <div class="step-vis">
-          <pre class="files"><b>xerabora v0.1.0-alpha.4</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
+          <pre class="files"><b>xerabora, latest release</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
 ├─ <span class="new">OPL-RA.ELF</span>              console loader (OPL 1.2.0 + RA)
 ├─ OPL-RA-debug.ELF        same, with on-screen diagnostics
 ├─ <span class="new">xerabora.exe</span>            PC client, Windows
@@ -547,6 +548,7 @@
           <h3>Check game support</h3>
           <p>Same menu, <strong>RA: check game support</strong>. The console hashes the image the RetroAchievements way and asks the PC. The PC asks the RA server, builds the <em>watch list</em> (every memory address the achievement set reads) and sends it back. The notice shows the title and the counts: total, unlocked, and how many cannot unlock on real hardware yet.</p>
           <p>Once checked, the game gets an <code>RA</code> prefix in the list and a badge on the cover. You do this once per game.</p>
+          <div class="tip"><b>Before you start the game.</b> This step fetches the list of addresses the console will read. Skip it and the game starts as plain OPL: no telemetry, nothing on the page. <code>RetroAchievements does not know this image</code> means the game plays without achievements.</div>
         </div>
         <div class="step-vis">
           <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
@@ -569,7 +571,7 @@
           <span class="n"></span>
           <h3>Start the game</h3>
           <p>Launch it from OPL as usual. When the game opens its controller, the in-game hooks attach. The console finds the PC with one broadcast, waits about thirty seconds for the game to finish loading, then starts streaming.</p>
-          <p>The LIVE tab lights up: console connected, the set, the first snapshot, and how many achievements cannot unlock on real hardware. From here on it is playing.</p>
+          <p>The LIVE tab lights up: console connected, the set, the first snapshot, and how many achievements cannot unlock on real hardware. From here on it is playing. A game you did not check stays dark here: it runs, without telemetry.</p>
         </div>
         <div class="step-vis">
           <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
@@ -616,8 +618,8 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Verified on hardware</span>
-      <h2>We tested two ways to run it. The rest, nobody has.</h2>
-      <p>We checked this page on a real console, with games on a USB stick or the original disc in the drive. OPL knows other ways of storing games, and we have not tried the RA additions with any of them.</p>
+      <h2>We tested two ways to run it. Play from one of them.</h2>
+      <p>We checked this page on a real console, with games on a USB stick or the original disc in the drive. Keep the images you play with achievements there. OPL knows other ways of storing games; one of them we know does not work yet, the rest we have not tried.</p>
     </div>
     <div class="verified">
       <div class="vcard ok">
@@ -631,9 +633,9 @@
         <p>Check and launch from OPL's main menu. Runs and unlocks; one game so far. Experimental, see below.</p>
       </div>
       <div class="vcard warn">
-        <span class="eyebrow">Untested</span>
+        <span class="eyebrow">Not yet</span>
         <h3>SMB share, internal HDD, UL and ZSO images</h3>
-        <p>Nobody has run the RA additions from these yet. Expect the image check to fail, and expect problems we have not seen. If you try one anyway, the PC window prints what we would need to know.</p>
+        <p>A share hashes fine, but a game with an achievement set does not run from it yet: it boots, the console connects, and about a minute in it stops loading. Games without a set run from a share as before. Nobody has run the RA additions from an internal HDD or from UL and ZSO images; expect problems we have not seen.</p>
       </div>
     </div>
   </div>
@@ -713,7 +715,7 @@
       </div>
       <div>
         <h3>Plain ISO or the disc</h3>
-        <p>The image check reads <code>.iso</code> files named <code>Title.iso</code> or the OPL Manager way (<code>SLUS_123.45.Title.iso</code>) in <code>DVD</code> or <code>CD</code> on a USB stick, and the disc in the drive. UL/USBExtreme, ZSO and the internal HDD are not hashed yet; telemetry itself does not care where the game runs from.</p>
+        <p>The image check reads <code>.iso</code> files named <code>Title.iso</code> or the OPL Manager way (<code>SLUS_123.45.Title.iso</code>) in <code>DVD</code> or <code>CD</code> on a USB stick or a share, and the disc in the drive. UL/USBExtreme, ZSO and the internal HDD are not hashed yet. Play from the stick or the disc: a game with a set does not run from a share yet.</p>
       </div>
       <div>
         <h3>Hooks need libpad</h3>
@@ -748,7 +750,7 @@
       </details>
       <details>
         <summary>Do I need a network share or an internal HDD?</summary>
-        <p>Neither. A USB stick with your images is the tested setup. We have not tried a share or the internal HDD with the RA additions, so expect trouble there. The loader cannot hash HDD games yet: they sit on HDL partitions rather than in <code>.iso</code> files.</p>
+        <p>Neither. A USB stick with your images, or the disc, is the tested setup. A share is fine for the loader and the watch lists, but a game with an achievement set does not run from it yet; games without a set do. We have not tried the internal HDD, and the loader cannot hash HDD games yet: they sit on HDL partitions rather than in <code>.iso</code> files.</p>
       </details>
       <details>
         <summary>The unlock showed on the page but the TV did not flash.</summary>

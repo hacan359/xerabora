@@ -88,12 +88,20 @@ nothing beyond what OPL already needs and changes nothing in the game.
 ### What you need
 
 - A PS2 with a network adapter and a way to run OPL (FMCB, FHDB or similar).
-- Your game images on a USB stick, or the original disc in the drive. Both
-  are tested; a share is optional and the internal HDD is untested.
+- Your game images on a USB stick, or the original disc in the drive. These
+  two we have tested, and they are the ones to play from. A game with an
+  achievement set does not run from a network share yet; a game without
+  one does. The internal HDD is untested.
 - A PC on the same local network, Windows or Linux.
 - A [RetroAchievements](https://retroachievements.org) account.
 
 ### Setup
+
+An unlock needs three things, in this order: `xerabora` running on the PC
+and signed in, the game checked once with **RA: check game support**, and
+only then the game started. Step 6 is the one people skip. A game you
+never checked starts as plain OPL, without telemetry, and the client
+shows nothing for it.
 
 1. Download `OPL-RA.ELF` and `xerabora.exe` (Windows) or `xerabora-linux-x86_64`
    (Linux) from the [releases](../../releases).
@@ -112,15 +120,19 @@ nothing beyond what OPL already needs and changes nothing in the game.
    **RA: test PC connection**. A notice tells you whether `xerabora` answered,
    from which address and how fast. If nothing answers, check that the PC
    is on the same network and that the firewall allows inbound UDP 18194.
-6. In the same menu choose **RA: check game support**. The console hashes
-   the disc image and asks the PC whether RetroAchievements knows it; the
-   notice shows the game title and the achievement counts (total, unlocked,
-   unsupported). Supported games get an `RA` prefix in the list and a badge
-   on the cover art.
+6. In the same menu choose **RA: check game support**. Do this before you
+   start the game, once per game: it fetches the list of addresses the
+   console will read, and without it there is nothing to track. The
+   console hashes the disc image and asks the PC whether RetroAchievements
+   knows it; the notice shows the game title and the achievement counts
+   (total, unlocked, unsupported). Supported games get an `RA` prefix in
+   the list and a badge on the cover art. `RetroAchievements does not know
+   this image` means the game plays without achievements.
 7. Start the game. Within about 30 seconds the **LIVE** tab shows the
    console connected, the set and the first snapshot. An unlock shows on
    the page, on your profile, and as a short gold flash over the game on
-   the console.
+   the console. A game you skipped step 6 for starts like plain OPL: no
+   telemetry, nothing on the page.
 
 **Playing from the original disc.** Put the disc in the drive, press START
 for OPL's main menu and choose **RA: check disc support**, then **RA: launch
