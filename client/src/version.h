@@ -4,7 +4,7 @@
 #define XERABORA_NAME "xerabora"
 
 #ifndef XERABORA_VERSION
-#define XERABORA_VERSION "0.1.0-alpha.5"
+#define XERABORA_VERSION "0.1.0-alpha.6"
 #endif
 
 #endif
