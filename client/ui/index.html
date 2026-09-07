@@ -29,6 +29,27 @@
   }
   nav button.on { background: var(--accent); color: #04101c; }
   .right { margin-left: auto; }
+  .hdr { display: flex; align-items: center; gap: 12px; min-width: 0; white-space: nowrap; }
+  select.lang {
+    background: none; border: 1px solid var(--line); color: var(--dim); font: inherit;
+    font-size: 15px; padding: 1px 4px; cursor: pointer;
+  }
+  select.lang:hover, select.lang:focus { border-color: var(--accent); color: var(--text); outline: none; }
+  button.quit {
+    font-family: 'Press Start 2P', monospace; font-size: 8px; background: none; color: #ff6b6b;
+    border: 1px solid #ff6b6b; padding: 7px 10px; cursor: pointer; margin-left: 14px;
+  }
+  button.quit:hover { background: #ff6b6b; color: #04101c; }
+  .switch {
+    display: flex; align-items: center; gap: 12px; padding: 9px 10px; background: var(--panel);
+    margin-bottom: 4px; cursor: pointer; user-select: none;
+  }
+  .switch .k { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--dim); }
+  .switch .state { font-family: 'Press Start 2P', monospace; font-size: 9px; padding: 5px 8px; border: 1px solid var(--line); color: var(--dimmer); }
+  .switch.on .state { background: var(--green); color: #04101c; border-color: var(--green); }
+  .switch .d { color: var(--dim); font-size: 17px; flex: 1; min-width: 0; }
+  .switch.busy { opacity: .5; pointer-events: none; }
+  .subsets { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 12px; }
   .muted { color: var(--dim); }
   .dimmer { color: var(--dimmer); }
 
@@ -92,8 +113,8 @@
   .set label { display: block; color: var(--dim); font-size: 16px; margin: 10px 0 4px; }
   .set .note { color: var(--dim); font-size: 17px; margin: 6px 0 0; }
   .set .msg { font-size: 17px; margin-top: 8px; min-height: 1.3em; }
-  input.f { background: #0a2136; border: 1px solid var(--line); color: var(--text); font: inherit; padding: 6px 9px; width: 100%; box-sizing: border-box; }
-  input.f:focus { border-color: var(--accent); outline: none; }
+  input.f, select.f { background: #0a2136; border: 1px solid var(--line); color: var(--text); font: inherit; padding: 6px 9px; width: 100%; box-sizing: border-box; }
+  input.f:focus, select.f:focus { border-color: var(--accent); outline: none; }
   button.act { font-family: 'Press Start 2P', monospace; font-size: 9px; background: var(--accent); color: #04101c; border: 0; padding: 10px 14px; cursor: pointer; margin-top: 12px; }
   button.act:disabled { background: var(--dimmer); cursor: default; }
   footer { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
@@ -112,6 +133,7 @@
   @media (max-width: 600px) {
     header { gap: 10px; padding: 10px 12px; }
     #who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+    select.lang { font-size: 13px; padding: 0 2px; }
     nav {
       position: fixed; left: 0; right: 0; bottom: 0; margin: 0; z-index: 6;
       background: rgba(4,16,28,.97); border-top: 1px solid var(--line);
@@ -139,18 +161,18 @@
   <span class="px name">xe<span style="color:var(--accent)">R</span><span style="color:#ffcc33">A</span>bora</span>
   <span class="dimmer" id="ver" style="font-size:15px"></span>
   <nav>
-    <button class="on" data-tab="live">LIVE</button>
-    <button data-tab="library">LIBRARY</button>
-    <button data-tab="game">GAME</button>
-    <button data-tab="boards">BOARDS</button>
-    <button data-tab="settings">SETTINGS</button>
+    <button class="on" data-tab="live" data-t="LIVE">LIVE</button>
+    <button data-tab="library" data-t="LIBRARY">LIBRARY</button>
+    <button data-tab="game" data-t="GAME">GAME</button>
+    <button data-tab="boards" data-t="BOARDS">BOARDS</button>
+    <button data-tab="settings" data-t="SETTINGS">SETTINGS</button>
   </nav>
-  <span class="right dimmer" id="who"></span>
+  <span class="right hdr"><span class="dimmer" id="who"></span><select id="lang-pick" class="lang" aria-label="Language"></select></span>
 </header>
 
 <div class="link">
   <span class="dot" id="dot"></span>
-  <span id="linktext">waiting for the console</span>
+  <span id="linktext" data-t="waiting for the console">waiting for the console</span>
   <span class="right dimmer" id="linkstats"></span>
 </div>
 
@@ -163,16 +185,16 @@
 </main>
 
 <footer>
-  <span class="chip on">SOFTCORE</span>
-  <span class="chip">FLASH</span>
-  <span class="chip">RUMBLE</span>
+  <span class="chip on" data-t="SOFTCORE" title="every unlock is softcore">SOFTCORE</span>
+  <span class="chip" id="chip-flash" data-t="FLASH" title="the gold flash on the TV: lit while a console streams">FLASH</span>
   <span class="right dimmer" id="clock"></span>
+  <button class="quit" id="btn-quit" data-t="QUIT" hidden>QUIT</button>
 </footer>
 
 <div id="toast">
   <img id="toastimg" alt="">
   <div>
-    <div class="px" style="font-size:10px;color:#fff;margin-bottom:8px">ACHIEVEMENT UNLOCKED</div>
+    <div class="px" style="font-size:10px;color:#fff;margin-bottom:8px" data-t="ACHIEVEMENT UNLOCKED">ACHIEVEMENT UNLOCKED</div>
     <div id="toasttext" style="color:#fff"></div>
   </div>
 </div>
@@ -180,6 +202,359 @@
 <script>
 const BADGE = 'https://media.retroachievements.org/Badge/';
 const MEDIA = 'https://media.retroachievements.org';
+
+/* ---- Language ---------------------------------------------------------- */
+
+/* The English source is the key: without a dictionary the page is the
+   page it always was. Dictionaries are generated from
+   lab/client-i18n/*.json; {name} placeholders keep their meaning. */
+const LANGS = [['', 'English'], ['pt-BR', 'Portugu\u00eas (Brasil)'], ['es', 'Espa\u00f1ol']];
+/* lang:begin -- written by tools/embed-lang.py from ui/lang/*.json */
+const LANG = {
+  "es": {
+    "LIVE": "EN VIVO",
+    "LIBRARY": "BIBLIOTECA",
+    "GAME": "JUEGO",
+    "BOARDS": "TABLAS",
+    "SETTINGS": "AJUSTES",
+    "SOFTCORE": "SOFTCORE",
+    "FLASH": "FLASH",
+    "ACHIEVEMENT UNLOCKED": "LOGRO DESBLOQUEADO",
+    "{packets} packets": "{packets} paquetes",
+    "{gaps} skipped · {dupes} rep · {torn} torn": "{gaps} saltados · {dupes} rep · {torn} rotos",
+    "CONSOLE": "CONSOLA",
+    "LINK": "ENLACE",
+    "lost": "perdido",
+    "SNAPSHOTS": "SNAPSHOTS",
+    "LOST": "PERDIDOS",
+    "WATCH LIST": "LISTA VIGILADA",
+    "{addresses} addr &middot; {bytes} B &middot; {parts} parts": "{addresses} dir &middot; {bytes} B &middot; {parts} partes",
+    "SESSION": "SESION",
+    "hash {hash}": "hash {hash}",
+    "playing now": "jugando ahora",
+    "THIS SESSION": "ESTA SESION",
+    "hardcore": "hardcore",
+    "FOLLOWING": "SIGUIENDO",
+    "no rich presence line yet": "aún sin línea de rich presence",
+    "PLATFORM": "PLATAFORMA",
+    "LAST SEEN": "VISTO POR ULTIMA VEZ",
+    "SOURCE": "FUENTE",
+    "RetroAchievements &middot; every 20 s": "RetroAchievements &middot; cada 20 s",
+    "POLLED": "CONSULTADO",
+    "UNLOCKS": "DESBLOQUEOS",
+    "the Web API is not answering; retrying": "la Web API no responde; reintentando",
+    "{n} s": "{n} s",
+    "{n} min": "{n} min",
+    "{h} h {m} min": "{h} h {m} min",
+    "{time} ago": "hace {time}",
+    "console connected, waiting for a game with achievements": "consola conectada, esperando un juego con logros",
+    "following your RetroAchievements activity: start a game on the console, or in any emulator with RetroAchievements on, and it shows up here within half a minute": "siguiendo tu actividad en RetroAchievements: empieza un juego en la consola, o en cualquier emulador con RetroAchievements activo, y aparece aquí en menos de medio minuto",
+    "start a game on the console, or browse your library above": "empieza un juego en la consola, o mira tu biblioteca arriba",
+    "next in progression": "siguiente en la progresión",
+    "possibly skipped": "posiblemente perdido",
+    "usually done by now": "normalmente ya está hecho a estas alturas",
+    "{points} pts": "{points} pts",
+    "UP NEXT &middot; BY MEDIAN UNLOCK TIME": "LO SIGUIENTE &middot; POR TIEMPO MEDIANO DE DESBLOQUEO",
+    "TRACKING NOW": "RASTREANDO AHORA",
+    "ALL ACHIEVEMENTS": "TODOS LOS LOGROS",
+    "unlocked": "desbloqueado",
+    "not on hardware": "no en hardware",
+    "locked": "bloqueado",
+    "MASTERED": "MAESTRIA",
+    "COMPLETED · SC": "COMPLETADO · SC",
+    "BEATEN": "SUPERADO",
+    "BEATEN · SC": "SUPERADO · SC",
+    "loading your library...": "cargando tu biblioteca...",
+    "could not reach the client": "no se pudo contactar con el cliente",
+    "ALL CONSOLES": "TODAS LAS CONSOLAS",
+    "ALL {n}": "TODOS {n}",
+    "NOT STARTED": "SIN EMPEZAR",
+    "IN PROGRESS": "EN CURSO",
+    "({n} hc)": "({n} hc)",
+    "nothing matches these filters": "nada coincide con estos filtros",
+    "pick a game in the library": "elige un juego en la biblioteca",
+    "loading...": "cargando...",
+    "{n} achievements": "{n} logros",
+    "beaten ~{time}": "superar ~{time}",
+    "full set ~{time}": "conjunto completo ~{time}",
+    "by median unlocks": "por desbloqueos medianos",
+    "on retroachievements.org": "en retroachievements.org",
+    "TRACKING NOW &middot; FROM CONSOLE MEMORY": "RASTREANDO AHORA &middot; DESDE LA MEMORIA DE LA CONSOLA",
+    "{n} LEADERBOARDS &middot; CLICK ONE TO EXPAND": "{n} CLASIFICACIONES &middot; PULSA UNA PARA ABRIRLA",
+    "no entries": "sin entradas",
+    "OTHER DEVICES": "OTROS DISPOSITIVOS",
+    "this page is open from {host}": "esta página está abierta desde {host}",
+    "account, Web API key, the network switch and QUIT are changed on the PC that runs xerabora; from here you watch.": "la cuenta, la clave de la Web API, el interruptor de red y SALIR se cambian en el PC que ejecuta xerabora; desde aquí solo miras.",
+    "signed in as {user}": "conectado como {user}",
+    "RETROACHIEVEMENTS ACCOUNT": "CUENTA DE RETROACHIEVEMENTS",
+    "unlocks from the console are credited to this account": "los desbloqueos de la consola se acreditan a esta cuenta",
+    "SIGN OUT": "CERRAR SESION",
+    "the account your unlocks are credited to; only a login token is stored": "la cuenta que recibe tus desbloqueos; solo se guarda un token de sesión",
+    "username": "usuario",
+    "password": "contraseña",
+    "SIGN IN": "ENTRAR",
+    "WEB API KEY": "CLAVE DE LA WEB API",
+    "a read-only key that fills the library, leaderboards and profile. Get it at {link}, section \"Keys\", and paste it here.": "una clave de solo lectura que llena la biblioteca, las clasificaciones y el perfil. Consíguela en {link}, sección \"Keys\", y pégala aquí.",
+    "key": "clave",
+    "(saved, paste to replace)": "(guardada, pega otra para cambiarla)",
+    "SAVE KEY": "GUARDAR CLAVE",
+    "FOLLOW MY PLAY": "SEGUIR MI PARTIDA",
+    "open to the network": "abierta a la red",
+    "(no network address found yet)": "(todavía no se encontró una dirección de red)",
+    "type that address into a phone or tablet on the same Wi-Fi and add the page to the home screen. Other devices watch; settings and QUIT stay here. On Windows, allow xerabora through the firewall when it asks.": "escribe esa dirección en un móvil o tablet en la misma Wi-Fi y añade la página a la pantalla de inicio. Los otros dispositivos solo miran; los ajustes y SALIR se quedan aquí. En Windows, permite xerabora en el firewall cuando lo pida.",
+    "CLOSE TO THIS PC": "CERRAR A ESTE PC",
+    "the page is reachable from this PC only. Open it to the network and any phone, tablet or second PC on the same Wi-Fi can watch this tracker.": "la página solo es accesible desde este PC. Ábrela a la red y cualquier móvil, tablet o segundo PC en la misma Wi-Fi podrá ver este seguimiento.",
+    "OPEN TO THE NETWORK": "ABRIR A LA RED",
+    "signing in...": "entrando...",
+    "failed": "falló",
+    "Quit xerabora? Console telemetry and unlocks stop.": "¿Salir de xerabora? La telemetría de la consola y los desbloqueos se detienen.",
+    "xerabora is closed. This tab can be closed too.": "xerabora está cerrado. Esta pestaña también se puede cerrar.",
+    "saving...": "guardando...",
+    "saved": "guardada",
+    "closing...": "cerrando...",
+    "opening...": "abriendo...",
+    "{frames} snapshots, {skipped} skipped": "{frames} snapshots, {skipped} saltados",
+    "console live at {ip}": "consola en vivo en {ip}",
+    "following {game} via RetroAchievements": "siguiendo {game} vía RetroAchievements",
+    "not signed in to RetroAchievements &mdash; open SETTINGS to sign in": "sin sesión en RetroAchievements &mdash; abre AJUSTES para entrar",
+    "waiting for the console": "esperando la consola",
+    "+{points} pts": "+{points} pts",
+    "{user} · {points} points": "{user} · {points} puntos",
+    "no Web API key, see SETTINGS": "sin clave de la Web API, mira AJUSTES",
+    "achievement set active, unlocks are tracked": "conjunto de logros activo, desbloqueos rastreados",
+    "image not identified &mdash; run 'RA: check game support' in the game's OPL menu": "imagen no identificada &mdash; usa 'RA: check game support' en el menú OPL del juego",
+    "telemetry only &mdash; no achievement set could be loaded for this image": "solo telemetría &mdash; no se pudo cargar ningún conjunto de logros para esta imagen",
+    "console watch list is out of date &mdash; run 'RA: check game support' again": "la lista vigilada de la consola está desactualizada &mdash; usa 'RA: check game support' otra vez",
+    "{n} CONSOLE": "{n} CONSOLA",
+    "{n} CONSOLES": "{n} CONSOLAS",
+    "missable": "perdible",
+    "progression": "progresión",
+    "win condition": "condición de victoria",
+    "ALL": "TODOS",
+    "LOCKED": "BLOQUEADOS",
+    "UNLOCKED": "DESBLOQUEADOS",
+    "MISSABLE": "PERDIBLES",
+    "PROGRESSION": "PROGRESION",
+    "WIN CONDITION": "COND. DE VICTORIA",
+    "AUTHOR ORDER": "ORDEN DEL AUTOR",
+    "PROGRESSION PATH": "RUTA DE PROGRESION",
+    "MEDIAN TIME": "TIEMPO MEDIANO",
+    "the console has LIVE while it streams; following takes over when it stops": "la consola tiene EN VIVO mientras transmite; el seguimiento toma el relevo cuando se detiene",
+    "LIVE shows the game you are in on any emulator with RetroAchievements, and the unlocks as they land": "EN VIVO muestra el juego en el que estás en cualquier emulador con RetroAchievements, y los desbloqueos en cuanto llegan",
+    "off. Turn it on and LIVE follows your account on any emulator with RetroAchievements": "desactivado. Actívalo y EN VIVO sigue tu cuenta en cualquier emulador con RetroAchievements",
+    "ACHIEVEMENTS": "LOGROS",
+    "POINTS": "PUNTOS",
+    "BEATEN AT": "SUPERADO EN",
+    "FULL SET AT": "CONJUNTO COMPLETO EN",
+    "YOUR POSITION": "TU POSICION",
+    "MISSABLES LEFT": "PERDIBLES RESTANTES",
+    "MAIN SET": "CONJUNTO PRINCIPAL",
+    "QUIT": "SALIR",
+    "ON": "ACTIVADO",
+    "OFF": "DESACTIVADO",
+    "still loading; the client is busy with RetroAchievements": "todavía cargando; el cliente está ocupado con RetroAchievements",
+    "try again": "intentar de nuevo",
+  },
+  "pt-BR": {
+    "LIVE": "AO VIVO",
+    "LIBRARY": "BIBLIOTECA",
+    "GAME": "JOGO",
+    "BOARDS": "PLACARES",
+    "SETTINGS": "AJUSTES",
+    "SOFTCORE": "SOFTCORE",
+    "FLASH": "FLASH",
+    "ACHIEVEMENT UNLOCKED": "CONQUISTA DESBLOQUEADA",
+    "{packets} packets": "{packets} pacotes",
+    "{gaps} skipped · {dupes} rep · {torn} torn": "{gaps} pulados · {dupes} rep · {torn} quebrados",
+    "CONSOLE": "CONSOLE",
+    "LINK": "CONEXÃO",
+    "lost": "perdida",
+    "SNAPSHOTS": "SNAPSHOTS",
+    "LOST": "PERDIDOS",
+    "WATCH LIST": "LISTA VIGIADA",
+    "{addresses} addr &middot; {bytes} B &middot; {parts} parts": "{addresses} end &middot; {bytes} B &middot; {parts} partes",
+    "SESSION": "SESSÃO",
+    "hash {hash}": "hash {hash}",
+    "playing now": "jogando agora",
+    "THIS SESSION": "NESTA SESSÃO",
+    "hardcore": "hardcore",
+    "FOLLOWING": "SEGUINDO",
+    "no rich presence line yet": "ainda sem linha de rich presence",
+    "PLATFORM": "PLATAFORMA",
+    "LAST SEEN": "VISTO POR ULTIMO",
+    "SOURCE": "FONTE",
+    "RetroAchievements &middot; every 20 s": "RetroAchievements &middot; a cada 20 s",
+    "POLLED": "CONSULTADO",
+    "UNLOCKS": "DESBLOQUEIOS",
+    "the Web API is not answering; retrying": "a Web API não responde; tentando de novo",
+    "{n} s": "{n} s",
+    "{n} min": "{n} min",
+    "{h} h {m} min": "{h} h {m} min",
+    "{time} ago": "há {time}",
+    "console connected, waiting for a game with achievements": "console conectado, aguardando um jogo com conquistas",
+    "following your RetroAchievements activity: start a game on the console, or in any emulator with RetroAchievements on, and it shows up here within half a minute": "seguindo sua atividade no RetroAchievements: comece um jogo no console, ou em qualquer emulador com RetroAchievements ligado, e ele aparece aqui em menos de meio minuto",
+    "start a game on the console, or browse your library above": "comece um jogo no console, ou explore sua biblioteca acima",
+    "next in progression": "próxima na progressão",
+    "possibly skipped": "possivelmente perdida",
+    "usually done by now": "normalmente já feita a esta altura",
+    "{points} pts": "{points} pts",
+    "UP NEXT &middot; BY MEDIAN UNLOCK TIME": "A SEGUIR &middot; PELO TEMPO MEDIANO DE DESBLOQUEIO",
+    "TRACKING NOW": "RASTREANDO AGORA",
+    "ALL ACHIEVEMENTS": "TODAS AS CONQUISTAS",
+    "unlocked": "desbloqueada",
+    "not on hardware": "não no hardware",
+    "locked": "bloqueada",
+    "MASTERED": "MASTERIZADO",
+    "COMPLETED · SC": "COMPLETADO · SC",
+    "BEATEN": "ZERADO",
+    "BEATEN · SC": "ZERADO · SC",
+    "loading your library...": "carregando sua biblioteca...",
+    "could not reach the client": "não foi possível falar com o cliente",
+    "ALL CONSOLES": "TODOS OS CONSOLES",
+    "ALL {n}": "TODOS {n}",
+    "NOT STARTED": "NÃO INICIADOS",
+    "IN PROGRESS": "EM ANDAMENTO",
+    "({n} hc)": "({n} hc)",
+    "nothing matches these filters": "nada corresponde a esses filtros",
+    "pick a game in the library": "escolha um jogo na biblioteca",
+    "loading...": "carregando...",
+    "{n} achievements": "{n} conquistas",
+    "beaten ~{time}": "zerar ~{time}",
+    "full set ~{time}": "conjunto completo ~{time}",
+    "by median unlocks": "por desbloqueios medianos",
+    "on retroachievements.org": "em retroachievements.org",
+    "TRACKING NOW &middot; FROM CONSOLE MEMORY": "RASTREANDO AGORA &middot; DA MEMÓRIA DO CONSOLE",
+    "{n} LEADERBOARDS &middot; CLICK ONE TO EXPAND": "{n} PLACARES &middot; CLIQUE PARA EXPANDIR",
+    "no entries": "sem registros",
+    "OTHER DEVICES": "OUTROS DISPOSITIVOS",
+    "this page is open from {host}": "esta página está aberta a partir de {host}",
+    "account, Web API key, the network switch and QUIT are changed on the PC that runs xerabora; from here you watch.": "conta, chave da Web API, o interruptor de rede e SAIR são alterados no PC que roda o xerabora; daqui você só acompanha.",
+    "signed in as {user}": "conectado como {user}",
+    "RETROACHIEVEMENTS ACCOUNT": "CONTA RETROACHIEVEMENTS",
+    "unlocks from the console are credited to this account": "os desbloqueios do console são creditados nesta conta",
+    "SIGN OUT": "SAIR DA CONTA",
+    "the account your unlocks are credited to; only a login token is stored": "a conta que recebe seus desbloqueios; só um token de login é guardado",
+    "username": "usuário",
+    "password": "senha",
+    "SIGN IN": "ENTRAR",
+    "WEB API KEY": "CHAVE DA WEB API",
+    "a read-only key that fills the library, leaderboards and profile. Get it at {link}, section \"Keys\", and paste it here.": "uma chave somente leitura que preenche a biblioteca, os placares e o perfil. Pegue em {link}, seção \"Keys\", e cole aqui.",
+    "key": "chave",
+    "(saved, paste to replace)": "(salva, cole outra para trocar)",
+    "SAVE KEY": "SALVAR CHAVE",
+    "FOLLOW MY PLAY": "SEGUIR MINHA JOGATINA",
+    "open to the network": "aberta para a rede",
+    "(no network address found yet)": "(nenhum endereço de rede encontrado ainda)",
+    "type that address into a phone or tablet on the same Wi-Fi and add the page to the home screen. Other devices watch; settings and QUIT stay here. On Windows, allow xerabora through the firewall when it asks.": "digite esse endereço num celular ou tablet na mesma Wi-Fi e adicione a página à tela inicial. Os outros dispositivos só acompanham; os ajustes e SAIR ficam aqui. No Windows, libere o xerabora no firewall quando ele pedir.",
+    "CLOSE TO THIS PC": "FECHAR NESTE PC",
+    "the page is reachable from this PC only. Open it to the network and any phone, tablet or second PC on the same Wi-Fi can watch this tracker.": "a página só é acessível deste PC. Abra para a rede e qualquer celular, tablet ou segundo PC na mesma Wi-Fi pode acompanhar este rastreador.",
+    "OPEN TO THE NETWORK": "ABRIR PARA A REDE",
+    "signing in...": "entrando...",
+    "failed": "falhou",
+    "Quit xerabora? Console telemetry and unlocks stop.": "Sair do xerabora? A telemetria do console e os desbloqueios param.",
+    "xerabora is closed. This tab can be closed too.": "o xerabora foi fechado. Esta aba também pode ser fechada.",
+    "saving...": "salvando...",
+    "saved": "salva",
+    "closing...": "fechando...",
+    "opening...": "abrindo...",
+    "{frames} snapshots, {skipped} skipped": "{frames} snapshots, {skipped} pulados",
+    "console live at {ip}": "console ao vivo em {ip}",
+    "following {game} via RetroAchievements": "seguindo {game} via RetroAchievements",
+    "not signed in to RetroAchievements &mdash; open SETTINGS to sign in": "sem login no RetroAchievements &mdash; abra AJUSTES para entrar",
+    "waiting for the console": "aguardando o console",
+    "+{points} pts": "+{points} pts",
+    "{user} · {points} points": "{user} · {points} pontos",
+    "no Web API key, see SETTINGS": "sem chave da Web API, veja AJUSTES",
+    "achievement set active, unlocks are tracked": "conjunto de conquistas ativo, desbloqueios rastreados",
+    "image not identified &mdash; run 'RA: check game support' in the game's OPL menu": "imagem não identificada &mdash; use 'RA: check game support' no menu OPL do jogo",
+    "telemetry only &mdash; no achievement set could be loaded for this image": "só telemetria &mdash; nenhum conjunto de conquistas pôde ser carregado para esta imagem",
+    "console watch list is out of date &mdash; run 'RA: check game support' again": "a lista vigiada do console está desatualizada &mdash; use 'RA: check game support' de novo",
+    "{n} CONSOLE": "{n} CONSOLE",
+    "{n} CONSOLES": "{n} CONSOLES",
+    "missable": "perdível",
+    "progression": "progressão",
+    "win condition": "condição de vitória",
+    "ALL": "TODAS",
+    "LOCKED": "BLOQUEADAS",
+    "UNLOCKED": "DESBLOQUEADAS",
+    "MISSABLE": "PERDIVEIS",
+    "PROGRESSION": "PROGRESSÃO",
+    "WIN CONDITION": "CONDIÇÃO DE VITORIA",
+    "AUTHOR ORDER": "ORDEM DO AUTOR",
+    "PROGRESSION PATH": "CAMINHO DA PROGRESSÃO",
+    "MEDIAN TIME": "TEMPO MEDIANO",
+    "the console has LIVE while it streams; following takes over when it stops": "o console tem o AO VIVO enquanto transmite; o acompanhamento assume quando ele para",
+    "LIVE shows the game you are in on any emulator with RetroAchievements, and the unlocks as they land": "AO VIVO mostra o jogo em que você está em qualquer emulador com RetroAchievements, e os desbloqueios assim que caem",
+    "off. Turn it on and LIVE follows your account on any emulator with RetroAchievements": "desligado. Ligue e AO VIVO segue sua conta em qualquer emulador com RetroAchievements",
+    "ACHIEVEMENTS": "CONQUISTAS",
+    "POINTS": "PONTOS",
+    "BEATEN AT": "ZERADO EM",
+    "FULL SET AT": "CONJUNTO COMPLETO EM",
+    "YOUR POSITION": "SUA POSIÇÃO",
+    "MISSABLES LEFT": "PERDIVEIS RESTANTES",
+    "MAIN SET": "CONJUNTO PRINCIPAL",
+    "QUIT": "SAIR",
+    "ON": "LIGADO",
+    "OFF": "DESLIGADO",
+    "still loading; the client is busy with RetroAchievements": "ainda carregando; o cliente está ocupado com o RetroAchievements",
+    "try again": "tentar de novo",
+  },
+};
+/* lang:end */
+let lang = '';
+try { lang = localStorage.getItem('lang') || ''; } catch (e) { lang = ''; }
+/* #lang=es opens the page in one language without touching the picker:
+   a second window for a stream, or a check while translating. The query
+   string works too. */
+{
+  const q = new URLSearchParams(location.search).get('lang') ||
+            new URLSearchParams(location.hash.slice(1)).get('lang');
+
+  if (q !== null && LANGS.some(([code]) => code === q)) lang = q;
+}
+
+function t(s, v) {
+  const d = LANG[lang];
+  let out = (d && d[s]) || s;
+
+  if (v) for (const k in v) out = out.split('{' + k + '}').join(v[k]);
+  return out;
+}
+
+/* A failure in a render lands on the page, not in a console nobody has
+   open: an alpha that says "loading..." forever is worse than one that
+   names its error. */
+function showError(err) {
+  const main = document.querySelector('main');
+  const box = document.getElementById('err') || main.insertBefore(document.createElement('div'), main.firstChild);
+
+  box.id = 'err';
+  box.style.cssText = 'color:#ff6b6b;font-size:17px;padding:8px 0 12px;white-space:pre-wrap';
+  box.textContent = 'page error: ' + (err && err.stack ? err.stack : err);
+}
+window.addEventListener('error', e => showError(e.error || e.message));
+window.addEventListener('unhandledrejection', e => showError(e.reason));
+
+/* The static half of the page: header, footer, the toast. */
+function translateMarkup() {
+  for (const el of document.querySelectorAll('[data-t]'))
+    el.textContent = t(el.getAttribute('data-t'));
+}
+
+/* The choice belongs to the browser looking at the page, not to the
+   client: a phone can read in Spanish while the PC stays English. The
+   select in the header shows the short code; the menu has the names. */
+function bindLangPicker() {
+  const el = document.getElementById('lang-pick');
+
+  el.innerHTML = LANGS.map(([code, name]) =>
+    '<option value="' + code + '"' + (code === lang ? ' selected' : '') + ' title="' + name + '">' +
+    (code || 'en').split('-')[0].toUpperCase() + '</option>').join('');
+  el.onchange = () => {
+    try { localStorage.setItem('lang', el.value); } catch (e) { /* private window */ }
+    location.reload();
+  };
+}
 let tab = 'live', lastUnlock = 0, library = null, libraryAt = 0, libFilter = 'all', gameId = 0, gameCache = {};
 
 function esc(s) {
@@ -211,11 +586,27 @@ function snapRate(frames) {
 function framesText(c) {
   const r = snapRate(c.frames || 0);
   return c.frames ? c.frames.toLocaleString() + (r ? ' · ' + r + '/s' : '')
-                  : (c.packets || 0).toLocaleString() + ' packets';
+                  : t('{packets} packets', { packets: (c.packets || 0).toLocaleString() });
 }
 
 function lostText(c) {
-  return (c.gaps || 0) + ' skipped · ' + (c.dupes || 0) + ' rep · ' + (c.torn || 0) + ' torn';
+  return t('{gaps} skipped · {dupes} rep · {torn} torn',
+           { gaps: c.gaps || 0, dupes: c.dupes || 0, torn: c.torn || 0 });
+}
+
+/* One stat tile; the CONSOLE, FOLLOWING and LIVE strips all use it. */
+const cell = (k, v, id) => '<div class="cell"><div class="k">' + k + '</div><div class="v"' +
+                           (id ? ' id="' + id + '"' : '') + '>' + v + '</div></div>';
+const muted = text => '<div class="muted">' + text + '</div>';
+
+/* Time cost of a set from its medians: beaten is the latest median on
+   the intended path, full the latest of all. */
+function setEstimates(list, medOf, isProgression) {
+  const meds = list.map(medOf).filter(m => m > 0);
+  const path = list.filter(a => isProgression(a)).map(medOf).filter(m => m > 0);
+
+  return { full: meds.length ? Math.max(...meds) : 0,
+           beaten: path.length ? Math.max(...path) : 0 };
 }
 
 const STATUS = {
@@ -224,6 +615,8 @@ const STATUS = {
   'telemetry-only': ['telemetry only &mdash; no achievement set could be loaded for this image', 0],
   'stale':          ["console watch list is out of date &mdash; run 'RA: check game support' again", 0]
 };
+
+/* The em dash is markup in these, so the dictionary key carries it too. */
 
 function consolePanel(s) {
   const c = s.console;
@@ -234,22 +627,23 @@ function consolePanel(s) {
 
   const st = STATUS[c.status];
   const w = c.watch || {};
-  const cell = (k, v) => '<div class="cell"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
 
-  return '<h2>CONSOLE</h2>' +
+  return '<h2>' + t('CONSOLE') + '</h2>' +
     (st ? '<div class="row ' + (st[1] ? 'done' : 'na') + '"><div class="body"><div class="t">' +
-          st[0] + '</div></div></div>' : '') +
+          t(st[0]) + '</div></div></div>' : '') +
     '<div class="stats">' +
-    cell('LINK', c.connected ? esc(c.ip) : '<span class="dimmer">lost</span>') +
-    cell('GAME', esc(s.game.serial) || '&mdash;') +
-    cell('SNAPSHOTS', '<span id="cv-frames">' + framesText(c) + '</span>') +
-    cell('LOST', '<span id="cv-lost">' + lostText(c) + '</span>') +
-    cell('WATCH LIST', w.addresses ? w.addresses + ' addr &middot; ' + w.bytes + ' B &middot; ' + w.parts + ' parts'
-                                   : '&mdash;') +
-    cell('SESSION', '<span id="cv-session">' + (c.seconds ? hms(c.seconds) : '&mdash;') + '</span>') +
+    cell(t('LINK'), c.connected ? esc(c.ip) : '<span class="dimmer">' + t('lost') + '</span>') +
+    cell(t('GAME'), esc(s.game.serial) || '&mdash;') +
+    cell(t('SNAPSHOTS'), '<span id="cv-frames">' + framesText(c) + '</span>') +
+    cell(t('LOST'), '<span id="cv-lost">' + lostText(c) + '</span>') +
+    cell(t('WATCH LIST'), w.addresses
+        ? t('{addresses} addr &middot; {bytes} B &middot; {parts} parts',
+            { addresses: w.addresses, bytes: w.bytes, parts: w.parts })
+        : '&mdash;') +
+    cell(t('SESSION'), '<span id="cv-session">' + (c.seconds ? hms(c.seconds) : '&mdash;') + '</span>') +
     '</div>' +
-    (s.game.hash ? '<div class="dimmer" style="font-size:16px;margin:-8px 0 14px">hash ' +
-                   esc(s.game.hash) + '</div>' : '');
+    (s.game.hash ? '<div class="dimmer" style="font-size:16px;margin:-8px 0 14px">' +
+                   t('hash {hash}', { hash: esc(s.game.hash) }) + '</div>' : '');
 }
 
 /* FOLLOWING: the account's play on another device, as the Web API
@@ -258,36 +652,41 @@ function consolePanel(s) {
 function followPanel(s) {
   const f = s.follow;
   if (!f || !f.active) return '';
-  const cell = (k, v) => '<div class="cell"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
-  const seen = f.online ? '<span style="color:var(--green)">playing now</span>'
-             : f.rp_date ? esc(f.rp_date) : f.rp_ago >= 0 ? ago(f.rp_ago) + ' ago' : '&mdash;';
+  const seen = f.online ? '<span style="color:var(--green)">' + t('playing now') + '</span>'
+             : f.rp_date ? esc(f.rp_date) : f.rp_ago >= 0 ? agoText(f.rp_ago) : '&mdash;';
   const session = (f.session || []).length
-    ? '<h2>THIS SESSION</h2>' + f.session.map(u =>
+    ? '<h2>' + t('THIS SESSION') + '</h2>' + f.session.map(u =>
         '<div class="row done"><img src="' + BADGE + u.badge + '.png" alt="">' +
         '<div class="body"><div class="t">' + esc(u.title) + '</div>' +
-        '<div class="d">' + ago(u.ago) + ' ago' + (u.hardcore ? ' &middot; hardcore' : '') + '</div></div>' +
+        '<div class="d">' + agoText(u.ago) +
+        (u.hardcore ? ' &middot; ' + t('hardcore') : '') + '</div></div>' +
         '<div class="m"><span style="color:var(--green)">+' + u.points + '</span></div></div>').join('')
     : '';
-  return '<h2>FOLLOWING</h2>' +
+  return '<h2>' + t('FOLLOWING') + '</h2>' +
     '<div class="row done"><div class="body"><div class="t">' +
-    esc(f.rp || 'no rich presence line yet') + '</div></div></div>' +
+    (f.rp ? esc(f.rp) : t('no rich presence line yet')) + '</div></div></div>' +
     '<div class="stats">' +
-    cell('PLATFORM', esc(s.game.console || '&mdash;')) +
-    cell('LAST SEEN', '<span id="fv-seen">' + seen + '</span>') +
-    cell('SOURCE', 'RetroAchievements &middot; every 20 s') +
-    cell('POLLED', '<span id="fv-polled">' + (f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '&mdash;') + '</span>') +
-    cell('SESSION', '<span id="fv-session">' + (f.since ? hms(f.since) : '&mdash;') + '</span>') +
-    cell('UNLOCKS', (f.session || []).length) +
+    cell(t('PLATFORM'), esc(s.game.console || '&mdash;')) +
+    cell(t('LAST SEEN'), '<span id="fv-seen">' + seen + '</span>') +
+    cell(t('SOURCE'), t('RetroAchievements &middot; every 20 s')) +
+    cell(t('POLLED'), '<span id="fv-polled">' +
+        (f.polled_ago >= 0 ? agoText(f.polled_ago) : '&mdash;') + '</span>') +
+    cell(t('SESSION'), '<span id="fv-session">' + (f.since ? hms(f.since) : '&mdash;') + '</span>') +
+    cell(t('UNLOCKS'), (f.session || []).length) +
     '</div>' +
-    (f.failures ? '<div class="note" style="color:var(--amber)">the Web API is not answering; retrying</div>' : '') +
+    (f.failures ? '<div class="note" style="color:var(--amber)">' +
+                  t('the Web API is not answering; retrying') + '</div>' : '') +
     session;
 }
 
 function ago(sec) {
-  if (sec < 60) return sec + ' s';
-  if (sec < 3600) return Math.floor(sec / 60) + ' min';
-  return Math.floor(sec / 3600) + ' h ' + Math.floor((sec % 3600) / 60) + ' min';
+  if (sec < 60) return t('{n} s', { n: sec });
+  if (sec < 3600) return t('{n} min', { n: Math.floor(sec / 60) });
+  return t('{h} h {m} min', { h: Math.floor(sec / 3600), m: Math.floor((sec % 3600) / 60) });
 }
+
+/* Word order moves between languages, so the whole line is one string. */
+function agoText(sec) { return t('{time} ago', { time: ago(sec) }); }
 
 /* ---- LIVE: the console's own session, straight from rc_client ---------- */
 
@@ -310,6 +709,37 @@ function loadLiveMeta(id) {
   }).catch(() => { liveMeta.loading = false; });
 }
 
+/* The FOLLOW MY PLAY switch lives on LIVE, where its effect shows. It is
+   the PC's to flip: from a phone the client answers 403. */
+function followSwitch(s) {
+  const f = s.follow || {};
+  const li = s.login || {};
+
+  if (REMOTE || !li.webapi) return '';
+  return '<div class="switch' + (f.on ? ' on' : '') + '" data-follow="' + (f.on ? '0' : '1') + '">' +
+    '<span class="k">' + t('FOLLOW MY PLAY') + '</span>' +
+    '<span class="d">' + (s.console.connected
+      ? t('the console has LIVE while it streams; following takes over when it stops')
+      : f.on ? t('LIVE shows the game you are in on any emulator with RetroAchievements, and the unlocks as they land')
+             : t('off. Turn it on and LIVE follows your account on any emulator with RetroAchievements')) +
+    '</span>' +
+    '<span class="state">' + t(f.on ? 'ON' : 'OFF') + '</span></div>';
+}
+
+/* ALL ACHIEVEMENTS, in one list or one list per subset when the server
+   sent more than the core set. */
+function achievementRows(list, subsets, row) {
+  if (!subsets || subsets.length < 2)
+    return list.map(row).join('');
+  return subsets.map(sub => {
+    const mine = list.filter(a => a.subset === sub.id);
+    if (!mine.length) return '';
+    const done = mine.filter(a => a.state === 2).length;
+    return '<h2>' + esc(sub.title).toUpperCase() + ' &middot; ' + done + ' / ' + mine.length + '</h2>' +
+      mine.map(row).join('');
+  }).join('');
+}
+
 function renderLive(s) {
   const list = s.game.achievements || [];
   const done = list.filter(a => a.state === 2).length;
@@ -319,13 +749,13 @@ function renderLive(s) {
   if (!list.length) {
     const f = s.follow || {};
     document.getElementById('tab-live').innerHTML =
-      consolePanel(s) +
-      '<div class="muted">' + (s.console.connected
-        ? 'console connected, waiting for a game with achievements'
+      followSwitch(s) + consolePanel(s) +
+      muted(s.console.connected
+        ? t('console connected, waiting for a game with achievements')
         : f.on && (s.login || {}).webapi
-          ? 'following your RetroAchievements activity: start a game on the console, or in any ' +
-            'emulator with RetroAchievements on, and it shows up here within half a minute'
-          : 'start a game on the console, or browse your library above') + '</div>';
+          ? t('following your RetroAchievements activity: start a game on the console, or in any ' +
+              'emulator with RetroAchievements on, and it shows up here within half a minute')
+          : t('start a game on the console, or browse your library above'));
     return;
   }
 
@@ -352,25 +782,40 @@ function renderLive(s) {
       (a.percent > 0 ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + pctClamp(a.percent) + '%"></i></div>' : '') +
       '</div><div class="m">' +
       (a.measured ? '<span style="color:var(--accent)" data-live-m="' + a.id + '">' + esc(a.measured) + '</span>' : '') +
-      (a === picked.prog ? '<div style="color:var(--accent)">next in progression</div>' : '') +
-      (missed.has(a.id) ? '<div style="color:var(--amber)">possibly skipped</div>'
-       : med(a) <= position ? '<div style="color:var(--amber)">usually done by now</div>' : '') +
-      '<div class="dimmer" style="font-size:16px"><span style="color:var(--amber)">' + a.points + ' pts</span> &middot; ~' +
+      (a === picked.prog ? '<div style="color:var(--accent)">' + t('next in progression') + '</div>' : '') +
+      (missed.has(a.id) ? '<div style="color:var(--amber)">' + t('possibly skipped') + '</div>'
+       : med(a) <= position ? '<div style="color:var(--amber)">' + t('usually done by now') + '</div>' : '') +
+      '<div class="dimmer" style="font-size:16px"><span style="color:var(--amber)">' +
+      t('{points} pts', { points: a.points }) + '</span> &middot; ~' +
       medianText(med(a)) + typeTag(a) + '</div></div></div>';
 
-    ahead = next.length ? '<h2>UP NEXT &middot; BY MEDIAN UNLOCK TIME</h2>' + next.map(bigRow).join('') : '';
+    ahead = next.length
+      ? '<h2>' + t('UP NEXT &middot; BY MEDIAN UNLOCK TIME') + '</h2>' + next.map(bigRow).join('') : '';
   }
 
   const trackers = (s.game.tracking || []).length
-    ? '<h2>TRACKING NOW</h2>' + s.game.tracking.map(t =>
-        '<div class="row near"><div class="body"><div class="t">' + esc(t.title) + '</div></div>' +
-        '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + t.id + '">' +
-        esc(t.value) + '</div></div>'
+    ? '<h2>' + t('TRACKING NOW') + '</h2>' + s.game.tracking.map(tr =>
+        '<div class="row near"><div class="body"><div class="t">' + esc(tr.title) + '</div></div>' +
+        '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + tr.id + '">' +
+        esc(tr.value) + '</div></div>'
       ).join('')
     : '';
 
+  /* The numbers strip: points, the time the set costs by its medians,
+     and where the player stands in it. */
+  const est = meta ? setEstimates(list, medOf, a => achType(a) === 'progression' || achType(a) === 'win_condition') : null;
+  const position = meta ? Math.max(0, ...list.filter(a => a.state === 2).map(medOf)) : 0;
+  const strip = '<div class="stats">' +
+    cell(t('ACHIEVEMENTS'), done + ' / ' + list.length) +
+    cell(t('POINTS'), '<span style="color:var(--amber)">' + ptsDone + '</span> / ' + ptsAll) +
+    cell(t('BEATEN AT'), est && est.beaten ? '~' + medianText(est.beaten) : '&mdash;') +
+    cell(t('FULL SET AT'), est && est.full ? '~' + medianText(est.full) : '&mdash;') +
+    cell(t('YOUR POSITION'), position ? '~' + medianText(position) : '&mdash;') +
+    cell(t('MISSABLES LEFT'), list.filter(a => a.state !== 2 && achType(a) === 'missable').length) +
+    '</div>';
+
   document.getElementById('tab-live').innerHTML =
-    followPanel(s) + consolePanel(s) +
+    followSwitch(s) + followPanel(s) + consolePanel(s) +
     '<div class="head">' +
     (meta && liveMeta.icon ? '<img src="' + MEDIA + liveMeta.icon + '" alt="">'
      : s.game.icon ? '<img src="' + MEDIA + s.game.icon + '" alt="">' : '') +
@@ -380,10 +825,11 @@ function renderLive(s) {
     '<div style="display:flex;margin-top:8px;gap:10px;flex-wrap:wrap"><span class="muted">' + esc(s.game.serial || s.game.console || '') + '</span>' +
     '<span class="right">' + done + ' / ' + list.length +
     ' <span class="dimmer">&middot;</span> <span style="color:var(--amber)">' + ptsDone + '</span>' +
-    '<span class="dimmer"> / ' + ptsAll + ' pts</span></span></div></div></div>' +
+    '<span class="dimmer"> / ' + t('{points} pts', { points: ptsAll }) + '</span></span></div></div></div>' +
+    strip +
     ahead + trackers +
-    ((ahead || trackers) ? '<h2>ALL ACHIEVEMENTS</h2>' : '') +
-    list.map(a => {
+    ((ahead || trackers || (s.game.subsets || []).length > 1) ? '<h2>' + t('ALL ACHIEVEMENTS') + '</h2>' : '') +
+    achievementRows(list, s.game.subsets, a => {
       const isDone = a.state === 2;
       const near = !isDone && a.percent > 0;
       /* state 3 means rc_client disabled it: on hardware that is a
@@ -395,14 +841,16 @@ function renderLive(s) {
         '<div class="d">' + esc(a.description) + '</div>' +
         (near ? '<div class="mini"><i data-live-p="' + a.id + '" style="width:' + pctClamp(a.percent) + '%"></i></div>' : '') +
         '</div><div class="m">' +
-        (isDone ? '<span style="color:var(--green)">unlocked</span>'
-         : na ? '<span style="color:var(--amber)">not on hardware</span>'
+        (isDone ? '<span style="color:var(--green)">' + t('unlocked') + '</span>'
+         : na ? '<span style="color:var(--amber)">' + t('not on hardware') + '</span>'
          : a.measured ? '<span style="color:var(--accent)" data-live-m="' + a.id + '">' + esc(a.measured) + '</span>'
-         : '<span class="dimmer">locked</span>') +
-        '<div class="dimmer" style="font-size:16px">' + a.points + ' pts' + typeTag(a) +
-        (missed.has(a.id) ? ' &middot; <span style="color:var(--amber)">possibly skipped</span>' : '') +
+         : '<span class="dimmer">' + t('locked') + '</span>') +
+        '<div class="dimmer" style="font-size:16px">' +
+        t('{points} pts', { points: a.points }) + typeTag(a) +
+        (missed.has(a.id) ? ' &middot; <span style="color:var(--amber)">' +
+                            t('possibly skipped') + '</span>' : '') +
         '</div></div></div>';
-    }).join('');
+    });
 }
 
 /* ---- LIBRARY: every system, from the Web API --------------------------- */
@@ -414,10 +862,10 @@ let libConsolesOpen = false;
    full clears, beaten comes in the same two flavours. */
 function awardBadge(g) {
   const a = g.award || '';
-  if (a === 'mastered') return '<span class="award gold">MASTERED</span>';
-  if (a === 'completed') return '<span class="award green">COMPLETED · SC</span>';
-  if (a === 'beaten-hardcore') return '<span class="award blue">BEATEN</span>';
-  if (a === 'beaten-softcore') return '<span class="award blue">BEATEN · SC</span>';
+  if (a === 'mastered') return '<span class="award gold">' + t('MASTERED') + '</span>';
+  if (a === 'completed') return '<span class="award green">' + t('COMPLETED · SC') + '</span>';
+  if (a === 'beaten-hardcore') return '<span class="award blue">' + t('BEATEN') + '</span>';
+  if (a === 'beaten-softcore') return '<span class="award blue">' + t('BEATEN · SC') + '</span>';
   return '';
 }
 
@@ -426,12 +874,12 @@ async function renderLibrary() {
 
   /* Two minutes, the same as the client's own cache of the Web API. */
   if (!library || Date.now() - libraryAt > 120000) {
-    if (!library) el.innerHTML = '<div class="muted">loading your library...</div>';
+    if (!library) el.innerHTML = '<div class="muted">' + t('loading your library...') + '</div>';
     try {
       library = (await (await fetch('/library')).json()).games || [];
       libraryAt = Date.now();
     } catch (e) {
-      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      el.innerHTML = '<div class="muted">' + t('could not reach the client') + '</div>';
       return;
     }
   }
@@ -452,15 +900,17 @@ async function renderLibrary() {
   const perConsole = {};
   for (const g of library) perConsole[g.console] = (perConsole[g.console] || 0) + 1;
   const consoles = Object.keys(perConsole).sort();
-  const conLabel = libConsoles.size === 0 ? 'ALL CONSOLES'
-                                          : libConsoles.size + ' CONSOLE' + (libConsoles.size > 1 ? 'S' : '');
+  /* Two strings, not a glued 'S': other languages build the plural
+     their own way. */
+  const conLabel = libConsoles.size === 0 ? t('ALL CONSOLES')
+    : t(libConsoles.size > 1 ? '{n} CONSOLES' : '{n} CONSOLE', { n: libConsoles.size });
 
   el.innerHTML =
     '<div class="filters">' +
-    [['all', 'ALL ' + library.length], ['new', 'NOT STARTED'], ['progress', 'IN PROGRESS'],
-     ['beaten', 'BEATEN'], ['mastered', 'MASTERED']]
-      .map(([k, t]) => '<span class="chip' + (libFilter === k ? ' on' : '') +
-                       '" data-filter="' + k + '">' + t + '</span>').join('') +
+    [['all', t('ALL {n}', { n: library.length })], ['new', t('NOT STARTED')],
+     ['progress', t('IN PROGRESS')], ['beaten', t('BEATEN')], ['mastered', t('MASTERED')]]
+      .map(([k, label]) => '<span class="chip' + (libFilter === k ? ' on' : '') +
+                           '" data-filter="' + k + '">' + label + '</span>').join('') +
     '<span class="chip' + (libConsoles.size ? ' on' : '') + '" data-consoles-toggle="1">' +
     conLabel + ' ' + (libConsolesOpen ? '&#9652;' : '&#9662;') + '</span>' +
     '</div>' +
@@ -481,12 +931,13 @@ async function renderLibrary() {
       '<div class="bar" style="height:8px"><i style="width:' + pct(g.awarded, g.total) + '%"></i></div>' +
       '<div style="display:flex;margin-top:6px;font-size:16px;align-items:center;gap:6px">' +
       '<span class="muted">' + g.awarded + ' / ' + g.total +
-      (g.hardcore > 0 && g.hardcore < g.awarded ? ' <span class="dimmer">(' + g.hardcore + ' hc)</span>' : '') +
+      (g.hardcore > 0 && g.hardcore < g.awarded
+        ? ' <span class="dimmer">' + t('({n} hc)', { n: g.hardcore }) + '</span>' : '') +
       '</span>' +
       '<span class="right">' + (awardBadge(g) ||
         '<span class="dimmer">' + esc(g.console) + '</span>') + '</span></div></div></div>').join('') +
     '</div>' +
-    (shown.length ? '' : '<div class="muted">nothing matches these filters</div>');
+    (shown.length ? '' : '<div class="muted">' + t('nothing matches these filters') + '</div>');
 }
 
 /* ---- GAME: one set in full, from the Web API --------------------------- */
@@ -540,10 +991,10 @@ function possiblyMissed(list, med) {
 }
 
 function typeTag(a) {
-  const t = achType(a);
-  return t ? ' &middot; <span' + (t === 'missable' ? ' style="color:var(--amber)"' : '') +
-             '>' + esc(t.replace('_', ' ')) + '</span>'
-           : '';
+  const ty = achType(a);
+  return ty ? ' &middot; <span' + (ty === 'missable' ? ' style="color:var(--amber)"' : '') +
+              '>' + t(ty.replace('_', ' ')) + '</span>'
+            : '';
 }
 
 function medianText(s) {
@@ -567,18 +1018,30 @@ async function renderGame() {
   const el = document.getElementById('tab-game');
 
   if (!gameId) {
-    el.innerHTML = '<div class="muted">pick a game in the library</div>';
+    el.innerHTML = '<div class="muted">' + t('pick a game in the library') + '</div>';
     return;
   }
 
   if (!gameCache[gameId]) {
-    el.innerHTML = '<div class="muted">loading...</div>';
+    const want = gameId;
+
+    el.innerHTML = muted(t('loading...'));
+    /* The client answers one request at a time and a Web API poll can
+       hold it for a while; a card opened in the first second after start
+       has been seen to wait on that. Say so, and offer another try. */
+    const slow = setTimeout(() => {
+      el.innerHTML = muted(t('still loading; the client is busy with RetroAchievements') +
+        ' <a href="#" data-game="' + gameId + '">' + t('try again') + '</a>');
+    }, 12000);
     try {
-      gameCache[gameId] = await (await fetch('/game?id=' + gameId)).json();
+      gameCache[want] = await (await fetch('/game?id=' + want)).json();
     } catch (e) {
-      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      clearTimeout(slow);
+      if (want === gameId) el.innerHTML = muted(t('could not reach the client'));
       return;
     }
+    clearTimeout(slow);
+    if (want !== gameId) return; /* the user moved on; the cache keeps the answer */
   }
 
   const g = gameCache[gameId];
@@ -589,31 +1052,44 @@ async function renderGame() {
     achType(a) === gameFilter));
 
   const chips = (pairs, cur, attr) => '<div class="filters">' +
-    pairs.map(([k, t]) => '<span class="chip' + (cur === k ? ' on' : '') +
-                          '" ' + attr + '="' + k + '">' + t + '</span>').join('') + '</div>';
+    pairs.map(([k, label]) => '<span class="chip' + (cur === k ? ' on' : '') +
+                              '" ' + attr + '="' + k + '">' + t(label) + '</span>').join('') + '</div>';
 
   /* Time cost of the set: beaten = latest median on the intended
      path, full = latest median of all. */
-  const meds = (g.achievements || []).filter(a => a.median > 0);
-  const est = rows => rows.length ? Math.max(...rows.map(a => a.median)) : 0;
-  const estBeaten = est(meds.filter(a => achType(a) === 'progression' || achType(a) === 'win_condition'));
-  const estFull = est(meds);
+  const est = setEstimates(g.achievements || [], a => a.median || 0,
+                           a => achType(a) === 'progression' || achType(a) === 'win_condition');
+  const estBeaten = est.beaten, estFull = est.full;
+
+  /* The family strip: the base game and its subsets as chips, the open
+     one lit. A subset is another game id, so a click is a plain load. */
+  const base = g.base || {};
+  const family = (g.subsets || []).length
+    ? '<div class="subsets">' +
+      (base.id ? '<span class="chip' + (base.id === g.id ? ' on' : '') + '" data-game="' + base.id + '">' +
+                 t('MAIN SET') + '</span>' : '') +
+      g.subsets.map(sub => '<span class="chip' + (sub.id === g.id ? ' on' : '') + '" data-game="' + sub.id + '">' +
+                           esc(sub.title).toUpperCase() + ' <span class="dimmer">' + sub.achievements + '</span></span>').join('') +
+      '</div>'
+    : '';
 
   el.innerHTML =
     '<div class="head">' +
     (g.icon ? '<img src="' + MEDIA + g.icon + '" alt="">' : '') +
     '<div style="flex:1"><h1>' + esc(g.title) + '</h1>' +
     '<div class="muted" style="margin-bottom:10px">' + esc(g.console) + ' &middot; ' +
-    (g.achievements || []).length + ' achievements' +
+    t('{n} achievements', { n: (g.achievements || []).length }) +
     (estFull ? ' &middot; <span style="color:var(--accent)">' +
-               (estBeaten ? 'beaten ~' + medianText(estBeaten) + ' &middot; ' : '') +
-               'full set ~' + medianText(estFull) + '</span>' +
-               ' <span class="dimmer">by median unlocks</span>' : '') +
+               (estBeaten ? t('beaten ~{time}', { time: medianText(estBeaten) }) + ' &middot; ' : '') +
+               t('full set ~{time}', { time: medianText(estFull) }) + '</span>' +
+               ' <span class="dimmer">' + t('by median unlocks') + '</span>' : '') +
     '</div>' +
     '<div class="bar"><i style="width:' + pct(g.awarded, g.total) + '%"></i></div>' +
     '<div style="display:flex;margin-top:8px"><span class="muted">' +
-    '<a href="https://retroachievements.org/game/' + g.id + '" target="_blank">on retroachievements.org</a>' +
+    '<a href="https://retroachievements.org/game/' + g.id + '" target="_blank">' +
+    t('on retroachievements.org') + '</a>' +
     '</span><span class="right">' + g.awarded + ' / ' + g.total + '</span></div></div></div>' +
+    family +
     chips([['all', 'ALL'], ['locked', 'LOCKED'], ['unlocked', 'UNLOCKED'],
            ['missable', 'MISSABLE'], ['progression', 'PROGRESSION'],
            ['win_condition', 'WIN CONDITION']], gameFilter, 'data-gfilter') +
@@ -627,8 +1103,8 @@ async function renderGame() {
         '<div class="d">' + esc(a.description) + '</div></div>' +
         '<div class="m">' +
         (done ? '<span style="color:var(--green)">' + esc(a.earned.slice(0, 10)) + '</span>'
-              : '<span class="dimmer">locked</span>') +
-        '<div class="dimmer" style="font-size:16px">' + a.points + ' pts' +
+              : '<span class="dimmer">' + t('locked') + '</span>') +
+        '<div class="dimmer" style="font-size:16px">' + t('{points} pts', { points: a.points }) +
         typeTag(a) +
         (a.median > 0 ? ' &middot; ~' + medianText(a.median) : '') + '</div></div></div>';
     }).join('');
@@ -643,16 +1119,16 @@ async function renderBoards() {
   const id = gameId || 0;
 
   if (!id) {
-    el.innerHTML = '<div class="muted">pick a game in the library</div>';
+    el.innerHTML = '<div class="muted">' + t('pick a game in the library') + '</div>';
     return;
   }
 
   if (!boardsCache[id]) {
-    el.innerHTML = '<div class="muted">loading...</div>';
+    el.innerHTML = '<div class="muted">' + t('loading...') + '</div>';
     try {
       boardsCache[id] = (await (await fetch('/boards?id=' + id)).json()).boards || [];
     } catch (e) {
-      el.innerHTML = '<div class="muted">could not reach the client</div>';
+      el.innerHTML = '<div class="muted">' + t('could not reach the client') + '</div>';
       return;
     }
   }
@@ -661,14 +1137,14 @@ async function renderBoards() {
 
   el.innerHTML =
     (tracking.length
-      ? '<h2>TRACKING NOW &middot; FROM CONSOLE MEMORY</h2>' +
-        tracking.map(t =>
-          '<div class="row near"><div class="body"><div class="t">' + esc(t.title) + '</div></div>' +
-          '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + t.id + '">' +
-          esc(t.value) + '</div></div>'
+      ? '<h2>' + t('TRACKING NOW &middot; FROM CONSOLE MEMORY') + '</h2>' +
+        tracking.map(tr =>
+          '<div class="row near"><div class="body"><div class="t">' + esc(tr.title) + '</div></div>' +
+          '<div class="m px" style="font-size:14px;color:var(--accent)" data-tr="' + tr.id + '">' +
+          esc(tr.value) + '</div></div>'
         ).join('')
       : '') +
-    '<h2>' + boards.length + ' LEADERBOARDS &middot; CLICK ONE TO EXPAND</h2>' +
+    '<h2>' + t('{n} LEADERBOARDS &middot; CLICK ONE TO EXPAND', { n: boards.length }) + '</h2>' +
     boards.map(b => {
       /* Closed row: one line, name and record. The click opens the
          description and the record holder. */
@@ -679,7 +1155,7 @@ async function renderBoards() {
         '</div><div class="m">' +
         (b.topScore ? '<span style="color:var(--accent)">' + esc(b.topScore) + '</span>' +
                       (open ? '<div class="dimmer" style="font-size:16px">' + esc(b.topUser) + '</div>' : '')
-                    : '<span class="dimmer">no entries</span>') +
+                    : '<span class="dimmer">' + t('no entries') + '</span>') +
         '</div></div>';
     }).join('');
 }
@@ -702,74 +1178,67 @@ const REMOTE = !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(location.hos
 function renderSettings() {
   const li = (lastState && lastState.login) || { ok: false, user: '', webapi: false };
   const lan = (lastState && lastState.lan) || { on: false, url: '' };
-  const fo = (lastState && lastState.follow) || { on: false };
 
   if (REMOTE) {
     document.getElementById('tab-settings').innerHTML =
       '<div class="set">' +
-      '<h2>OTHER DEVICES</h2>' +
-      '<div>this page is open from <span style="color:var(--green)">' + esc(location.host) + '</span></div>' +
-      '<div class="note">account, Web API key, the network switch and QUIT are changed on the PC ' +
-      'that runs xerabora; from here you watch.</div>' +
-      (li.ok ? '<div style="margin-top:14px">signed in as <span style="color:var(--green)">' + esc(li.user) + '</span></div>' : '') +
+      '<h2>' + t('OTHER DEVICES') + '</h2>' +
+      '<div>' + t('this page is open from {host}',
+                  { host: '<span style="color:var(--green)">' + esc(location.host) + '</span>' }) + '</div>' +
+      '<div class="note">' +
+      t('account, Web API key, the network switch and QUIT are changed on the PC ' +
+        'that runs xerabora; from here you watch.') + '</div>' +
+      (li.ok ? '<div style="margin-top:14px">' +
+               t('signed in as {user}',
+                 { user: '<span style="color:var(--green)">' + esc(li.user) + '</span>' }) + '</div>' : '') +
       '</div>';
     return;
   }
 
   document.getElementById('tab-settings').innerHTML =
     '<div class="set">' +
-    '<h2>RETROACHIEVEMENTS ACCOUNT</h2>' +
+    '<h2>' + t('RETROACHIEVEMENTS ACCOUNT') + '</h2>' +
     (li.ok
-      ? '<div>signed in as <span style="color:var(--green)">' + esc(li.user) + '</span></div>' +
-        '<div class="note">unlocks from the console are credited to this account</div>' +
-        '<button class="act" id="btn-logout">SIGN OUT</button>'
-      : '<div class="note">the account your unlocks are credited to; only a login token is stored</div>' +
+      ? '<div>' + t('signed in as {user}',
+                    { user: '<span style="color:var(--green)">' + esc(li.user) + '</span>' }) + '</div>' +
+        '<div class="note">' + t('unlocks from the console are credited to this account') + '</div>' +
+        '<button class="act" id="btn-logout">' + t('SIGN OUT') + '</button>'
+      : '<div class="note">' +
+        t('the account your unlocks are credited to; only a login token is stored') + '</div>' +
         '<form id="form-login">' +
-        '<label>username</label><input class="f" name="user" autocomplete="username">' +
-        '<label>password</label><input class="f" name="password" type="password" autocomplete="current-password">' +
-        '<button class="act">SIGN IN</button></form>') +
+        '<label>' + t('username') + '</label><input class="f" name="user" autocomplete="username">' +
+        '<label>' + t('password') + '</label><input class="f" name="password" type="password" autocomplete="current-password">' +
+        '<button class="act">' + t('SIGN IN') + '</button></form>') +
     '<div class="msg" id="login-msg"></div>' +
 
-    '<h2 style="margin-top:26px">WEB API KEY</h2>' +
-    '<div class="note">a read-only key that fills the library, leaderboards and profile. ' +
-    'Get it at <a href="https://retroachievements.org/settings" target="_blank">retroachievements.org/settings</a>, ' +
-    'section "Keys", and paste it here.</div>' +
+    '<h2 style="margin-top:26px">' + t('WEB API KEY') + '</h2>' +
+    '<div class="note">' +
+    t('a read-only key that fills the library, leaderboards and profile. ' +
+      'Get it at {link}, section "Keys", and paste it here.',
+      { link: '<a href="https://retroachievements.org/settings" target="_blank">retroachievements.org/settings</a>' }) +
+    '</div>' +
     '<form id="form-apikey">' +
-    '<label>key ' + (li.webapi ? '<span style="color:var(--green)">(saved, paste to replace)</span>' : '') +
+    '<label>' + t('key') + ' ' +
+    (li.webapi ? '<span style="color:var(--green)">' + t('(saved, paste to replace)') + '</span>' : '') +
     '</label><input class="f" name="key" autocomplete="off">' +
-    '<button class="act">SAVE KEY</button></form>' +
+    '<button class="act">' + t('SAVE KEY') + '</button></form>' +
     '<div class="msg" id="apikey-msg"></div>' +
 
-    '<h2 style="margin-top:26px">FOLLOW MY PLAY</h2>' +
-    (fo.on
-      ? '<div>on: LIVE shows the game you are in on any emulator with RetroAchievements, ' +
-        'and the unlocks as they land</div>' +
-        '<div class="note">from the Web API, every 20 seconds. The console takes over when it is connected. ' +
-        'No measured progress here; that needs a memory source.</div>' +
-        '<button class="act" id="btn-follow">STOP FOLLOWING</button>'
-      : '<div class="note">off. Turn it on and LIVE follows your account: the game you are in on any ' +
-        'emulator with RetroAchievements, and the unlocks as they land.</div>' +
-        '<button class="act" id="btn-follow">FOLLOW MY PLAY</button>') +
-    '<div class="msg" id="follow-msg"></div>' +
-
-    '<h2 style="margin-top:26px">OTHER DEVICES</h2>' +
+    '<h2 style="margin-top:26px">' + t('OTHER DEVICES') + '</h2>' +
     (lan.on
-      ? '<div>open to the network' + (lan.url
+      ? '<div>' + t('open to the network') + (lan.url
           ? ': <a href="' + esc(lan.url) + '" style="color:var(--green)">' + esc(lan.url) + '</a>'
-          : ' (no network address found yet)') + '</div>' +
-        '<div class="note">type that address into a phone or tablet on the same Wi-Fi and add the page ' +
-        'to the home screen. Other devices watch; settings and QUIT stay here. ' +
-        'On Windows, allow xerabora through the firewall when it asks.</div>' +
-        '<button class="act" id="btn-lan">CLOSE TO THIS PC</button>'
-      : '<div class="note">the page is reachable from this PC only. Open it to the network and any ' +
-        'phone, tablet or second PC on the same Wi-Fi can watch this tracker.</div>' +
-        '<button class="act" id="btn-lan">OPEN TO THE NETWORK</button>') +
+          : ' ' + t('(no network address found yet)')) + '</div>' +
+        '<div class="note">' +
+        t('type that address into a phone or tablet on the same Wi-Fi and add the page ' +
+          'to the home screen. Other devices watch; settings and QUIT stay here. ' +
+          'On Windows, allow xerabora through the firewall when it asks.') + '</div>' +
+        '<button class="act" id="btn-lan">' + t('CLOSE TO THIS PC') + '</button>'
+      : '<div class="note">' +
+        t('the page is reachable from this PC only. Open it to the network and any ' +
+          'phone, tablet or second PC on the same Wi-Fi can watch this tracker.') + '</div>' +
+        '<button class="act" id="btn-lan">' + t('OPEN TO THE NETWORK') + '</button>') +
     '<div class="msg" id="lan-msg"></div>' +
-
-    '<h2 style="margin-top:26px">CLIENT</h2>' +
-    '<div class="note">the client has no window of its own. It exits by itself about 15 seconds ' +
-    'after its last page is closed, on the PC or a phone; this button exits at once.</div>' +
-    '<button class="act" id="btn-quit">QUIT XERABORA</button>' +
     '</div>';
 
   const msg = (id, text, good) => {
@@ -783,7 +1252,7 @@ function renderSettings() {
     e.preventDefault();
     const btn = loginForm.querySelector('button');
     btn.disabled = true;
-    msg('login-msg', 'signing in...', true);
+    msg('login-msg', t('signing in...'), true);
     try {
       const r = await postForm('/login', {
         user: loginForm.user.value.trim(), password: loginForm.password.value });
@@ -791,43 +1260,22 @@ function renderSettings() {
         lastState = await (await fetch('/state', { cache: 'no-store' })).json();
         renderSettings();
         apply(lastState);
-      } else { msg('login-msg', r.error || 'failed', false); btn.disabled = false; }
-    } catch (err) { msg('login-msg', 'could not reach the client', false); btn.disabled = false; }
-  };
-
-  const quitBtn = document.getElementById('btn-quit');
-  if (quitBtn) quitBtn.onclick = async () => {
-    if (!confirm('Quit xerabora? Console telemetry and unlocks stop.')) return;
-    try { await postForm('/quit', {}); } catch (err) {}
-    document.body.innerHTML =
-      '<div class="muted" style="padding:60px;text-align:center;font-size:20px">' +
-      'xerabora is closed. This tab can be closed too.</div>';
-  };
-
-  const followBtn = document.getElementById('btn-follow');
-  if (followBtn) followBtn.onclick = async () => {
-    followBtn.disabled = true;
-    try {
-      const r = await postForm('/follow', { on: fo.on ? '0' : '1' });
-      if (!r.ok) { msg('follow-msg', r.error || 'failed', false); followBtn.disabled = false; return; }
-      lastState = await (await fetch('/state', { cache: 'no-store' })).json();
-      renderSettings();
-      liveSig = '';
-    } catch (err) { msg('follow-msg', 'could not reach the client', false); followBtn.disabled = false; }
+      } else { msg('login-msg', r.error || t('failed'), false); btn.disabled = false; }
+    } catch (err) { msg('login-msg', t('could not reach the client'), false); btn.disabled = false; }
   };
 
   const lanBtn = document.getElementById('btn-lan');
   if (lanBtn) lanBtn.onclick = async () => {
     lanBtn.disabled = true;
-    msg('lan-msg', lan.on ? 'closing...' : 'opening...', true);
+    msg('lan-msg', t(lan.on ? 'closing...' : 'opening...'), true);
     try {
       const r = await postForm('/lan', { on: lan.on ? '0' : '1' });
-      if (!r.ok) { msg('lan-msg', r.error || 'failed', false); lanBtn.disabled = false; return; }
+      if (!r.ok) { msg('lan-msg', r.error || t('failed'), false); lanBtn.disabled = false; return; }
       /* The listener reopens on the next request; give it a moment. */
       await new Promise(res => setTimeout(res, 700));
       lastState = await (await fetch('/state', { cache: 'no-store' })).json();
       renderSettings();
-    } catch (err) { msg('lan-msg', 'could not reach the client', false); lanBtn.disabled = false; }
+    } catch (err) { msg('lan-msg', t('could not reach the client'), false); lanBtn.disabled = false; }
   };
 
   const logoutBtn = document.getElementById('btn-logout');
@@ -842,7 +1290,7 @@ function renderSettings() {
     e.preventDefault();
     const btn = keyForm.querySelector('button');
     btn.disabled = true;
-    msg('apikey-msg', 'saving...', true);
+    msg('apikey-msg', t('saving...'), true);
     try {
       const r = await postForm('/apikey', { key: keyForm.key.value.trim() });
       if (r.ok) {
@@ -850,9 +1298,9 @@ function renderSettings() {
         library = null;      /* refetched with the new key */
         loadProfile();
         renderSettings();
-        msg('apikey-msg', 'saved', true);
-      } else { msg('apikey-msg', r.error || 'failed', false); btn.disabled = false; }
-    } catch (err) { msg('apikey-msg', 'could not reach the client', false); btn.disabled = false; }
+        msg('apikey-msg', t('saved'), true);
+      } else { msg('apikey-msg', r.error || t('failed'), false); btn.disabled = false; }
+    } catch (err) { msg('apikey-msg', t('could not reach the client'), false); btn.disabled = false; }
   };
 }
 
@@ -870,9 +1318,39 @@ function show(name) {
   if (name === 'settings') renderSettings();
 }
 
+/* The red button in the footer. Hidden from other devices: the client
+   would answer 403 anyway. */
+async function quit() {
+  if (!confirm(t('Quit xerabora? Console telemetry and unlocks stop.'))) return;
+  try { await postForm('/quit', {}); } catch (err) { /* it is going away */ }
+  document.body.innerHTML =
+    '<div class="muted" style="padding:60px;text-align:center;font-size:20px">' +
+    t('xerabora is closed. This tab can be closed too.') + '</div>';
+}
+
+async function setFollow(el, on) {
+  el.classList.add('busy');
+  try {
+    const r = await postForm('/follow', { on });
+    if (r.ok) {
+      lastState = await (await fetch('/state', { cache: 'no-store' })).json();
+      liveSig = '';
+      apply(lastState);
+      return;
+    }
+    el.querySelector('.d').textContent = r.error || t('failed');
+  } catch (err) {
+    el.querySelector('.d').textContent = t('could not reach the client');
+  }
+  el.classList.remove('busy');
+}
+
 document.addEventListener('click', e => {
   const nav = e.target.closest('nav button');
   if (nav) return show(nav.dataset.tab);
+
+  const sw = e.target.closest('[data-follow]');
+  if (sw) return setFollow(sw, sw.dataset.follow);
 
   const chip = e.target.closest('[data-filter]');
   if (chip) { libFilter = chip.dataset.filter; return renderLibrary(); }
@@ -901,7 +1379,12 @@ document.addEventListener('click', e => {
   if (gs) { gameSort = gs.dataset.gsort; return renderGame(); }
 
   const card = e.target.closest('[data-game]');
-  if (card) { gameId = +card.dataset.game; return show('game'); }
+  if (card) {
+    e.preventDefault();
+    gameId = +card.dataset.game;
+    if (card.tagName === 'A') delete gameCache[gameId]; /* "try again" */
+    return show('game');
+  }
 });
 
 /* The live feed. The client pushes a state whenever a snapshot lands,
@@ -937,8 +1420,9 @@ function updateLiveNumbers(c, live, trk) {
     const se = document.getElementById('cv-session');
     if (se) se.textContent = c.seconds ? hms(c.seconds) : '-';
     document.getElementById('linkstats').textContent =
-      c.frames ? c.frames.toLocaleString() + ' snapshots, ' + (c.gaps || 0) + ' skipped'
-      : c.packets ? c.packets.toLocaleString() + ' packets' : '';
+      c.frames ? t('{frames} snapshots, {skipped} skipped',
+                   { frames: c.frames.toLocaleString(), skipped: c.gaps || 0 })
+      : c.packets ? t('{packets} packets', { packets: c.packets.toLocaleString() }) : '';
     document.getElementById('clock').textContent = c.seconds ? hms(c.seconds) : '';
   }
   for (const a of live || []) {
@@ -956,7 +1440,7 @@ function applyDelta(d) {
 /* A full state redraws a tab only when its structure changed: a new
    game, an unlock, a tracker appearing. Otherwise the numbers are
    updated in place, same as a delta. */
-let liveSig = '', boardsSig = '';
+let liveSig = '', boardsSig = '', settingsSig = '';
 
 function apply(s) {
     const c = s.console;
@@ -966,13 +1450,14 @@ function apply(s) {
     const li = s.login || { ok: true };
     const f = s.follow || {};
     document.getElementById('dot').className = 'dot' + ((c.connected || f.active) ? ' on' : '');
+    document.getElementById('chip-flash').classList.toggle('on', !!c.connected);
     document.getElementById('linktext').innerHTML =
-      c.connected ? 'console live at ' + esc(c.ip)
-      : f.active ? 'following ' + esc(s.game.title || '') + (f.online ? ' &middot; playing now' : '') +
-                   ' via RetroAchievements'
-      : !li.ok ? '<span style="color:var(--amber)">not signed in to RetroAchievements &mdash; ' +
-                 'open SETTINGS to sign in</span>'
-      : 'waiting for the console';
+      c.connected ? t('console live at {ip}', { ip: esc(c.ip) })
+      : f.active ? t('following {game} via RetroAchievements', { game: esc(s.game.title || '') }) +
+                   (f.online ? ' &middot; ' + t('playing now') : '')
+      : !li.ok ? '<span style="color:var(--amber)">' +
+                 t('not signed in to RetroAchievements &mdash; open SETTINGS to sign in') + '</span>'
+      : t('waiting for the console');
 
     tracking = s.game.tracking || [];
     const list = s.game.achievements || [];
@@ -990,16 +1475,23 @@ function apply(s) {
       const bsig = tracking.map(t => t.id).join(',');
       if (bsig !== boardsSig) { boardsSig = bsig; renderBoards(); }
     }
+    /* SETTINGS is drawn from the last state, so a page that opened on
+       that tab shows a signed-out form until the first state lands. */
+    if (tab === 'settings') {
+      const ssig = [li.ok, li.user, li.webapi, (s.lan || {}).on, (s.lan || {}).url,
+                    (s.follow || {}).on].join('|');
+      if (ssig !== settingsSig) { settingsSig = ssig; renderSettings(); }
+    }
     updateLiveNumbers(c,
       list.map(a => ({ id: a.id, m: a.measured, p: a.percent })),
       tracking.map(t => ({ id: t.id, v: t.value })));
     if (f.active) {
       const po = document.getElementById('fv-polled');
-      if (po) po.textContent = f.polled_ago >= 0 ? ago(f.polled_ago) + ' ago' : '\u2014';
+      if (po) po.textContent = f.polled_ago >= 0 ? agoText(f.polled_ago) : '\u2014';
       const se = document.getElementById('fv-session');
       if (se) se.textContent = f.since ? hms(f.since) : '\u2014';
       const sn = document.getElementById('fv-seen');
-      if (sn && !f.online && !f.rp_date && f.rp_ago >= 0) sn.textContent = ago(f.rp_ago) + ' ago';
+      if (sn && !f.online && !f.rp_date && f.rp_ago >= 0) sn.textContent = agoText(f.rp_ago);
       document.getElementById('clock').textContent = f.since ? hms(f.since) : '';
     }
 
@@ -1011,11 +1503,12 @@ function apply(s) {
       /* The shelf changed too; give the server a moment to record it. */
       library = null;
       if (tab === 'library') setTimeout(renderLibrary, 3000);
-      const t = document.getElementById('toast');
+      const toastEl = document.getElementById('toast');
       document.getElementById('toastimg').src = BADGE + (u.badge || '') + '.png';
-      document.getElementById('toasttext').textContent = u.title + '  +' + u.points + ' pts';
-      t.style.display = 'flex';
-      setTimeout(() => { t.style.display = 'none'; }, 6000);
+      document.getElementById('toasttext').textContent =
+        u.title + '  ' + t('+{points} pts', { points: u.points });
+      toastEl.style.display = 'flex';
+      setTimeout(() => { toastEl.style.display = 'none'; }, 6000);
     }
 }
 
@@ -1029,12 +1522,28 @@ async function tick() {
 function loadProfile() {
   fetch('/profile').then(r => r.json()).then(p => {
     document.getElementById('who').textContent =
-      p.user ? p.user + ' · ' + p.points.toLocaleString() + ' points' : 'no Web API key, see SETTINGS';
+      p.user ? t('{user} · {points} points',
+                 { user: p.user, points: p.points.toLocaleString() })
+             : t('no Web API key, see SETTINGS');
   }).catch(() => {});
 }
 
+translateMarkup();
+bindLangPicker();
+document.getElementById('btn-quit').hidden = REMOTE;
+document.getElementById('btn-quit').onclick = quit;
 loadProfile();
-show('live');
+/* #tab=boards opens straight on a tab: a deep link, and the tab a demo
+   or an OBS window should start on. */
+{
+  const q = new URLSearchParams(location.hash.slice(1) || location.search);
+  const want = q.get('tab');
+  const game = +q.get('game');
+
+  /* #game=5761 opens that game's card, a link worth sharing. */
+  if (game > 0) { gameId = game; show('game'); }
+  else show(['live', 'library', 'game', 'boards', 'settings'].includes(want) ? want : 'live');
+}
 stream();
 tick();
 </script>
