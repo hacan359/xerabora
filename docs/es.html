@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>xeRAbora · RetroAchievements companion: what to chase next, live from a real console</title>
+<title>xeRAbora · compañero de RetroAchievements: qué cazar a continuación, en vivo desde una consola real</title>
 <meta name="description" content="xeRAbora is a RetroAchievements companion app: your library, what to chase next by other players' median times, missable warnings, leaderboards and rank, plus a live view of a real console. PlayStation 2 first, through a patched Open PS2 Loader.">
-<link rel="canonical" href="https://hacan359.github.io/xerabora/">
+<link rel="canonical" href="https://hacan359.github.io/xerabora/es.html">
 <link rel="alternate" hreflang="en" href="https://hacan359.github.io/xerabora/">
 <link rel="alternate" hreflang="pt-BR" href="https://hacan359.github.io/xerabora/pt-br.html">
 <link rel="alternate" hreflang="es" href="https://hacan359.github.io/xerabora/es.html">
@@ -359,17 +359,17 @@
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v0.1.0-alpha.7</small></a>
-    <nav class="links" aria-label="Sections">
-      <a href="#how">How it works</a>
-      <a href="#start">How to start</a>
-      <a href="#tested">Verified</a>
-      <a href="#roadmap">Roadmap</a>
-      <a href="#limits">Limits</a>
+    <nav class="links" aria-label="Secciones">
+      <a href="#how">Cómo funciona</a>
+      <a href="#start">Cómo empezar</a>
+      <a href="#tested">Verificado</a>
+      <a href="#roadmap">Planes</a>
+      <a href="#limits">Límites</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/hacan359/xerabora">GitHub</a>
     </nav>
-    <nav class="langs" aria-label="Language"><a href="./" class="on">EN</a><a href="pt-br.html">PT</a><a href="es.html">ES</a></nav>
-    <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download</a>
+    <nav class="langs" aria-label="Idioma"><a href="./">EN</a><a href="pt-br.html">PT</a><a href="es.html" class="on">ES</a></nav>
+    <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Descargar</a>
   </div>
 </header>
 
@@ -379,16 +379,16 @@
   <div class="wrap">
     <div class="hero-art"><canvas id="wordmark" aria-label="xeRAbora"></canvas></div>
     <div class="hero-copy">
-      <h1>Your RetroAchievements companion, live from a <span>real</span> console.</h1>
-      <p class="lede">One window for your library, what to chase next, the missables you are about to lose, the leaderboards and your rank. Plug in a console and it shows progress as it moves, an unlock the moment it happens, and a gold flash on the TV. PlayStation&nbsp;2 first, through a patched Open PS2 Loader.</p>
+      <h1>Tu compañero de RetroAchievements, en vivo desde una consola <span>real</span>.</h1>
+      <p class="lede">Una ventana para tu biblioteca, qué cazar a continuación, los logros perdibles que estás a punto de perder, las clasificaciones y tu puesto. Conecta una consola y verás el progreso mientras avanza, el desbloqueo en el instante en que ocurre, y un destello dorado en la tele. PlayStation&nbsp;2 primero, con un Open PS2 Loader modificado.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download alpha.7</a>
-        <a class="btn" href="#start">How to start</a>
+        <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Descargar alpha.7</a>
+        <a class="btn" href="#start">Cómo empezar</a>
       </div>
       <div class="hero-meta">
-        <span><b>Softcore</b> only</span>
-        <span><b>USB</b> and the original <b>disc</b></span>
-        <span><b>Windows</b> / <b>Linux</b> / <b>macOS</b>, one file</span>
+        <span>Solo <b>softcore</b></span>
+        <span><b>USB</b> y el <b>disco</b> original</span>
+        <span><b>Windows</b> / <b>Linux</b> / <b>macOS</b>, un archivo</span>
       </div>
     </div>
   </div>
@@ -397,68 +397,68 @@
 <section id="how">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">How it works</span>
-      <h2>The console plays, the PC watches, the TV flashes.</h2>
-      <p>Your PS2 runs the game as usual. While it plays, the loader sends the PC a copy of what the game keeps in memory. The PC compares that with the achievement rules, tells RetroAchievements when you earn one, and tells the console, which answers with a gold flash over the game.</p>
+      <span class="eyebrow">Cómo funciona</span>
+      <h2>La consola juega, el PC mira, la tele destella.</h2>
+      <p>Tu PS2 corre el juego como siempre. Mientras corre, el loader envía al PC una copia de lo que el juego guarda en memoria. El PC lo compara con las reglas de los logros, avisa a RetroAchievements cuando ganas uno, y avisa a la consola, que responde con un destello dorado sobre el juego.</p>
     </div>
     <div class="pipeline">
       <div class="node">
-        <span class="where">Your PS2</span>
-        <h3>Runs the game</h3>
-        <p>A patched Open PS2 Loader starts the game the same way OPL always does, from a USB stick or the disc.</p>
+        <span class="where">Tu PS2</span>
+        <h3>Corre el juego</h3>
+        <p>Un Open PS2 Loader modificado arranca el juego igual que siempre, desde una memoria USB o el disco.</p>
       </div>
       <div class="node">
-        <span class="where">Your PS2</span>
-        <h3>Shares what the game remembers</h3>
-        <p>While you play, the loader sends the PC the numbers the game keeps in memory: score, position, health, whatever the achievements look at.</p>
+        <span class="where">Tu PS2</span>
+        <h3>Comparte lo que el juego recuerda</h3>
+        <p>Mientras juegas, el loader envía al PC los números que el juego guarda en memoria: puntuación, posición, vida, lo que miren los logros.</p>
       </div>
       <div class="node">
-        <span class="where">Your PC</span>
-        <h3>Checks the achievement rules</h3>
-        <p>xerabora runs rcheevos, the same engine the emulators use, and watches those numbers for the moment an achievement is earned.</p>
+        <span class="where">Tu PC</span>
+        <h3>Comprueba las reglas de los logros</h3>
+        <p>xerabora ejecuta rcheevos, el mismo motor que usan los emuladores, y vigila esos números esperando el momento en que se gana un logro.</p>
       </div>
       <div class="node ra">
         <span class="where">retroachievements.org</span>
-        <h3>Records the unlock</h3>
-        <p>The unlock lands on your profile like any other. Softcore, on a real console. The page shows a toast, the console a gold flash.</p>
+        <h3>Registra el desbloqueo</h3>
+        <p>El desbloqueo cae en tu perfil como cualquier otro. Softcore, en una consola real. La página muestra un aviso, la consola un destello dorado.</p>
       </div>
     </div>
-    <p class="pipeline-note">The client knows nothing about the PS2 beyond the memory it receives. The wire between the two halves is a documented protocol (<a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">PROTOCOL.md</a>): an agent for another console reads its memory, computes the RetroAchievements hash and speaks it. The <a href="https://github.com/hacan359/xerabora#how-the-ps2-side-works">README</a> goes into the internals.</p>
+    <p class="pipeline-note">El cliente no sabe nada del PS2 más allá de la memoria que recibe. El hilo entre las dos mitades es un protocolo documentado (<a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">PROTOCOL.md</a>): un agente para otra consola lee su memoria, calcula el hash de RetroAchievements y habla el mismo protocolo. El <a href="https://github.com/hacan359/xerabora#how-the-ps2-side-works">README</a> entra en los detalles.</p>
   </div>
 </section>
 
 <section id="client">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow gold">The client</span>
-      <h2>Your RetroAchievements, in one window.</h2>
-      <p>xeRAbora is a full client. It works without a console and without a login: the library, every game's achievements and the leaderboards come from your Web API key. Plug in the console and the same screens fill with numbers straight from the game's memory.</p>
+      <span class="eyebrow gold">El cliente</span>
+      <h2>Tu RetroAchievements, en una sola ventana.</h2>
+      <p>xeRAbora es un cliente completo. Funciona sin consola y sin sesión: la biblioteca, los logros de cada juego y las clasificaciones vienen de tu clave de la Web API. Conecta la consola y esas mismas pantallas se llenan de números sacados directamente de la memoria del juego.</p>
     </div>
     <div class="cols">
       <div>
-        <h3>LIVE</h3>
-        <p>The running game as the console sees it: measured progress, UP NEXT by the median time other players took, live leaderboard trackers, and a CONSOLE panel with the link, the snapshot rate and the losses.</p>
+        <h3>EN VIVO</h3>
+        <p>El juego en marcha tal como lo ve la consola: progreso medido, LO SIGUIENTE por el tiempo mediano que tardaron otros jugadores, seguidores de clasificación en vivo, y un panel CONSOLA con el enlace, la tasa de snapshots y las pérdidas.</p>
       </div>
       <div>
-        <h3>LIBRARY, GAME, BOARDS</h3>
-        <p>Every game you have touched, on every system, with progress and awards. One set in full: the author's order, the intended path with missables flagged, the median unlock times. A game's leaderboards with the top entries.</p>
+        <h3>BIBLIOTECA, JUEGO, TABLAS</h3>
+        <p>Cada juego que has tocado, en cada sistema, con progreso y premios. Un conjunto entero: el orden del autor, la ruta prevista con los perdibles marcados, los tiempos medianos de desbloqueo. Las clasificaciones de un juego con las mejores marcas.</p>
       </div>
       <div>
-        <h3>FOLLOW MY PLAY</h3>
-        <p>With the console off, LIVE follows your account through the Web API: the game you are in on any emulator with RetroAchievements, the unlocks as they land, UP NEXT and the missable warnings. The console takes over the moment it connects.</p>
+        <h3>SEGUIR MI PARTIDA</h3>
+        <p>Con la consola apagada, EN VIVO sigue tu cuenta por la Web API: el juego en el que estás en cualquier emulador con RetroAchievements, los desbloqueos en cuanto llegan, LO SIGUIENTE y los avisos de perdibles. La consola toma el relevo en cuanto se conecta.</p>
       </div>
       <div>
-        <h3>SETTINGS</h3>
-        <p>Your account, your Web API key and the switch that opens the page to a phone on the same Wi-Fi. Nothing else to set: the language menu sits in the header, FOLLOW MY PLAY on LIVE, and the red QUIT in the footer.</p>
+        <h3>AJUSTES</h3>
+        <p>Tu cuenta, tu clave de la Web API y el interruptor que abre la página a un móvil en la misma Wi-Fi. Nada más que configurar: el menú de idioma está en la cabecera, SEGUIR MI PARTIDA en EN VIVO, y el SALIR rojo en el pie.</p>
       </div>
       <div>
-        <h3>Made for streaming</h3>
-        <p>The interface is a page the client serves to itself on localhost, so OBS takes it as a browser source. <code>--obs</code> writes text labels and a <code>data.json</code> for everything else.</p>
+        <h3>Hecho para streaming</h3>
+        <p>La interfaz es una página que el cliente se sirve a sí mismo en localhost, así que OBS la toma como fuente de navegador. <code>--obs</code> escribe etiquetas de texto y un <code>data.json</code> para todo lo demás.</p>
       </div>
     </div>
     <div class="demo">
-      <div class="demo__bar"><span>Try it</span> This is the client's own page with a recorded session in place of the console. Click the tabs, open a game from LIBRARY, change the language in the header, wait for the unlock.</div>
-      <iframe src="demo.html" title="xeRAbora, live demo of the client's page" loading="lazy"></iframe>
+      <div class="demo__bar"><span>Pruébalo</span> Esta es la propia página del cliente con una sesión grabada en lugar de la consola. Pulsa las pestañas, abre un juego desde BIBLIOTECA, cambia el idioma en la cabecera, espera el desbloqueo.</div>
+      <iframe src="demo.html#lang=es" title="xeRAbora, demo en vivo de la página del cliente" loading="lazy"></iframe>
     </div>
   </div>
 </section>
@@ -466,10 +466,10 @@
 <section id="start">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow gold">How to start</span>
-      <h2>From download to the first unlock.</h2>
-      <p>One evening, one USB stick. The panels on the right are what the client's page shows at each step, with the numbers from a real session.</p>
-      <p>An unlock needs three things, in this order: xerabora signed in on the PC, the game checked once from its menu, then the game started. Step 5 is the one people skip.</p>
+      <span class="eyebrow gold">Cómo empezar</span>
+      <h2>De la descarga al primer desbloqueo.</h2>
+      <p>Una tarde, una memoria USB. Los paneles de la derecha son lo que muestra la página del cliente en cada paso, con los números de una sesión real.</p>
+      <p>Un desbloqueo necesita tres cosas, en este orden: xerabora con la sesión iniciada en el PC, el juego comprobado una vez desde su menú, y solo entonces el juego arrancado. El paso 5 es el que la gente se salta.</p>
     </div>
 
     <div class="steps">
@@ -477,70 +477,65 @@
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Download two files</h3>
-          <p>From the <a href="https://github.com/hacan359/xerabora/releases/latest">latest release</a>: <code>OPL-RA.ELF</code> for the console and <code>xerabora.exe</code> (Windows), <code>xerabora-linux-x86_64</code> (Linux) or <code>xerabora-macos</code> (macOS) for the PC. <code>SHA256SUMS</code> lets you check them.</p>
-          <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> files on a USB stick or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
+          <h3>Descarga dos archivos</h3>
+          <p>De la <a href="https://github.com/hacan359/xerabora/releases/latest">última versión</a>: <code>OPL-RA.ELF</code> para la consola y <code>xerabora.exe</code> (Windows), <code>xerabora-linux-x86_64</code> (Linux) o <code>xerabora-macos</code> (macOS) para el PC. <code>SHA256SUMS</code> sirve para comprobarlos.</p>
+          <p>Necesitas un PS2 con adaptador de red que ya ejecute Open PS2 Loader (FMCB, FHDB o similar), tus juegos como archivos <code>.iso</code> en una memoria USB o el disco original, y un PC en la misma red local con una cuenta de <a href="https://retroachievements.org">RetroAchievements</a>.</p>
         </div>
         <div class="step-vis">
-          <pre class="files"><b>xerabora, latest release</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
-├─ <span class="new">OPL-RA.ELF</span>              console loader (OPL 1.2.0 + RA)
-├─ OPL-RA-debug.ELF        same, with on-screen diagnostics
-├─ <span class="new">xerabora.exe</span>            PC client, Windows
-├─ xerabora-linux-x86_64   PC client, Linux
-├─ xerabora-macos          PC client, macOS
-└─ SHA256SUMS</pre>
+          <pre class="files"><b>xerabora, última versión</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
+├─ <span class="new">OPL-RA.ELF</span>              loader de consola (OPL 1.2.0 + RA) ├─ OPL-RA-debug.ELF igual, con diagnóstico en pantalla ├─ <span class="new">xerabora.exe</span>            cliente PC, Windows ├─ xerabora-linux-x86_64 cliente PC, Linux ├─ xerabora-macos cliente PC, macOS └─ SHA256SUMS</pre>
         </div>
       </div>
 
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Put the loader next to your games</h3>
-          <p><code>OPL-RA.ELF</code> is a full OPL build, so it goes wherever your OPL apps live. On a USB stick: an <code>APPS</code> folder, and one line in <code>conf_apps.cfg</code> in the root so it shows up under <strong>Apps</strong>. Your images stay in <code>DVD</code> and <code>CD</code> as always.</p>
-          <div class="tip"><b>Notifications.</b> The RA menu items report through on-screen notices whatever OPL's Notifications setting says. Turn it on (Settings → Notifications → On, Save Changes, cold-boot) if you also want OPL's own notices.</div>
+          <h3>Pon el loader junto a tus juegos</h3>
+          <p><code>OPL-RA.ELF</code> es una build completa de OPL, así que va donde ya viven tus apps de OPL. En una memoria USB: una carpeta <code>APPS</code>, y una línea en <code>conf_apps.cfg</code> en la raíz para que aparezca en <strong>Apps</strong>. Tus imágenes siguen en <code>DVD</code> y <code>CD</code> como siempre.</p>
+          <div class="tip"><b>Notificaciones.</b> Los elementos de menú RA avisan en pantalla diga lo que diga la opción Notifications de OPL. Actívala (Settings → Notifications → On, Save Changes, y arranque en frío) si también quieres los avisos del propio OPL.</div>
         </div>
         <div class="step-vis">
           <pre class="files"><b>E:\</b>  <span class="c">(mass0:)</span>
 ├─ <span class="new">conf_apps.cfg</span>       <span class="c">OPL+RA=mass0:APPS/OPL-RA.ELF</span>
 ├─ APPS\
 │   └─ <span class="new">OPL-RA.ELF</span>
-├─ DVD\                 <span class="c">your .iso images</span>
+├─ DVD\                 <span class="c">tus imágenes .iso</span>
 ├─ CD\
 └─ CFG\  LNG\  THM\  ART\  CHT\  VMC\</pre>
-          <span class="cap">Plain ASCII, CRLF line endings.</span>
+          <span class="cap">ASCII simple, saltos de línea CRLF.</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Start xerabora on the PC</h3>
-          <p>Run it. The page opens in your browser. On SETTINGS, sign in with your RetroAchievements login and paste the Web API key from your RA profile settings; the token and the key are saved in your profile (<code>%LOCALAPPDATA%\xerabora</code> or <code>~/.config/xerabora</code>), the password is not. Then it listens on UDP port 18194 and waits.</p>
-          <p>Leave it running while you play. The LIVE tab shows everything below; the same lines go to <code>xerabora.log</code> next to the saved login. If Windows asks about the firewall, allow it on private networks.</p>
+          <h3>Arranca xerabora en el PC</h3>
+          <p>Ejecútalo. La página se abre en tu navegador. En AJUSTES, entra con tu cuenta de RetroAchievements y pega la clave de la Web API de los ajustes de tu perfil de RA; el token y la clave se guardan en tu perfil (<code>%LOCALAPPDATA%\xerabora</code> o <code>~/.config/xerabora</code>), la contraseña no. Después escucha en el puerto UDP 18194 y espera.</p>
+          <p>Déjalo abierto mientras juegas. La pestaña EN VIVO muestra todo lo de abajo; las mismas líneas van al <code>xerabora.log</code> junto a la sesión guardada. Si Windows pregunta por el firewall, permítelo en redes privadas.</p>
         </div>
         <div class="step-vis">
-          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab on">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
-            <div class="app__status"><span><i class="dot off"></i>waiting for the console on UDP 18194</span><span>&nbsp;</span></div>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab">EN VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JUEGO</span><span class="tab">TABLAS</span><span class="tab on">AJUSTES</span><span class="who">Hacan359 · 10 847 puntos</span></div>
+            <div class="app__status"><span><i class="dot off"></i>esperando la consola en UDP 18194</span><span>&nbsp;</span></div>
             <div class="app__form">
-              <label>RetroAchievements login</label><div class="field">hacan359 <em>· signed in, only the token is stored</em></div>
-              <label>Web API key</label><div class="field">••••••••••••••••••••••••••••••••</div>
-              <span class="app__btn">SAVE</span>
+              <label>cuenta de RetroAchievements</label><div class="field">hacan359 <em>· sesión iniciada, solo se guarda el token</em></div>
+              <label>clave de la Web API</label><div class="field">••••••••••••••••••••••••••••••••</div>
+              <span class="app__btn">GUARDAR</span>
             </div>
           </div>
-          <span class="cap">Both fields can wait: the library needs the key, an unlock needs the login.</span>
+          <span class="cap">Los dos campos pueden esperar: la biblioteca necesita la clave, un desbloqueo necesita la sesión.</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Boot OPL-RA and test the link</h3>
-          <p>On the console: Apps → <strong>OPL+RA</strong>. It looks and behaves like OPL 1.2.0. Highlight a game, press <kbd>△</kbd> for its menu and choose <strong>RA: test PC connection</strong>. A notice tells you whether xerabora answered, from which address and how fast.</p>
-          <p>Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, the client is running.</p>
+          <h3>Arranca OPL-RA y prueba el enlace</h3>
+          <p>En la consola: Apps → <strong>OPL+RA</strong>. Se ve y se comporta como OPL 1.2.0. Marca un juego, pulsa <kbd>△</kbd> para su menú y elige <strong>RA: test PC connection</strong>. Un aviso te dice si xerabora respondió, desde qué dirección y en cuánto tiempo.</p>
+          <p>¿No responde nada? Misma subred, el firewall del PC permitiendo UDP 18194 de entrada, y el cliente en marcha.</p>
         </div>
         <div class="step-vis">
           <div class="term console">
-            <div class="term__bar"><i></i><i></i><i></i><span>PS2 · OPL+RA · game menu</span></div>
+            <div class="term__bar"><i></i><i></i><i></i><span>PS2 · OPL+RA · menú del juego</span></div>
 <pre><span class="dim">  Need for Speed: Underground 2</span>
 
   Settings
@@ -551,12 +546,12 @@
   Rename
   Delete
 
-<span class="notice">  PC client found at 192.168.1.10 xerabora/1.0.0</span>
-<span class="notice">  Reply in 3 ms, console at 192.168.1.142</span></pre>
+<span class="notice">  cliente PC encontrado en 192.168.1.10 xerabora/1.0.0</span>
+<span class="notice">  Respuesta en 3 ms, consola en 192.168.1.142</span></pre>
           </div>
-          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
-            <div class="app__status"><span><i class="dot off"></i>console at 192.168.1.142 answered the link test</span><span>&nbsp;</span></div>
-            <div class="app__panel muted">start a game on the console, or browse your library above</div>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">EN VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JUEGO</span><span class="tab">TABLAS</span><span class="tab">AJUSTES</span><span class="who">Hacan359 · 10 847 puntos</span></div>
+            <div class="app__status"><span><i class="dot off"></i>la consola en 192.168.1.142 respondió a la prueba de enlace</span><span>&nbsp;</span></div>
+            <div class="app__panel muted">empieza un juego en la consola, o mira tu biblioteca arriba</div>
           </div>
         </div>
       </div>
@@ -564,68 +559,68 @@
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Check game support</h3>
-          <p>Same menu, <strong>RA: check game support</strong>. The console hashes the image the RetroAchievements way and asks the PC. The PC asks the RA server, builds the <em>watch list</em> (every memory address the achievement set reads) and sends it back. The notice shows the title and the counts: total, unlocked, and how many cannot unlock on real hardware yet.</p>
-          <p>Once checked, the game gets an <code>RA</code> prefix in the list and a badge on the cover. You do this once per game.</p>
-          <div class="tip"><b>Before you start the game.</b> This step fetches the list of addresses the console will read. Skip it and the game starts as plain OPL: no telemetry, nothing on the page. <code>RetroAchievements does not know this image</code> means the game plays without achievements.</div>
+          <h3>Comprueba el soporte del juego</h3>
+          <p>Mismo menú, <strong>RA: check game support</strong>. La consola calcula el hash de la imagen a la manera de RetroAchievements y pregunta al PC. El PC pregunta al servidor de RA, monta la <em>lista vigilada</em> (cada dirección de memoria que lee el conjunto de logros) y la devuelve. El aviso muestra el título y las cuentas: total, desbloqueados, y cuántos aún no pueden desbloquearse en hardware real.</p>
+          <p>Una vez comprobado, el juego lleva un prefijo <code>RA</code> en la lista y un distintivo en la portada. Esto se hace una vez por juego.</p>
+          <div class="tip"><b>Antes de arrancar el juego.</b> Este paso busca la lista de direcciones que va a leer la consola. Sáltatelo y el juego arranca como OPL a secas: sin telemetría, nada en la página. <code>RetroAchievements does not know this image</code> significa que el juego se juega sin logros.</div>
         </div>
         <div class="step-vis">
-          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
-            <div class="app__status"><span><i class="dot off"></i>console at 192.168.1.142, no game running</span><span>&nbsp;</span></div>
-            <div class="app__label">CONSOLE</div>
-            <div class="app__panel">Need for Speed: Underground 2 · 76 achievements · watch list sent</div>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">EN VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JUEGO</span><span class="tab">TABLAS</span><span class="tab">AJUSTES</span><span class="who">Hacan359 · 10 847 puntos</span></div>
+            <div class="app__status"><span><i class="dot off"></i>consola en 192.168.1.142, ningún juego en marcha</span><span>&nbsp;</span></div>
+            <div class="app__label">CONSOLA</div>
+            <div class="app__panel">Need for Speed: Underground 2 · 76 logros · lista vigilada enviada</div>
             <div class="app__tiles">
-              <div class="tile"><b>game</b><span>SLUS_210.65</span></div>
-              <div class="tile"><b>image</b><span>f45e0a19…</span></div>
-              <div class="tile"><b>watch list</b><span>490 addr · 1351 B · 2 parts</span></div>
-              <div class="tile"><b>cannot unlock here</b><span>0 of 76</span></div>
+              <div class="tile"><b>juego</b><span>SLUS_210.65</span></div>
+              <div class="tile"><b>imagen</b><span>f45e0a19…</span></div>
+              <div class="tile"><b>lista vigilada</b><span>490 dir · 1351 B · 2 partes</span></div>
+              <div class="tile"><b>no puede desbloquearse aquí</b><span>0 de 76</span></div>
             </div>
           </div>
-          <span class="cap">The console asks a few times while it collects the list in chunks. Normal.</span>
+          <span class="cap">La consola pregunta varias veces mientras junta la lista por trozos. Es normal.</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Start the game</h3>
-          <p>Launch it from OPL as usual. When the game opens its controller, the in-game hooks attach. The console finds the PC with one broadcast, waits about thirty seconds for the game to finish loading, then starts streaming.</p>
-          <p>The LIVE tab lights up: console connected, the set, the first snapshot, and how many achievements cannot unlock on real hardware. From here on it is playing. A game you did not check stays dark here: it runs, without telemetry.</p>
+          <h3>Arranca el juego</h3>
+          <p>Lánzalo desde OPL como siempre. Cuando el juego abre su mando, los hooks in-game se enganchan. La consola encuentra el PC con un broadcast, espera unos treinta segundos a que el juego termine de cargar, y empieza a transmitir.</p>
+          <p>La pestaña EN VIVO se enciende: consola conectada, el conjunto, el primer snapshot, y cuántos logros no pueden desbloquearse en hardware real. De aquí en adelante toca jugar. Un juego que no comprobaste se queda apagado aquí: funciona, sin telemetría.</p>
         </div>
         <div class="step-vis">
-          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
-            <div class="app__status"><span><i class="dot"></i>console live at 192.168.1.142</span><span>60 snapshots, 0 skipped</span></div>
-            <div class="app__label">CONSOLE</div>
-            <div class="app__panel">achievement set active, unlocks are tracked</div>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">EN VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JUEGO</span><span class="tab">TABLAS</span><span class="tab">AJUSTES</span><span class="who">Hacan359 · 10 847 puntos</span></div>
+            <div class="app__status"><span><i class="dot"></i>consola en vivo en 192.168.1.142</span><span>60 snapshots, 0 saltados</span></div>
+            <div class="app__label">CONSOLA</div>
+            <div class="app__panel">conjunto de logros activo, desbloqueos rastreados</div>
             <div class="app__tiles">
-              <div class="tile"><b>link</b><span>192.168.1.142</span></div>
-              <div class="tile"><b>game</b><span>SLUS_210.65</span></div>
+              <div class="tile"><b>enlace</b><span>192.168.1.142</span></div>
+              <div class="tile"><b>juego</b><span>SLUS_210.65</span></div>
               <div class="tile"><b>snapshots</b><span>60 · 53/s</span></div>
-              <div class="tile"><b>lost</b><span>0 skipped · 0 rep · 0 torn</span></div>
-              <div class="tile"><b>watch list</b><span>490 addr · 1351 B · 2 parts</span></div>
-              <div class="tile"><b>session</b><span>0:00:01</span></div>
+              <div class="tile"><b>perdidos</b><span>0 saltados · 0 rep · 0 rotos</span></div>
+              <div class="tile"><b>lista vigilada</b><span>490 dir · 1351 B · 2 partes</span></div>
+              <div class="tile"><b>sesión</b><span>0:00:01</span></div>
             </div>
           </div>
-          <span class="cap">Need for Speed: Underground 2, 0 of 76, and the first UP NEXT cards appear below this panel.</span>
+          <span class="cap">Need for Speed: Underground 2, 0 de 76, y las primeras tarjetas de LO SIGUIENTE aparecen bajo este panel.</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-text">
           <span class="n"></span>
-          <h3>Play</h3>
-          <p>The CONSOLE panel counts sixty snapshots a second, how many the console skipped because its DMA was busy, how many arrived incomplete. Then the moment you were waiting for: a toast on the page, a short sound, a gold flash over the game on the TV, and the unlock on your profile.</p>
-          <p>Lose the network for five seconds and the PC says so. When the stream returns, it picks up where it was.</p>
+          <h3>Juega</h3>
+          <p>El panel CONSOLA cuenta sesenta snapshots por segundo, cuántos saltó la consola porque su DMA estaba ocupado, cuántos llegaron incompletos. Y entonces el momento que esperabas: un aviso en la página, un sonido corto, un destello dorado sobre el juego en la tele, y el desbloqueo en tu perfil.</p>
+          <p>Pierde la red cinco segundos y el PC lo dice. Cuando vuelve el flujo, retoma donde estaba.</p>
         </div>
         <div class="step-vis">
-          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who">Hacan359 · 10 847 points</span></div>
-            <div class="app__status"><span><i class="dot"></i>console live at 192.168.1.142</span><span>32 400 snapshots, 3 387 skipped</span></div>
+          <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">EN VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JUEGO</span><span class="tab">TABLAS</span><span class="tab">AJUSTES</span><span class="who">Hacan359 · 10 847 puntos</span></div>
+            <div class="app__status"><span><i class="dot"></i>consola en vivo en 192.168.1.142</span><span>32 400 snapshots, 3 387 saltados</span></div>
             <div class="app__toast"><img src="https://media.retroachievements.org/Badge/609318.png" alt="" width="40" height="40"><span>Yo Noobie&nbsp;&nbsp;+2 pts</span></div>
-            <div class="app__label">UP NEXT · BY MEDIAN UNLOCK TIME</div>
-            <div class="app__card"><div><b>Bring My Car Back... Now!</b><span>Complete all three races available before going to Rachel's place</span></div><em>~0h43 · <u>missable</u></em></div>
-            <div class="app__card"><div><b>Making a Name</b><span>Complete Stage 1</span></div><em><strong>next in progression</strong>~1h14 · progression</em></div>
+            <div class="app__label">LO SIGUIENTE · POR TIEMPO MEDIANO DE DESBLOQUEO</div>
+            <div class="app__card"><div><b>Bring My Car Back... Now!</b><span>Complete all three races available before going to Rachel's place</span></div><em>~0h43 · <u>perdible</u></em></div>
+            <div class="app__card"><div><b>Making a Name</b><span>Complete Stage 1</span></div><em><strong>siguiente en la progresión</strong>~1h14 · progresión</em></div>
           </div>
-          <span class="cap">On the TV the screen dips to gold and comes back. Lose the network for five seconds and the status bar says so.</span>
+          <span class="cap">En la tele la pantalla se hunde en dorado y vuelve. Pierde la red cinco segundos y la barra de estado lo dice.</span>
         </div>
       </div>
 
@@ -636,25 +631,25 @@
 <section id="tested">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Verified on hardware</span>
-      <h2>We tested two ways to run it. Play from one of them.</h2>
-      <p>We checked this page on a real console, with games on a USB stick or the original disc in the drive. Keep the images you play with achievements there. OPL knows other ways of storing games; one of them we know does not work yet, the rest we have not tried.</p>
+      <span class="eyebrow">Verificado en hardware</span>
+      <h2>Probamos dos maneras de ejecutarlo. Juega por una de ellas.</h2>
+      <p>Comprobamos esta página en una consola real, con juegos en una memoria USB o el disco original en la unidad. Guarda ahí las imágenes con las que juegas con logros. OPL conoce otras formas de guardar juegos; de una sabemos que aún no funciona, las demás no las hemos probado.</p>
     </div>
     <div class="verified">
       <div class="vcard ok">
-        <span class="eyebrow">Verified</span>
-        <h3>USB stick</h3>
-        <p>Plain <code>.iso</code> images in <code>DVD</code> or <code>CD</code>. Hashing, the watch list, telemetry and in-game unlocks: the session in the walkthrough ran this way.</p>
+        <span class="eyebrow">Verificado</span>
+        <h3>Memoria USB</h3>
+        <p>Imágenes <code>.iso</code> simples en <code>DVD</code> o <code>CD</code>. Hash, lista vigilada, telemetría y desbloqueos in-game: la sesión del recorrido fue así.</p>
       </div>
       <div class="vcard ok">
-        <span class="eyebrow">Verified</span>
-        <h3>Original disc</h3>
-        <p>Check and launch from OPL's main menu. Runs and unlocks; one game so far. Experimental, see below.</p>
+        <span class="eyebrow">Verificado</span>
+        <h3>Disco original</h3>
+        <p>Comprueba y arranca desde el menú principal de OPL. Funciona y desbloquea; un juego por ahora. Experimental, mira abajo.</p>
       </div>
       <div class="vcard warn">
-        <span class="eyebrow">Not yet</span>
-        <h3>SMB share, internal HDD, UL and ZSO images</h3>
-        <p>A share hashes fine, but a game with an achievement set does not run from it yet: it boots, the console connects, and about a minute in it stops loading. Games without a set run from a share as before. Nobody has run the RA additions from an internal HDD or from UL and ZSO images; expect problems we have not seen.</p>
+        <span class="eyebrow">Todavía no</span>
+        <h3>Recurso SMB, disco duro interno, imágenes UL y ZSO</h3>
+        <p>Un recurso compartido calcula el hash bien, pero un juego con conjunto de logros todavía no arranca desde ahí: se inicia, la consola conecta, y un minuto después deja de cargar. Los juegos sin conjunto arrancan desde un recurso como antes. Nadie ha ejecutado los añadidos de RA desde un disco duro interno ni desde imágenes UL y ZSO; espera problemas que no hemos visto.</p>
       </div>
     </div>
   </div>
@@ -664,14 +659,14 @@
   <div class="wrap">
     <div class="cols">
       <div>
-        <span class="eyebrow">From the original disc</span>
-        <h2 style="margin:0.6rem 0 1rem">No image needed.</h2>
-        <p>Put the disc in, press <kbd>START</kbd> for OPL's main menu and choose <strong>RA: check disc support</strong>, then <strong>RA: launch disc</strong>. The check reads the disc through the console's own drive and asks the PC the same way it does for an image. The launch boots the disc under OPL's in-game hooks, so telemetry and unlocks work as they do from USB.</p>
-        <p>You give up OPL's virtual memory cards, per-game compatibility patches and cheats. They live in the part of OPL that emulates the drive, and a real disc does not use it.</p>
+        <span class="eyebrow">Desde el disco original</span>
+        <h2 style="margin:0.6rem 0 1rem">Sin imagen ninguna.</h2>
+        <p>Mete el disco, pulsa <kbd>START</kbd> para el menú principal de OPL y elige <strong>RA: check disc support</strong>, y luego <strong>RA: launch disc</strong>. La comprobación lee el disco por la propia unidad de la consola y pregunta al PC igual que con una imagen. El arranque inicia el disco bajo los hooks in-game de OPL, así que telemetría y desbloqueos funcionan igual que por USB.</p>
+        <p>Renuncias a las tarjetas de memoria virtuales de OPL, a los parches de compatibilidad por juego y a los trucos. Viven en la parte de OPL que emula la unidad, y un disco de verdad no la usa.</p>
       </div>
       <div class="callout">
         <span class="eyebrow">Experimental</span>
-        <p>Disc mode has run with Shadow of the Colossus only. A game it cannot boot may hang the console hard: black screen, and the reset button does nothing. Power off and back on to recover. Transformers: The Game is one known case; from USB it runs fine.</p>
+        <p>El modo disco solo ha funcionado con Shadow of the Colossus. Un juego que no consigue arrancar puede colgar la consola del todo: pantalla negra, y el botón de reset no hace nada. Apaga y enciende para recuperarla. Transformers: The Game es un caso conocido; por USB funciona bien.</p>
       </div>
     </div>
   </div>
@@ -680,34 +675,34 @@
 <section id="roadmap">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow gold">Where this is going</span>
-      <h2>A companion for wherever you play.</h2>
-      <p>The console side proved the idea. The plan is to grow the client into the thing you keep open next to any RetroAchievements session, and to give the PS2 agent the pieces it still lacks.</p>
+      <span class="eyebrow gold">Hacia dónde va esto</span>
+      <h2>Un compañero para donde sea que juegues.</h2>
+      <p>El lado de la consola demostró la idea. El plan es convertir el cliente en eso que dejas abierto al lado de cualquier sesión de RetroAchievements, y darle al agente del PS2 las piezas que aún le faltan.</p>
     </div>
     <div class="cols">
       <div>
-        <h3>Pointer chains on the console</h3>
-        <p>The agent reads flat addresses today. Next it reads the pointer bases too and the client asks for the targets on the following frame, so the sets that dereference pointers unlock on real hardware as well.</p>
+        <h3>Cadenas de punteros en la consola</h3>
+        <p>Hoy el agente lee direcciones planas. Después leerá también las bases de los punteros, y el cliente pedirá los destinos en el fotograma siguiente, para que los conjuntos que usan punteros también desbloqueen en hardware real.</p>
       </div>
       <div>
-        <h3>Guidance that does not depend on the source</h3>
-        <p>UP NEXT, missable warnings and progression order come from RetroAchievements data, so they work for any game you have started. The goal is a companion that guides you through a set whether you play on the console, on a PC, or in an emulator, so you miss nothing on the way to mastery.</p>
+        <h3>Guía que no depende de la fuente</h3>
+        <p>LO SIGUIENTE, los avisos de perdibles y el orden de progresión salen de los datos de RetroAchievements, así que funcionan para cualquier juego que hayas empezado. La meta es un compañero que te guíe por un conjunto, juegues en la consola, en un PC o en un emulador, para que no te pierdas nada camino de la maestría.</p>
       </div>
       <div>
-        <h3>More agents, one protocol</h3>
-        <p>The protocol is small and documented. An agent for another console, or for an emulator that wants the same window, is a weekend of work, and the client does the rest.</p>
+        <h3>Más agentes, un protocolo</h3>
+        <p>El protocolo es pequeño y está documentado. Un agente para otra consola, o para un emulador que quiera la misma ventana, es un fin de semana de trabajo, y el cliente hace el resto.</p>
       </div>
       <div>
-        <h3>Louder unlocks</h3>
-        <p>The gold flash is the first notice on the TV. Controller rumble in step with it, a badge on screen, a mastery alert on the page, and Discord presence are on the list.</p>
+        <h3>Desbloqueos más sonoros</h3>
+        <p>El destello dorado es el primer aviso en la tele. Vibración del mando a la vez, un distintivo en pantalla, un aviso de maestría en la página y presencia en Discord están en la lista.</p>
       </div>
       <div>
-        <h3>For streams</h3>
-        <p>A compact overlay layout for OBS, live counters from the game's own values, and the leaderboard trackers beside the video.</p>
+        <h3>Para streams</h3>
+        <p>Un diseño de overlay compacto para OBS, contadores en vivo a partir de los propios valores del juego, y los seguidores de clasificación junto al vídeo.</p>
       </div>
       <div>
         <h3>Hardcore</h3>
-        <p>RetroAchievements decides who qualifies. The question is with the RA team; until then, softcore, with the trackers running and no entries posted.</p>
+        <p>RetroAchievements decide quién califica. La pregunta está con el equipo de RA; hasta entonces, softcore, con los seguidores en marcha y ninguna marca enviada.</p>
       </div>
     </div>
   </div>
@@ -716,33 +711,33 @@
 <section id="limits">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Known limits</span>
-      <h2>Read before you try.</h2>
+      <span class="eyebrow">Límites conocidos</span>
+      <h2>Léelo antes de probar.</h2>
     </div>
     <div class="cols">
       <div>
-        <h3>Softcore only</h3>
-        <p>OPL can write to game memory through its cheat engine, so the client does not claim hardcore. The RA team decides whether a real-hardware client can qualify; we cannot grant it ourselves.</p>
+        <h3>Solo softcore</h3>
+        <p>OPL puede escribir en la memoria del juego con su motor de trucos, así que el cliente no reclama hardcore. El equipo de RA decide si un cliente en hardware real puede calificar; no podemos concedérnoslo nosotros.</p>
       </div>
       <div>
-        <h3>Flat addresses only</h3>
-        <p>The console reads the addresses on the watch list and follows no pointers. Achievements that dereference a pointer stay active but cannot unlock, and the PC counts them for you. Most PS2 sets lose few or none.</p>
+        <h3>Solo direcciones planas</h3>
+        <p>La consola lee las direcciones de la lista vigilada y no sigue punteros. Los logros que usan punteros siguen activos pero no pueden desbloquearse, y el PC te los cuenta. La mayoría de los conjuntos de PS2 pierden pocos o ninguno.</p>
       </div>
       <div>
-        <h3>Same subnet</h3>
-        <p>The console learns the PC's MAC address from the discovery reply. It hears a PC behind a router but cannot answer it. A PC in a container works with host networking only.</p>
+        <h3>Misma subred</h3>
+        <p>La consola aprende la dirección MAC del PC por la respuesta de descubrimiento. Oye a un PC detrás de un router pero no puede contestarle. Un PC en contenedor solo funciona con red del host.</p>
       </div>
       <div>
-        <h3>Plain ISO or the disc</h3>
-        <p>The image check reads <code>.iso</code> files named <code>Title.iso</code> or the OPL Manager way (<code>SLUS_123.45.Title.iso</code>) in <code>DVD</code> or <code>CD</code> on a USB stick or a share, and the disc in the drive. UL/USBExtreme, ZSO and the internal HDD are not hashed yet. Play from the stick or the disc: a game with a set does not run from a share yet.</p>
+        <h3>ISO simple o el disco</h3>
+        <p>La comprobación de la imagen lee archivos <code>.iso</code> llamados <code>Title.iso</code> o al estilo de OPL Manager (<code>SLUS_123.45.Title.iso</code>) en <code>DVD</code> o <code>CD</code> de una memoria USB o un recurso compartido, y el disco en la unidad. UL/USBExtreme, ZSO y el disco duro interno aún no tienen hash. Juega desde la memoria o el disco: un juego con conjunto todavía no arranca desde un recurso compartido.</p>
       </div>
       <div>
-        <h3>Hooks need libpad</h3>
-        <p>Telemetry starts when the game opens its controller through libpad, which is how OPL's in-game hooks attach. A game with unusual input code may never start sending, and the PC then shows no snapshots.</p>
+        <h3>Los hooks necesitan libpad</h3>
+        <p>La telemetría empieza cuando el juego abre su mando por libpad, que es como se enganchan los hooks in-game de OPL. Un juego con código de entrada poco común puede no enviar nunca, y entonces el PC no muestra ningún snapshot.</p>
       </div>
       <div>
-        <h3>An alpha</h3>
-        <p>A hobby experiment, run from a USB stick on two consoles. Use it at your own risk.</p>
+        <h3>Una alpha</h3>
+        <p>Un experimento casero, ejecutado desde una memoria USB en dos consolas. Úsalo bajo tu responsabilidad.</p>
       </div>
     </div>
   </div>
@@ -752,40 +747,40 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">FAQ</span>
-      <h2>Questions people ask first.</h2>
+      <h2>Las preguntas que la gente hace primero.</h2>
     </div>
     <div class="faq">
       <details>
-        <summary>Does it change the game?</summary>
-        <p>No. The in-game core reads memory and writes nothing into the game or the image. During development a debug build poked a value into a HUD counter; that code went away before alpha.3, and the release core is read-only.</p>
+        <summary>¿Cambia el juego?</summary>
+        <p>No. El core in-game lee memoria y no escribe nada en el juego ni en la imagen. Durante el desarrollo una build de depuración metió un valor en un contador del HUD; ese código desapareció antes del alpha.3, y el core de release es de solo lectura.</p>
       </details>
       <details>
-        <summary>Is this cheating? Will RA accept the unlocks?</summary>
-        <p>The unlocks go through stock rcheevos in softcore mode, the same runtime the supported emulators use. We announced the project on the RetroAchievements forum and discussed it with the rcheevos maintainers. The client does not claim hardcore; that would need the RA team's approval.</p>
+        <summary>¿Esto es hacer trampa? ¿RA aceptará los desbloqueos?</summary>
+        <p>Los desbloqueos pasan por rcheevos original en modo softcore, el mismo runtime que usan los emuladores soportados. Anunciamos el proyecto en el foro de RetroAchievements y lo hablamos con los mantenedores de rcheevos. El cliente no reclama hardcore; eso necesitaría la aprobación del equipo de RA.</p>
       </details>
       <details>
-        <summary>Which games work?</summary>
-        <p>Any PS2 game with an achievement set whose logic reads flat addresses, which covers most of them. The check in the game's menu tells you the counts for your game before you play: total, unlocked, and how many cannot unlock on real hardware yet.</p>
+        <summary>¿Qué juegos funcionan?</summary>
+        <p>Cualquier juego de PS2 con conjunto de logros cuya lógica lea direcciones planas, que son la mayoría. La comprobación en el menú del juego te da las cuentas antes de jugar: total, desbloqueados, y cuántos aún no pueden desbloquearse en hardware real.</p>
       </details>
       <details>
-        <summary>Do I need a network share or an internal HDD?</summary>
-        <p>Neither. A USB stick with your images, or the disc, is the tested setup. A share is fine for the loader and the watch lists, but a game with an achievement set does not run from it yet; games without a set do. We have not tried the internal HDD, and the loader cannot hash HDD games yet: they sit on HDL partitions rather than in <code>.iso</code> files.</p>
+        <summary>¿Necesito un recurso de red o un disco duro interno?</summary>
+        <p>Ninguno de los dos. Una memoria USB con tus imágenes, o el disco, es la configuración probada. Un recurso compartido vale para el loader y las listas vigiladas, pero un juego con conjunto de logros todavía no arranca desde ahí; los juegos sin conjunto sí. No hemos probado el disco duro interno, y el loader aún no puede calcular el hash de juegos del disco duro: están en particiones HDL en vez de archivos <code>.iso</code>.</p>
       </details>
       <details>
-        <summary>The unlock showed on the page but the TV did not flash.</summary>
-        <p>Look for <code>console acknowledged unlock notice</code> in <code>xerabora.log</code>. If it is missing, the notice never reached the console: same subnet, and the client must be running while you play (it can be restarted mid-game). If it is there, the console got it; tell us the game.</p>
+        <summary>El desbloqueo salió en la página pero la tele no destelló.</summary>
+        <p>Busca <code>console acknowledged unlock notice</code> en <code>xerabora.log</code>. Si no está, el aviso nunca llegó a la consola: misma subred, y el cliente tiene que estar en marcha mientras juegas (se puede reiniciar a mitad de partida). Si está, la consola lo recibió; cuéntanos qué juego era.</p>
       </details>
       <details>
-        <summary>Why does the PC say "skipped by console"?</summary>
-        <p>The console skips a frame when the previous snapshot's DMA is still in flight, rather than stall the game. A few hundred per minute is normal. rcheevos evaluates the snapshots that arrive.</p>
+        <summary>¿Por qué el PC dice "skipped by console"?</summary>
+        <p>La consola salta un fotograma cuando el DMA del snapshot anterior sigue en vuelo, en vez de frenar el juego. Unos cientos por minuto es normal. rcheevos evalúa los snapshots que llegan.</p>
       </details>
       <details>
-        <summary>Can another console use this?</summary>
-        <p>Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">the protocol</a>, and xerabora does the rest: the library, the live view, the unlocks.</p>
+        <summary>¿Puede usar esto otra consola?</summary>
+        <p>Sí. El cliente de PC no sabe nada del PS2 más allá de la memoria que recibe. Escribe un agente que lea la memoria de tu consola, calcule el hash de RA y hable <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">el protocolo</a>, y xerabora hace el resto: la biblioteca, la vista en vivo, los desbloqueos.</p>
       </details>
       <details>
-        <summary>Do I need the console at all?</summary>
-        <p>No. Without one, xeRAbora is a RetroAchievements client: your library, each game's achievements, leaderboards and profile from your Web API key. The console adds the live half.</p>
+        <summary>¿Hace falta la consola siquiera?</summary>
+        <p>No. Sin ella, xeRAbora es un cliente de RetroAchievements: tu biblioteca, los logros de cada juego, clasificaciones y perfil a partir de tu clave de la Web API. La consola añade la mitad en vivo.</p>
       </details>
     </div>
   </div>
@@ -797,22 +792,22 @@
   <div class="wrap">
     <div>
       <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span></a>
-      <p style="margin-top:0.9rem">Built on Open PS2 Loader, rcheevos and ps2sdk, tested on a real console. The OPL fork keeps OPL's license (AFL 3.0); the PC client is MIT; rcheevos is MIT.</p>
-      <p style="margin-top:0.9rem">The OPL logo belongs to the Open PS2 Loader project and the RA mark to RetroAchievements; they appear here to show what this project connects.</p>
+      <p style="margin-top:0.9rem">Construido sobre Open PS2 Loader, rcheevos y ps2sdk, probado en una consola real. El fork de OPL mantiene la licencia de OPL (AFL 3.0); el cliente de PC es MIT; rcheevos es MIT.</p>
+      <p style="margin-top:0.9rem">El logo de OPL pertenece al proyecto Open PS2 Loader y la marca RA a RetroAchievements; aparecen aquí para mostrar qué conecta este proyecto.</p>
     </div>
     <div>
-      <h4>Code</h4>
+      <h4>Código</h4>
       <ul>
-        <li><a href="https://github.com/hacan359/xerabora">xerabora: client, protocol, docs</a></li>
-        <li><a href="https://github.com/hacan359/Open-PS2-Loader/tree/ra">OPL fork, branch <code>ra</code></a></li>
+        <li><a href="https://github.com/hacan359/xerabora">xerabora: cliente, protocolo, documentación</a></li>
+        <li><a href="https://github.com/hacan359/Open-PS2-Loader/tree/ra">fork de OPL, rama <code>ra</code></a></li>
         <li><a href="https://github.com/hacan359/xerabora/releases">Releases</a></li>
       </ul>
     </div>
     <div>
-      <h4>Read</h4>
+      <h4>Lee</h4>
       <ul>
-        <li><a href="https://github.com/hacan359/xerabora/blob/main/docs/USAGE.md">Full usage guide</a></li>
-        <li><a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">Wire protocol</a></li>
+        <li><a href="https://github.com/hacan359/xerabora/blob/main/docs/USAGE.md">Guía de uso completa</a></li>
+        <li><a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">Protocolo de red</a></li>
         <li><a href="https://retroachievements.org">RetroAchievements</a></li>
         <li><a href="https://github.com/ps2homebrew/Open-PS2-Loader">Open PS2 Loader</a></li>
       </ul>

@@ -17,8 +17,8 @@ There are two parts:
 - **The console** runs a patched OPL (`OPL-RA.ELF`). It hashes the game
   image, asks the PC which achievements to watch, then reads console
   memory every frame during play and streams snapshots to the PC.
-- **The PC client** (`xerabora.exe` on Windows, `xerabora-linux-x86_64` on
-  Linux) talks to the RetroAchievements server, tells the console what
+- **The PC client** (`xerabora.exe` on Windows, `xerabora-linux-x86_64`
+  on Linux, `xerabora-macos` on macOS) talks to the RetroAchievements server, tells the console what
   to watch, receives the snapshots, and unlocks achievements.
 
 The console and the PC talk over the local network by UDP. No PC address
@@ -208,11 +208,13 @@ interface: the client has no window of its own. Sign in on the
 profile settings ("Keys"): the login is for unlocks, the key fills the
 library, leaderboards and profile, and drives the following described
 below. Both are saved in your user profile (`%LOCALAPPDATA%\xerabora` on
-Windows, `~/.config/xerabora` on Linux).
+Windows, `~/.config/xerabora` on Linux and macOS).
 
 Five tabs: **LIVE**, **LIBRARY**, **GAME**, **BOARDS** (leaderboards
 with live trackers; softcore, so no entries are posted) and **SETTINGS**
-(login, key, the switches below, QUIT).
+(login, key, the network switch). The language menu sits in the header
+next to your name, the FOLLOW MY PLAY switch at the top of LIVE, and the
+red QUIT button in the footer.
 
 **What LIVE shows.** It follows whatever you are playing, from one of two
 sources:
@@ -231,11 +233,14 @@ sources:
   server sees you playing right now, and the unlocks of this session.
   New unlocks land as a toast and a sound. The client asks the Web API
   every 20 seconds. Measured progress and trackers do not exist in this
-  mode; they need a memory source. The switch is FOLLOW MY PLAY on
-  SETTINGS, on by default.
+  mode; they need a memory source. The switch is FOLLOW MY PLAY at the
+  top of LIVE, on by default.
 
 The header of LIVE counts achievements and points, earned and total,
-for the game that is on. When the console goes quiet for ten seconds the
+for the game that is on, and a strip below it shows the time the set
+costs by other players' medians: when it is beaten, when it is full,
+where you stand, and how many missables are still open. A set with
+subsets lists each subset under its own heading. When the console goes quiet for ten seconds the
 link is marked lost, the session clock stops, and following takes LIVE
 back if it is on.
 
@@ -244,14 +249,15 @@ until you press OPEN TO THE NETWORK on SETTINGS. The tab then shows an
 address such as `http://192.168.1.5:18280/`; type it into any phone,
 tablet or PC on the same Wi-Fi and add the page to the home screen. Up to
 four pages can watch at once, all live. Other devices see everything;
-the login, the key, the two switches and QUIT work only from the PC that
-runs the client. On Windows, allow `xerabora.exe` through the firewall
+the login, the key, the network switch, FOLLOW MY PLAY and QUIT work
+only from the PC that runs the client. On Windows, allow `xerabora.exe` through the firewall
 when it asks (private networks). The setting is remembered between runs.
 On a narrow screen the tabs sit along the bottom.
 
 **Exiting.** About 15 seconds after the last page is closed, on the PC,
 a phone or in OBS, the client exits by itself and says so in the log.
-Keep one page open while you play. QUIT on SETTINGS exits at once. One
+Keep one page open while you play. The red QUIT in the footer exits at
+once. One
 copy runs at a time; a second start opens the running copy's page.
 Everything the client does is also in `xerabora.log` next to the saved
 login.
@@ -298,7 +304,7 @@ an address (DHCP is enough).
 | Achievements don't unlock in game | Client must stay running; run "check game support" once first so the watch list is loaded. |
 | Game from a share stops loading after about a minute | A game with an achievement set does not run from a share yet. Put the image on a USB stick or use the disc. |
 | Unlock on the page, no flash on the console | Look for `console acknowledged unlock notice` in `xerabora.log`. Missing: the notice never reached the console, check that both are on the same subnet. Present: the console got it; report the game. |
-| Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it on its SETTINGS tab, or end it in Task Manager. |
+| Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it from its footer, or end it in Task Manager. |
 
 ## Notes and limits
 
