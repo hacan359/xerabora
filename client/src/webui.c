@@ -1147,11 +1147,17 @@ void webui_serve(sock_t listener, rc_client_t *client)
 
     /* One request: headers, plus the body of a settings POST, which may
        need a second read. Anything larger than this buffer is cut short and
-       falls through to "not found". */
+       falls through to "not found". Browsers open spare connections and
+       send nothing on them; a blocking recv there held the whole client,
+       telemetry included, until the browser gave up. Two seconds is
+       plenty for a request that is coming. */
     for (;;) {
         char *hdr_end;
-        int r = (int)recv(c, req + n, (int)sizeof(req) - 1 - n, 0);
+        int r;
 
+        if (platform_wait_readable(c, 2000) != 1)
+            break;
+        r = (int)recv(c, req + n, (int)sizeof(req) - 1 - n, 0);
         if (r <= 0)
             break;
         n += r;
@@ -1173,6 +1179,18 @@ void webui_serve(sock_t listener, rc_client_t *client)
             if (have >= want || n >= (int)sizeof(req) - 1)
                 break;
         }
+    }
+    /* Every request in the log at detail level, method and path. */
+    if (n > 0) {
+        char line[96];
+        const char *sp = strchr(req, ' ');
+        size_t len = sp != NULL ? strcspn(sp + 1, " \r\n") : 0;
+
+        if (len > sizeof(line) - 1)
+            len = sizeof(line) - 1;
+        memcpy(line, sp != NULL ? sp + 1 : "?", len);
+        line[len] = '\0';
+        log_detail("http %.*s %s", (int)(sp != NULL ? sp - req : 1), req, line);
     }
     if (n <= 0) {
         sock_close(c);
@@ -1259,7 +1277,9 @@ void webui_serve(sock_t listener, rc_client_t *client)
             respond(c, "application/json; charset=utf-8", body, len);
             free(body);
         }
-    } else if (strncmp(req, "GET / ", 6) == 0 || strncmp(req, "GET /index", 10) == 0) {
+    /* "/?lang=es" is still the page, not a miss. */
+    } else if (strncmp(req, "GET / ", 6) == 0 || strncmp(req, "GET /?", 6) == 0 ||
+               strncmp(req, "GET /index", 10) == 0) {
         /* --ui-file: the page straight from disk, for working on it.
            Edit, refresh, see -- no re-embed, no rebuild. The shipped
            client never sets this and serves the built-in copy. */
