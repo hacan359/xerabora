@@ -91,9 +91,17 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      # A failed build puts its last lines on the run's summary page, which
+      # needs no sign-in to read; the full log does.
       - name: Build
         working-directory: client
-        run: make macos && ./xerabora-macos --help
+        run: |
+          set -o pipefail
+          if ! make macos 2>&1 | tee build.log; then
+            { echo '### macOS build failed'; echo '```'; tail -80 build.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          ./xerabora-macos --help
 
       # Both slices present, the page server answers, and the browser
       # branch runs for real: what a Linux job cannot check.
