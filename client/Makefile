@@ -3,6 +3,8 @@
 #   make            native build (Linux, macOS, MSYS2): needs libcurl
 #   make windows    cross build for Windows with MinGW-w64: no external
 #                   libraries, HTTPS goes through WinHTTP
+#   make macos      one binary for both Mac architectures; libcurl comes
+#                   with the system
 #
 # rcheevos is compiled from the submodule, unmodified.
 # Notification sounds: tools/make-sounds.py regenerates sounds/*.wav and
@@ -92,7 +94,16 @@ xerabora_res.o: xerabora.rc xerabora.ico
 xerabora.exe: $(SRC) src/http_winhttp.c $(RC_SRC) $(HDRS) xerabora_res.o
 	$(WINCC) $(CFLAGS) -D_WIN32_WINNT=0x0601 -static -mwindows -o $@ $(filter %.c,$^) xerabora_res.o -lws2_32 -lwinhttp -lwinmm -lshell32 -lm -lpthread
 
-clean:
-	rm -f xerabora xerabora.exe xerabora_res.o
+# ---- macOS --------------------------------------------------------------
+# Apple Silicon and Intel in one file: the SDK stubs carry both
+# architectures, so an Apple Silicon machine builds the Intel half too.
 
-.PHONY: all windows clean
+macos: xerabora-macos
+
+xerabora-macos: $(SRC) src/http_curl.c $(RC_SRC) $(HDRS)
+	$(CC) $(CFLAGS) -arch arm64 -arch x86_64 -o $@ $(filter %.c,$^) -lcurl -lm
+
+clean:
+	rm -f xerabora xerabora.exe xerabora_res.o xerabora-macos
+
+.PHONY: all windows macos clean

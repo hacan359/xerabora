@@ -1410,6 +1410,19 @@ void webui_open_browser(int port)
         if ((INT_PTR)ShellExecuteA(NULL, "open", "msedge.exe", args, NULL, SW_SHOWNORMAL) <= 32)
             ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
     }
+#elif defined(__APPLE__)
+    {
+        char cmd[512];
+
+        /* open -n gives a window of its own even when Chrome already runs;
+           without Chrome the URL goes to the default browser, which on
+           Safari means a plain tab, not application mode. */
+        snprintf(cmd, sizeof(cmd),
+                 "(open -n -a 'Google Chrome' --args --app=%s --window-size=580,800 || open %s) >/dev/null 2>&1 &",
+                 url, url);
+        if (system(cmd) != 0)
+            log_info("open %s in a browser", url);
+    }
 #else
     {
         char cmd[512];

@@ -41,12 +41,16 @@ static int file_exists(const char *path)
 }
 
 #ifndef _WIN32
-/* Command-line players are the portable option on Linux. The embedded
-   default is written to the config directory once so a player can read
-   it as a file. */
+/* Command-line players are the portable option on Linux and macOS. The
+   embedded default is written to the config directory once so a player
+   can read it as a file. */
 static const char *find_player(void)
 {
-    static const char *const candidates[] = {"paplay", "aplay", "pw-play", NULL};
+    static const char *const candidates[] = {
+#ifdef __APPLE__
+        "afplay",
+#endif
+        "paplay", "aplay", "pw-play", NULL};
     int i;
 
     for (i = 0; candidates[i] != NULL; i++) {
@@ -116,7 +120,7 @@ void sound_init(int enabled)
 #ifndef _WIN32
     g_player = find_player();
     if (g_player == NULL)
-        log_detail("no audio player found (paplay, aplay, pw-play); sounds fall back to the terminal bell");
+        log_detail("no audio player found (afplay, paplay, aplay, pw-play); sounds fall back to the terminal bell");
 #endif
 }
 

@@ -82,10 +82,45 @@ jobs:
           name: xerabora-windows-x86_64
           path: client/xerabora.exe
 
+  client-macos:
+    name: PC client (macOS, universal)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Build
+        working-directory: client
+        run: make macos && ./xerabora-macos --help
+
+      # Both slices present, the page server answers, and the browser
+      # branch runs for real: what a Linux job cannot check.
+      - name: Smoke test
+        working-directory: client
+        run: |
+          set -e
+          lipo -archs xerabora-macos
+          lipo -archs xerabora-macos | grep -q arm64
+          lipo -archs xerabora-macos | grep -q x86_64
+          ./xerabora-macos --ui-only --no-sound &
+          pid=$!
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:18280/ -o page.html && break || sleep 1
+          done
+          grep -q '<title>xerabora</title>' page.html
+          kill $pid
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xerabora-macos
+          path: client/xerabora-macos
+
   release:
     name: Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [opl, client-linux, client-windows]
+    needs: [opl, client-linux, client-windows, client-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -102,6 +137,7 @@ jobs:
           cp dist/OPL-RA-debug.ELF/OPL-RA-debug.ELF out/
           cp dist/xerabora-windows-x86_64/xerabora.exe out/
           cp dist/xerabora-linux-x86_64/xerabora out/xerabora-linux-x86_64
+          cp dist/xerabora-macos/xerabora-macos out/
           cd out && sha256sum * > SHA256SUMS
 
       - uses: softprops/action-gh-release@v2
