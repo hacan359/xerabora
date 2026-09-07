@@ -158,7 +158,7 @@ void ra_destroy(rc_client_t *client)
 
 /* ---- Login ----------------------------------------------------------- */
 
-struct wait
+struct pending
 {
     int done;
     int result;
@@ -166,7 +166,7 @@ struct wait
 
 static void on_login(int result, const char *error_message, rc_client_t *client, void *ud)
 {
-    struct wait *w = (struct wait *)ud;
+    struct pending *w = (struct pending *)ud;
 
     (void)client;
     w->done = 1;
@@ -177,7 +177,7 @@ static void on_login(int result, const char *error_message, rc_client_t *client,
 
 /* server_call is blocking, so the callback has run by the time
    rc_client_begin_login_* returns. */
-static int finish_login(rc_client_t *client, struct wait *w)
+static int finish_login(rc_client_t *client, struct pending *w)
 {
     if (!w->done)
         return RC_API_FAILURE;
@@ -188,7 +188,7 @@ static int finish_login(rc_client_t *client, struct wait *w)
 
 int ra_login_with_token(rc_client_t *client, const char *user, const char *token)
 {
-    struct wait w = {0, RC_OK};
+    struct pending w = {0, RC_OK};
 
     rc_client_begin_login_with_token(client, user, token, on_login, &w);
     return finish_login(client, &w);
@@ -196,7 +196,7 @@ int ra_login_with_token(rc_client_t *client, const char *user, const char *token
 
 int ra_login_with_password(rc_client_t *client, const char *user, const char *password)
 {
-    struct wait w = {0, RC_OK};
+    struct pending w = {0, RC_OK};
 
     rc_client_begin_login_with_password(client, user, password, on_login, &w);
     return finish_login(client, &w);
@@ -205,7 +205,7 @@ int ra_login_with_password(rc_client_t *client, const char *user, const char *pa
 /* ---- Game ------------------------------------------------------------ */
 
 static char g_loaded_hash[33] = "";
-static struct wait g_game = {0, RC_NO_GAME_LOADED};
+static struct pending g_game = {0, RC_NO_GAME_LOADED};
 
 static void on_game_loaded(int result, const char *error_message, rc_client_t *client, void *ud)
 {
