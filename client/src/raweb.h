@@ -83,6 +83,8 @@ struct raweb_game_progress
     unsigned id;
     char title[96];
     char console[40];
+    unsigned console_id;
+    unsigned parent_id;         /* ParentGameID: set when this game is a subset */
     char image_icon[64];
     unsigned achievements_total;
     unsigned awarded;
@@ -90,6 +92,26 @@ struct raweb_game_progress
     unsigned points_total;
     unsigned points_earned;
 };
+
+/* A subset is a separate game on the server, titled
+   "<Parent> [Subset - Name]", and the Web API has no call that lists
+   them. The console's game list does, once, by title. */
+struct raweb_subset
+{
+    unsigned id;
+    char title[96];             /* the name inside the brackets */
+    unsigned achievements;
+    unsigned points;
+};
+
+/* The base title of a game: the part before " [Subset - ". */
+void raweb_base_title(const char *title, char *out, size_t size);
+
+/* Subsets of the game titled `base_title` on `console_id`, and the id of
+   the base game itself (0 when the list has no such title). One game
+   list per console is kept in memory for an hour. */
+int raweb_game_subsets(unsigned console_id, const char *base_title,
+                       unsigned *base_id, struct raweb_subset *rows, int max);
 
 /* Every call returns the number of rows written, or 0 on any failure
    (no credentials, transport error, unexpected JSON). Failures are

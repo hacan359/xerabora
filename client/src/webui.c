@@ -560,12 +560,37 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                     p += snprintf(p, (size_t)(end - p), ",");
                     json_field(&p, end, "measured", ach->measured_progress);
                     p += snprintf(p, (size_t)(end - p),
-                                  ",\"points\":%u,\"state\":%u,\"percent\":%.4f,\"type\":%u,\"bucket\":%u}",
+                                  ",\"points\":%u,\"state\":%u,\"percent\":%.4f,\"type\":%u,\"bucket\":%u,\"subset\":%u}",
                                   ach->points, ach->state, ach->measured_percent,
-                                  (unsigned)ach->type, list->buckets[b].bucket_type);
+                                  (unsigned)ach->type, list->buckets[b].bucket_type,
+                                  list->buckets[b].subset_id);
                 }
             }
             rc_client_destroy_achievement_list(list);
+        }
+    }
+    p += snprintf(p, (size_t)(end - p), "]");
+    /* The subsets of the loaded set, when the server sent more than the
+       core one; the page groups the list by them. */
+    p += snprintf(p, (size_t)(end - p), ",\"subsets\":[");
+    if (client != NULL) {
+        rc_client_subset_list_t *subs = rc_client_create_subset_list(client);
+
+        if (subs != NULL) {
+            unsigned i;
+
+            for (i = 0; i < subs->num_subsets && end - p > 256; i++) {
+                const rc_client_subset_t *sub = subs->subsets[i];
+
+                if (i > 0)
+                    p += snprintf(p, (size_t)(end - p), ",");
+                p += snprintf(p, (size_t)(end - p), "{\"id\":%u,", sub->id);
+                json_field(&p, end, "title", sub->title);
+                p += snprintf(p, (size_t)(end - p), ",");
+                json_field(&p, end, "badge", sub->badge_name);
+                p += snprintf(p, (size_t)(end - p), ",\"achievements\":%u}", sub->num_achievements);
+            }
+            rc_client_destroy_subset_list(subs);
         }
     }
     p += snprintf(p, (size_t)(end - p), "]");
@@ -714,6 +739,10 @@ static struct raweb_profile g_me;
 static time_t g_me_at;
 
 static struct raweb_game_progress g_gp;
+static struct raweb_subset g_gp_subsets[16];
+static int g_gp_subset_count;
+static unsigned g_gp_base_id;
+static char g_gp_base_title[96];
 static struct raweb_achievement g_gp_ach[600];
 static int g_gp_count;
 static unsigned g_gp_id;
@@ -795,6 +824,17 @@ static int build_game(char *buf, size_t size, unsigned id)
                                          (int)(sizeof(g_gp_ach) / sizeof(g_gp_ach[0])));
         g_gp_med_count = raweb_median_times(id, g_gp_med_ids, g_gp_med_secs,
                                             (int)(sizeof(g_gp_med_ids) / sizeof(g_gp_med_ids[0])));
+        /* The family: the base game and its subsets, found by title in
+           the console's list. The base game itself is one of them from
+           the page's point of view. */
+        raweb_base_title(g_gp.title, g_gp_base_title, sizeof(g_gp_base_title));
+        g_gp_subset_count = raweb_game_subsets(g_gp.console_id, g_gp_base_title, &g_gp_base_id,
+                                               g_gp_subsets,
+                                               (int)(sizeof(g_gp_subsets) / sizeof(g_gp_subsets[0])));
+        if (g_gp_base_id == 0 && g_gp.parent_id == 0)
+            g_gp_base_id = id;
+        if (g_gp_base_id == 0)
+            g_gp_base_id = g_gp.parent_id;
         g_gp_id = id;
         g_gp_at = time(NULL);
     }
@@ -805,8 +845,19 @@ static int build_game(char *buf, size_t size, unsigned id)
     json_field(&p, end, "console", g_gp.console);
     p += snprintf(p, (size_t)(end - p), ",");
     json_field(&p, end, "icon", g_gp.image_icon);
-    p += snprintf(p, (size_t)(end - p), ",\"total\":%u,\"awarded\":%u,\"achievements\":[",
-                  g_gp.achievements_total, g_gp.awarded);
+    p += snprintf(p, (size_t)(end - p), ",\"total\":%u,\"awarded\":%u,\"base\":{\"id\":%u,",
+                  g_gp.achievements_total, g_gp.awarded, g_gp_base_id);
+    json_field(&p, end, "title", g_gp_base_title);
+    p += snprintf(p, (size_t)(end - p), "},\"subsets\":[");
+    for (i = 0; i < g_gp_subset_count && end - p > 256; i++) {
+        if (i > 0)
+            p += snprintf(p, (size_t)(end - p), ",");
+        p += snprintf(p, (size_t)(end - p), "{\"id\":%u,", g_gp_subsets[i].id);
+        json_field(&p, end, "title", g_gp_subsets[i].title);
+        p += snprintf(p, (size_t)(end - p), ",\"achievements\":%u,\"points\":%u}",
+                      g_gp_subsets[i].achievements, g_gp_subsets[i].points);
+    }
+    p += snprintf(p, (size_t)(end - p), "],\"achievements\":[");
 
     for (i = 0; i < g_gp_count && end - p > 512; i++) {
         if (i > 0)

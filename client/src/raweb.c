@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "http.h"
 #include "log.h"
@@ -412,6 +413,8 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
     info->id = game_id;
     obj_str(&j, 0, "Title", info->title, sizeof(info->title));
     obj_str(&j, 0, "ConsoleName", info->console, sizeof(info->console));
+    info->console_id = obj_uint(&j, 0, "ConsoleID");
+    info->parent_id = obj_uint(&j, 0, "ParentGameID");
     obj_str(&j, 0, "ImageIcon", info->image_icon, sizeof(info->image_icon));
     info->achievements_total = obj_uint(&j, 0, "NumAchievements");
     info->awarded = obj_uint(&j, 0, "NumAwardedToUser");
@@ -460,6 +463,91 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
     }
 
     json_free(&j);
+    return n;
+}
+
+/* ---- Subsets ------------------------------------------------------------ */
+
+#define SUBSET_MARK " [Subset - "
+#define GAME_LIST_TTL 3600
+
+static struct json g_list;
+static unsigned g_list_console;
+static time_t g_list_at;
+static time_t g_list_failed_at;   /* a list that would not come: retry in a while */
+#define GAME_LIST_RETRY 300
+
+void raweb_base_title(const char *title, char *out, size_t size)
+{
+    const char *cut = strstr(title, SUBSET_MARK);
+    size_t n = cut != NULL ? (size_t)(cut - title) : strlen(title);
+
+    if (n >= size)
+        n = size - 1;
+    memcpy(out, title, n);
+    out[n] = '\0';
+}
+
+/* The console's game list, fetched once an hour. ~1000 sets for the
+   PS2, well inside the token budget without hashes. */
+static int game_list(unsigned console_id)
+{
+    char query[64];
+
+    if (g_list.count > 0 && g_list_console == console_id &&
+        time(NULL) - g_list_at < GAME_LIST_TTL)
+        return 1;
+    if (g_list_failed_at != 0 && g_list_console == console_id &&
+        time(NULL) - g_list_failed_at < GAME_LIST_RETRY)
+        return 0;
+
+    json_free(&g_list);
+    g_list_console = console_id;
+    snprintf(query, sizeof(query), "i=%u&f=1", console_id);
+    if (!json_get(&g_list, "API_GetGameList.php", query)) {
+        g_list_failed_at = time(NULL);
+        return 0;
+    }
+    g_list_failed_at = 0;
+    g_list_at = time(NULL);
+    return 1;
+}
+
+int raweb_game_subsets(unsigned console_id, const char *base_title,
+                       unsigned *base_id, struct raweb_subset *rows, int max)
+{
+    char prefix[128], title[160];
+    size_t plen;
+    int e, n = 0;
+
+    *base_id = 0;
+    if (console_id == 0 || base_title[0] == '\0' || !game_list(console_id))
+        return 0;
+
+    snprintf(prefix, sizeof(prefix), "%s" SUBSET_MARK, base_title);
+    plen = strlen(prefix);
+
+    if (g_list.tok[0].type != JSMN_ARRAY)
+        return 0;
+    for (e = 1; e < g_list.count; e++) {
+        if (g_list.tok[e].parent != 0 || g_list.tok[e].type != JSMN_OBJECT)
+            continue;
+        obj_str(&g_list, e, "Title", title, sizeof(title));
+        if (strcmp(title, base_title) == 0) {
+            *base_id = obj_uint(&g_list, e, "ID");
+            continue;
+        }
+        if (n >= max || strncmp(title, prefix, plen) != 0)
+            continue;
+        rows[n].id = obj_uint(&g_list, e, "ID");
+        snprintf(rows[n].title, sizeof(rows[n].title), "%s", title + plen);
+        /* drop the closing bracket */
+        if (rows[n].title[0] != '\0' && rows[n].title[strlen(rows[n].title) - 1] == ']')
+            rows[n].title[strlen(rows[n].title) - 1] = '\0';
+        rows[n].achievements = obj_uint(&g_list, e, "NumAchievements");
+        rows[n].points = obj_uint(&g_list, e, "Points");
+        n++;
+    }
     return n;
 }
 
