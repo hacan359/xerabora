@@ -83,7 +83,7 @@
   .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px; margin-bottom: 14px; }
   .stats .cell { background: var(--panel); padding: 7px 10px; min-width: 0; }
   .stats .cell .k { font-size: 15px; color: var(--dimmer); }
-  .stats .cell .v { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stats .cell .v { color: #fff; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
   .card { border: 1px solid var(--line); background: rgba(10,33,54,.5); cursor: pointer; }
@@ -221,7 +221,7 @@ const LANG = {
     "FLASH": "FLASH",
     "ACHIEVEMENT UNLOCKED": "LOGRO DESBLOQUEADO",
     "{packets} packets": "{packets} paquetes",
-    "{gaps} skipped · {dupes} rep · {torn} torn": "{gaps} saltados · {dupes} rep · {torn} rotos",
+    "{gaps} skipped · {dupes} repeated · {torn} torn": "{gaps} saltados · {dupes} repetidos · {torn} rotos",
     "CONSOLE": "CONSOLA",
     "LINK": "ENLACE",
     "lost": "perdido",
@@ -365,7 +365,7 @@ const LANG = {
     "FLASH": "FLASH",
     "ACHIEVEMENT UNLOCKED": "CONQUISTA DESBLOQUEADA",
     "{packets} packets": "{packets} pacotes",
-    "{gaps} skipped · {dupes} rep · {torn} torn": "{gaps} pulados · {dupes} rep · {torn} quebrados",
+    "{gaps} skipped · {dupes} repeated · {torn} torn": "{gaps} pulados · {dupes} repetidos · {torn} quebrados",
     "CONSOLE": "CONSOLE",
     "LINK": "CONEXÃO",
     "lost": "perdida",
@@ -589,9 +589,11 @@ function framesText(c) {
                   : t('{packets} packets', { packets: (c.packets || 0).toLocaleString() });
 }
 
+/* Three counters in a 170px tile in a pixel font: one per line, or the
+   tail is clipped ("670 rep" was all that showed of the middle one). */
 function lostText(c) {
-  return t('{gaps} skipped · {dupes} rep · {torn} torn',
-           { gaps: c.gaps || 0, dupes: c.dupes || 0, torn: c.torn || 0 });
+  return t('{gaps} skipped · {dupes} repeated · {torn} torn',
+           { gaps: c.gaps || 0, dupes: c.dupes || 0, torn: c.torn || 0 }).split(' · ').join('<br>');
 }
 
 /* One stat tile; the CONSOLE, FOLLOWING and LIVE strips all use it. */
@@ -638,7 +640,7 @@ function consolePanel(s) {
     cell(t('LOST'), '<span id="cv-lost">' + lostText(c) + '</span>') +
     cell(t('WATCH LIST'), w.addresses
         ? t('{addresses} addr &middot; {bytes} B &middot; {parts} parts',
-            { addresses: w.addresses, bytes: w.bytes, parts: w.parts })
+            { addresses: w.addresses, bytes: w.bytes, parts: w.parts }).split(' &middot; ').join('<br>')
         : '&mdash;') +
     cell(t('SESSION'), '<span id="cv-session">' + (c.seconds ? hms(c.seconds) : '&mdash;') + '</span>') +
     '</div>' +
@@ -1416,7 +1418,7 @@ function updateLiveNumbers(c, live, trk) {
     const fr = document.getElementById('cv-frames');
     if (fr) fr.textContent = framesText(c);
     const lo = document.getElementById('cv-lost');
-    if (lo) lo.textContent = lostText(c);
+    if (lo) lo.innerHTML = lostText(c);
     const se = document.getElementById('cv-session');
     if (se) se.textContent = c.seconds ? hms(c.seconds) : '-';
     document.getElementById('linkstats').textContent =
