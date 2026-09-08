@@ -196,7 +196,7 @@
   "The unlock showed on the page but the TV did not flash.": "",
   "Look for <code>console acknowledged unlock notice</code> in <code>xerabora.log</code>. If it is missing, the notice never reached the console: same subnet, and the client must be running while you play (it can be restarted mid-game). If it is there, the console got it; tell us the game.": "",
   "Why does the PC say \"skipped by console\"?": "",
-  "The console skips a frame when the previous snapshot's DMA is still in flight, rather than stall the game. A few hundred per minute is normal. rcheevos evaluates the snapshots that arrive.": "",
+  "A snapshot the console produced and the PC never got. Since alpha.8 the count stays at zero or close to it during play; before it the console lost one snapshot in twelve to its own send loop. A number that keeps growing means the console is short of time: a game hammering the USB stick, or a busy transmitter. rcheevos evaluates the snapshots that arrive.": "",
   "Can another console use this?": "",
   "Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href=\"https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md\">the protocol</a>, and xerabora does the rest: the library, the live view, the unlocks.": "",
   "Do I need the console at all?": "",

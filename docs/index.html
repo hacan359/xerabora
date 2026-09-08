@@ -777,7 +777,7 @@
       </details>
       <details>
         <summary>Why does the PC say "skipped by console"?</summary>
-        <p>The console skips a frame when the previous snapshot's DMA is still in flight, rather than stall the game. A few hundred per minute is normal. rcheevos evaluates the snapshots that arrive.</p>
+        <p>A snapshot the console produced and the PC never got. Since alpha.8 the count stays at zero or close to it during play; before it the console lost one snapshot in twelve to its own send loop. A number that keeps growing means the console is short of time: a game hammering the USB stick, or a busy transmitter. rcheevos evaluates the snapshots that arrive.</p>
       </details>
       <details>
         <summary>Can another console use this?</summary>
