@@ -148,8 +148,25 @@ jobs:
           cp dist/xerabora-macos/xerabora-macos out/
           cd out && sha256sum * > SHA256SUMS
 
+      # The release text is the annotated tag's message, written by hand
+      # before tagging; the commit list is not a description. A tag with
+      # no message falls back to GitHub's generated notes.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: src
+      - name: Release notes from the tag message
+        id: notes
+        run: |
+          set -e
+          cd src
+          git fetch origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}" --force
+          git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='%(contents)' > ../release_notes.md
+          if [ -s ../release_notes.md ]; then echo "from_tag=true" >> "$GITHUB_OUTPUT"; else echo "from_tag=false" >> "$GITHUB_OUTPUT"; fi
+
       - uses: softprops/action-gh-release@v2
         with:
           files: out/*
-          generate_release_notes: true
+          body_path: ${{ steps.notes.outputs.from_tag == 'true' && 'release_notes.md' || '' }}
+          generate_release_notes: ${{ steps.notes.outputs.from_tag != 'true' }}
           prerelease: true
