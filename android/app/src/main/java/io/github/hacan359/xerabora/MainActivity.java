@@ -18,6 +18,7 @@ import android.provider.Settings;
 import android.text.util.Linkify;
 import android.view.WindowInsets;
 import android.view.WindowManager;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -143,7 +144,11 @@ public final class MainActivity extends Activity {
     }
 
     private void goBack() {
-        if (web.canGoBack()) {
+        // Back stays inside the client's page; the "Starting..." screen
+        // before it is not somewhere to go back to.
+        WebBackForwardList history = web.copyBackForwardList();
+        int current = history.getCurrentIndex();
+        if (current > 0 && isPage(history.getItemAtIndex(current - 1).getUrl())) {
             web.goBack();
             return;
         }
@@ -268,6 +273,11 @@ public final class MainActivity extends Activity {
         return "http://127.0.0.1:" + port + "/";
     }
 
+    /** The client's page, whatever tab or state its address carries. */
+    private boolean isPage(String url) {
+        return url != null && url.startsWith(pageUrl());
+    }
+
     private void loadPage() {
         probing = false;
         pageLoaded = false;
@@ -334,6 +344,9 @@ public final class MainActivity extends Activity {
         public void onPageFinished(WebView view, String url) {
             if (!failed && pageUrl().equals(url)) {
                 pageLoaded = true;
+                // What came before the page (the waiting screen, a failed
+                // try) is not history.
+                web.clearHistory();
                 seedLanguage();
             }
         }
