@@ -125,10 +125,64 @@ jobs:
           name: xerabora-macos
           path: client/xerabora-macos
 
+  # The same client as an Android app (android/README.md). Signed with the
+  # ANDROID_* secrets when they exist; a pull request from a fork gets none,
+  # so there the build only proves the app still compiles.
+  client-android:
+    name: Android app
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The versionCode is the commit count.
+          fetch-depth: 0
+
+      # Only rcheevos: the app does not use the OPL submodule.
+      - name: rcheevos
+        run: git submodule update --init third_party/rcheevos
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: NDK and CMake
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;28.2.13676358" "cmake;3.22.1" > /dev/null
+
+      - name: Keystore
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "XERABORA_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Build
+        working-directory: android
+        env:
+          XERABORA_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          XERABORA_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          XERABORA_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease --console=plain
+          out=app/build/outputs/apk/release
+          if [ -f $out/app-release.apk ]; then
+            cp $out/app-release.apk ../xerabora-android.apk
+          else
+            # Unsigned: Android will not install it, so it is kept apart
+            # and never reaches a release.
+            cp $out/app-release-unsigned.apk ../xerabora-android-unsigned.apk
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xerabora-android
+          path: xerabora-android*.apk
+
   release:
     name: Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [opl, client-linux, client-windows, client-macos]
+    needs: [opl, client-linux, client-windows, client-macos, client-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -146,6 +200,11 @@ jobs:
           cp dist/xerabora-windows-x86_64/xerabora.exe out/
           cp dist/xerabora-linux-x86_64/xerabora out/xerabora-linux-x86_64
           cp dist/xerabora-macos/xerabora-macos out/
+          if [ -f dist/xerabora-android/xerabora-android.apk ]; then
+            cp dist/xerabora-android/xerabora-android.apk out/
+          else
+            echo "::warning::no signed Android APK (ANDROID_* secrets missing); the release goes out without it"
+          fi
           cd out && sha256sum * > SHA256SUMS
 
       # The release text is the annotated tag's message, written by hand
