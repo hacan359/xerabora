@@ -35,6 +35,7 @@ import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * The client's own page, in a WebView. The page is served by the client on
@@ -177,12 +178,10 @@ public final class MainActivity extends Activity {
        collected from the repository by the build). */
     private void showAbout() {
         StringBuilder text = new StringBuilder(getString(R.string.about_body, BuildConfig.VERSION_NAME));
-        String[][] licenses = {
-                {"xeRAbora", "xerabora.txt"},
-                {"rcheevos", "rcheevos.txt"},
-        };
-        for (String[] license : licenses) {
-            text.append("\n\n— ").append(license[0]).append(" —\n\n").append(asset("licenses/" + license[1]));
+        for (String file : licenseFiles()) {
+            String name = file.substring(0, file.length() - ".txt".length());
+            text.append("\n\n— ").append(name.equals("xerabora") ? "xeRAbora" : name).append(" —\n\n")
+                    .append(asset("licenses/" + file));
         }
 
         TextView view = new TextView(this);
@@ -198,6 +197,25 @@ public final class MainActivity extends Activity {
                 .setView(scroll)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
+    }
+
+    /* The client's own first, then rcheevos, then the page's libraries. */
+    private String[] licenseFiles() {
+        String[] files;
+        try {
+            files = getAssets().list("licenses");
+        } catch (IOException e) {
+            return new String[0];
+        }
+        Arrays.sort(files, (a, b) -> {
+            int c = Integer.compare(licenseRank(a), licenseRank(b));
+            return c != 0 ? c : a.compareTo(b);
+        });
+        return files;
+    }
+
+    private static int licenseRank(String file) {
+        return file.equals("xerabora.txt") ? 0 : file.equals("rcheevos.txt") ? 1 : 2;
     }
 
     private String asset(String path) {

@@ -100,4 +100,5 @@ login. A local release build is signed the same way through the `XERABORA_KEYSTO
 ## Credits
 
 Android app by MrRexD ([oMrRexD](https://github.com/oMrRexD)). It is part of xeRAbora and shares its
-MIT license (`client/LICENSE`); the app shows it, with rcheevos', under **About and licenses**.
+MIT license (`client/LICENSE`); the app shows it, with the licenses of rcheevos and of the page's
+libraries, under **About and licenses**.

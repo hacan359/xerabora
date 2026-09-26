@@ -79,9 +79,11 @@ android {
     }
 }
 
-// The MIT licenses of what the APK carries (the client's covers android/
-// too), as assets the About screen shows: MIT asks for the notice to
-// travel with every copy. Read from the repository at build time.
+// The licenses of what the APK carries, as assets the About screen shows:
+// the client's (it covers android/ too), rcheevos', and one for every
+// library the page vendors (client/ui/vendor/LICENSE.<name>). MIT and
+// Apache ask for the notice to travel with every copy. Read from the
+// repository at build time, so a library added to the page is listed too.
 abstract class CollectLicenses : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
@@ -90,6 +92,10 @@ abstract class CollectLicenses : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val rcheevos: RegularFileProperty
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
+    abstract val vendor: ConfigurableFileCollection
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
@@ -101,12 +107,14 @@ abstract class CollectLicenses : DefaultTask() {
         dir.mkdirs()
         xerabora.get().asFile.copyTo(dir.resolve("xerabora.txt"))
         rcheevos.get().asFile.copyTo(dir.resolve("rcheevos.txt"))
+        vendor.files.forEach { it.copyTo(dir.resolve(it.name.removePrefix("LICENSE.") + ".txt")) }
     }
 }
 
 val collectLicenses = tasks.register<CollectLicenses>("collectLicenses") {
     xerabora.set(File(repoRoot, "client/LICENSE"))
     rcheevos.set(File(repoRoot, "third_party/rcheevos/LICENSE"))
+    vendor.from(fileTree(File(repoRoot, "client/ui/vendor")) { include("LICENSE.*") })
 }
 
 androidComponents {
