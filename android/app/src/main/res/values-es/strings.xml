@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spanish, with the words the client's own page uses (client/ui/lang/es.json):
+     logros, consola, AJUSTES. -->
+<resources>
+    <string name="waiting">Iniciando xeRAbora…</string>
+    <string name="later">Más tarde</string>
+
+    <string name="channel_engine">Estado</string>
+    <string name="action_quit">Salir</string>
+    <string name="status_off_title">Consola inactiva</string>
+    <string name="status_off_text">Esperando la PS2 en esta red Wi-Fi</string>
+    <string name="status_last_game">Último juego: %1$s · %2$s</string>
+    <string name="status_found_title">PS2 encontrada</string>
+    <string name="status_found_text">En el menú de OPL. Inicia un juego con RetroAchievements.</string>
+    <string name="status_connected_title">PS2 conectada</string>
+    <string name="status_connected_text">Recibiendo datos de la consola</string>
+    <string name="status_identifying">Cargando los logros…</string>
+    <string name="status_no_hash">Sin logros: usa \"RA: check game support\" en el menú del juego en OPL</string>
+    <string name="status_telemetry_only">Este juego funciona sin logros</string>
+    <string name="status_stale">La lista de direcciones de la consola está desactualizada: usa \"RA: check game support\" otra vez</string>
+    <string name="status_login_title">Inicia sesión</string>
+    <string name="status_login_text">Abre la app e inicia sesión en la pestaña AJUSTES</string>
+    <string name="status_port_title">Puerto UDP 18194 ocupado</string>
+    <string name="status_port_text">Otra app está usando el puerto de la consola. Ciérrala y abre xeRAbora de nuevo.</string>
+    <string name="status_progress">%1$d de %2$d logros · %3$d/%4$d puntos</string>
+    <string name="status_mastered">¡Maestría! Los %1$d logros</string>
+    <string name="status_total_time">Tiempo total en este juego: %1$s</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="duration_hours">%1$d h %2$02d min</string>
+
+    <string name="channel_unlocks">Logros</string>
+    <string name="unlock_sub">Logro desbloqueado · +%1$d puntos</string>
+    <string name="unlock_progress">%1$d de %2$d logros</string>
+    <string name="mastery_title">¡Juego completado con maestría!</string>
+    <string name="mastery_text">%1$s: los %2$d logros</string>
+
+
+    <string name="battery_title">Seguir funcionando con la pantalla apagada</string>
+    <string name="battery_text">Android puede cerrar xeRAbora en medio de una partida para ahorrar batería. ¿Permitir que funcione en segundo plano?</string>
+    <string name="battery_ok">Permitir</string>
+
+    <string name="update_title">Actualización disponible</string>
+    <string name="update_text">Salió la %1$s. ¿Instalarla ahora?</string>
+    <string name="update_install">Instalar</string>
+    <string name="update_downloading">Descargando la actualización…</string>
+    <string name="update_allow">Permite las instalaciones desde xeRAbora y vuelve a la app.</string>
+    <string name="update_failed">La actualización falló: %1$s</string>
+    <string name="channel_events">Avisos de la consola</string>
+    <string name="event_found_title">PS2 conectada</string>
+    <string name="event_found_text">La PS2 en %1$s encontró este móvil.</string>
+    <string name="event_check_ok_title">Juego reconocido</string>
+    <string name="event_check_ok_text">%1$s · %2$d logros, %3$d ya desbloqueados</string>
+    <string name="event_check_unsupported">%1$d no funcionan en la consola</string>
+    <string name="event_check_ready">Listo: ya puedes iniciar el juego</string>
+    <string name="event_check_no_title">Juego no reconocido</string>
+    <string name="event_check_no_text">RetroAchievements no conoce esta imagen: el juego funciona sin logros.</string>
+    <string name="event_playing_text">Jugando ahora en la PS2 · %1$s</string>
+    <string name="share_log">Enviar registro</string>
+    <plurals name="unlocks_summary">
+        <item quantity="one">%d logro desbloqueado</item>
+        <item quantity="many">%d logros desbloqueados</item>
+        <item quantity="other">%d logros desbloqueados</item>
+    </plurals>
+    <string name="menu_minimize">Minimizar (sigue funcionando)</string>
+    <string name="menu_quit">Salir (apaga el cliente)</string>
+    <string name="menu_about">Acerca de y licencias</string>
+    <string name="about_body">xeRAbora para Android %1$s\n\nxeRAbora es creado y mantenido por hacan359:\nhttps://github.com/hacan359/xerabora\n\nApp para Android por MrRexD:\nhttps://github.com/oMrRexD\n\nrcheevos, de RetroAchievements:\nhttps://github.com/RetroAchievements/rcheevos</string>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">xeRAbora</string>
+    <string name="waiting">Starting xeRAbora…</string>
+    <string name="later">Later</string>
+
+    <!-- The fixed notification -->
+    <string name="channel_engine">Status</string>
+    <string name="action_quit">Quit</string>
+    <string name="status_off_title">Console idle</string>
+    <string name="status_off_text">Waiting for the PS2 on this Wi-Fi</string>
+    <string name="status_last_game">Last game: %1$s · %2$s</string>
+    <string name="status_found_title">PS2 found</string>
+    <string name="status_found_text">In the OPL menu. Start a game with RetroAchievements.</string>
+    <string name="status_connected_title">PS2 connected</string>
+    <string name="status_connected_text">Receiving data from the console</string>
+    <string name="status_identifying">Loading the achievements…</string>
+    <string name="status_no_hash">No achievements: choose \"RA: check game support\" in the game\'s menu in OPL</string>
+    <string name="status_telemetry_only">This game runs without achievements</string>
+    <string name="status_stale">The console\'s address list is out of date: run \"RA: check game support\" again</string>
+    <string name="status_login_title">Sign in</string>
+    <string name="status_login_text">Open the app and sign in on the SETTINGS tab</string>
+    <string name="status_port_title">UDP port 18194 is busy</string>
+    <string name="status_port_text">Another app is using the console\'s port. Close it and open xeRAbora again.</string>
+    <string name="status_progress">%1$d of %2$d achievements · %3$d/%4$d points</string>
+    <string name="status_mastered">Mastered! All %1$d achievements</string>
+    <string name="status_total_time">Total time in this game: %1$s</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="duration_hours">%1$d h %2$02d min</string>
+
+    <!-- Unlocks -->
+    <string name="channel_unlocks">Achievements</string>
+    <string name="unlock_sub">Achievement unlocked · +%1$d points</string>
+    <string name="unlock_progress">%1$d of %2$d achievements</string>
+    <string name="mastery_title">Game mastered!</string>
+    <string name="mastery_text">%1$s: all %2$d achievements</string>
+
+    <!-- Quitting -->
+
+    <string name="battery_title">Keep running with the screen off</string>
+    <string name="battery_text">Android may stop xeRAbora in the middle of a game to save battery. Let it run in the background?</string>
+    <string name="battery_ok">Allow</string>
+
+    <string name="update_title">Update available</string>
+    <string name="update_text">%1$s is out. Install it now?</string>
+    <string name="update_install">Install</string>
+    <string name="update_downloading">Downloading the update…</string>
+    <string name="update_allow">Allow installs from xeRAbora, then come back.</string>
+    <string name="update_failed">Update failed: %1$s</string>
+    <!-- Pop-ups -->
+    <string name="channel_events">Console events</string>
+    <string name="event_found_title">PS2 connected</string>
+    <string name="event_found_text">The PS2 at %1$s found this phone.</string>
+    <string name="event_check_ok_title">Game recognized</string>
+    <string name="event_check_ok_text">%1$s · %2$d achievements, %3$d already unlocked</string>
+    <string name="event_check_unsupported">%1$d don\'t work on the console</string>
+    <string name="event_check_ready">Ready: you can start the game</string>
+    <string name="event_check_no_title">Game not recognized</string>
+    <string name="event_check_no_text">RetroAchievements does not know this image: the game runs without achievements.</string>
+    <string name="event_playing_text">Now playing on the PS2 · %1$s</string>
+    <string name="share_log">Send log</string>
+    <plurals name="unlocks_summary">
+        <item quantity="one">%d achievement unlocked</item>
+        <item quantity="many">%d achievements unlocked</item>
+        <item quantity="other">%d achievements unlocked</item>
+    </plurals>
+    <string name="menu_minimize">Minimize (keeps running)</string>
+    <string name="menu_quit">Quit (turns the client off)</string>
+    <string name="menu_about">About and licenses</string>
+    <string name="about_body">xeRAbora for Android %1$s\n\nxeRAbora is created and maintained by hacan359:\nhttps://github.com/hacan359/xerabora\n\nAndroid app by MrRexD:\nhttps://github.com/oMrRexD\n\nrcheevos by RetroAchievements:\nhttps://github.com/RetroAchievements/rcheevos</string>
+</resources>
