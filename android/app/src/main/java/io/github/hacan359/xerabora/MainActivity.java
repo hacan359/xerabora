@@ -19,6 +19,7 @@ import android.text.util.Linkify;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -96,6 +97,9 @@ public final class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         web.setWebViewClient(new PageClient());
+        /* Without a chrome client WebView drops confirm() and alert(), and
+           confirm() answers false: RESET CONSOLE and QUIT never posted. */
+        web.setWebChromeClient(new WebChromeClient());
         root.addView(web, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
