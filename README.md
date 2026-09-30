@@ -2,6 +2,14 @@
   <img src="docs/banner.png" alt="xeRAbora" width="720">
 </p>
 
+<p align="center">
+  <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/v/release/hacan359/xerabora?include_prereleases&label=release" alt="Latest release"></a>
+  <a href="https://github.com/hacan359/xerabora/actions/workflows/build.yml"><img src="https://github.com/hacan359/xerabora/actions/workflows/build.yml/badge.svg?branch=main" alt="Build"></a>
+  <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/downloads/hacan359/xerabora/total" alt="Downloads"></a>
+  <img src="https://img.shields.io/badge/runs%20on-PS2%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20macOS%20%C2%B7%20Android-555" alt="Runs on PS2, Windows, Linux, macOS, Android">
+  <a href="https://discord.gg/JZVNPF7cS2"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
+</p>
+
 # xeRAbora
 
 **RetroAchievements on a real PlayStation 2.** You play on the console,
