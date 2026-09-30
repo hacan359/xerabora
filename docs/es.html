@@ -27,7 +27,7 @@
   "@type": "SoftwareApplication",
   "name": "xeRAbora",
   "applicationCategory": "GameApplication",
-  "operatingSystem": "PlayStation 2, Windows, Linux, macOS",
+  "operatingSystem": "PlayStation 2, Windows, Linux, macOS, Android",
   "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from an ISO image or the disc, without an emulator.",
   "softwareVersion": "0.1.0-alpha.13",
   "url": "https://hacan359.github.io/xerabora/",
@@ -495,6 +495,7 @@
           <span><b>ISO</b> or the original <b>disc</b></span>
           <span><b>Softcore</b></span>
           <span><b>Windows</b> / <b>Linux</b> / <b>macOS</b>, un archivo</span>
+          <span><b>Android</b>, sin PC</span>
         </div>
         <p class="hero-alt"><b>No PS2 at hand?</b> The same client follows your play on any emulator with RetroAchievements. <a href="#nops2">Without a PS2</a></p>
       </div>
@@ -693,12 +694,12 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">What you need</span>
-      <h2>A PS2 on your network and a PC next to it.</h2>
+      <h2>A PS2 on your network and a PC or a phone next to it.</h2>
     </div>
     <div class="need">
       <div><span class="eyebrow">Console</span><h3>PS2 with a network adapter</h3><p>A fat with the adapter or a slim with the built-in port, running OPL through FMCB, FHDB or similar.</p></div>
       <div><span class="eyebrow">Games</span><h3>ISO or the disc</h3><p>A <code>.iso</code> image wherever OPL runs it, USB stick or internal HDD over BDM, or the original disc in the drive.</p></div>
-      <div><span class="eyebrow">PC</span><h3>On the same network</h3><p>Windows, Linux or macOS in the same subnet as the console.</p></div>
+      <div><span class="eyebrow">PC or phone</span><h3>On the same network</h3><p>Windows, Linux or macOS in the same subnet as the console, or an Android phone on the same Wi-Fi.</p></div>
       <div><span class="eyebrow">Account</span><h3>RetroAchievements</h3><p>Your login for unlocks and the Web API key from your profile.</p></div>
     </div>
   </div>
@@ -720,11 +721,12 @@
           <span class="n"></span>
           <h3>Descarga dos archivos</h3>
           <p>De la <a href="https://github.com/hacan359/xerabora/releases/latest">última versión</a>: <code>OPL-RA.ELF</code> para la consola y <code>xerabora.exe</code> (Windows), <code>xerabora-linux-x86_64</code> (Linux) o <code>xerabora-macos</code> (macOS) para el PC. <code>SHA256SUMS</code> sirve para comprobarlos.</p>
+          <p>En un teléfono Android, instala <code>xerabora-android.apk</code> en lugar del cliente para PC. El teléfono ejecuta el cliente entero, así que no hace falta un PC, y los pasos de abajo son los mismos en la app.</p>
           <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> images (USB stick, internal HDD over BDM) or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
         </div>
         <div class="step-vis">
           <pre class="files"><b>xerabora, última versión</b>  <span class="c">github.com/hacan359/xerabora/releases</span>
-├─ <span class="new">OPL-RA.ELF</span>              loader de consola (OPL 1.2.0 + RA) ├─ OPL-RA-debug.ELF igual, con diagnóstico en pantalla ├─ <span class="new">xerabora.exe</span>            cliente PC, Windows ├─ xerabora-linux-x86_64 cliente PC, Linux ├─ xerabora-macos cliente PC, macOS └─ SHA256SUMS</pre>
+├─ <span class="new">OPL-RA.ELF</span>              loader de consola (OPL 1.2.0 + RA) ├─ OPL-RA-debug.ELF igual, con diagnóstico en pantalla ├─ <span class="new">xerabora.exe</span>            cliente PC, Windows ├─ xerabora-linux-x86_64 cliente PC, Linux ├─ xerabora-macos cliente PC, macOS ├─ xerabora-android.apk el mismo cliente, Android └─ SHA256SUMS</pre>
         </div>
       </div>
 
@@ -984,6 +986,10 @@
       <details>
         <summary>¿Puede usar esto otra consola?</summary>
         <p>Sí. El cliente de PC no sabe nada del PS2 más allá de la memoria que recibe. Escribe un agente que lea la memoria de tu consola, calcule el hash de RA y hable <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">el protocolo</a>, y xerabora hace el resto: la biblioteca, la vista en vivo, los desbloqueos.</p>
+      </details>
+      <details>
+        <summary>¿Puedo seguir la partida desde el teléfono?</summary>
+        <p>De dos maneras. La app de Android ejecuta el cliente en el propio teléfono: la consola encuentra el teléfono en el Wi-Fi igual que encuentra un PC, el teléfono desbloquea los logros y cada desbloqueo llega como notificación. Con el cliente en un PC, pulsa ABRIR A LA RED en AJUSTES y abre la página en el navegador del teléfono; muestra EN VIVO y todo lo demás, mientras que la sesión y SALIR se quedan en el PC.</p>
       </details>
       <details>
         <summary>¿Hace falta la consola siquiera?</summary>

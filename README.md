@@ -12,6 +12,10 @@ Without a PS2, the same client shows your play on any emulator with
 RetroAchievements: library, achievements, leaderboards. See
 [Without a PS2](#without-a-ps2).
 
+On a phone, the [Android app](android/README.md) runs the whole client:
+the console finds the phone on the Wi-Fi, and each unlock arrives as a
+notification. No PC needed.
+
 **Project page:** [hacan359.github.io/xerabora](https://hacan359.github.io/xerabora/),
 the setup as a walkthrough: [How to start](https://hacan359.github.io/xerabora/#start).
 

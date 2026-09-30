@@ -27,7 +27,7 @@
   "@type": "SoftwareApplication",
   "name": "xeRAbora",
   "applicationCategory": "GameApplication",
-  "operatingSystem": "PlayStation 2, Windows, Linux, macOS",
+  "operatingSystem": "PlayStation 2, Windows, Linux, macOS, Android",
   "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from an ISO image or the disc, without an emulator.",
   "softwareVersion": "0.1.0-alpha.13",
   "url": "https://hacan359.github.io/xerabora/",
@@ -495,6 +495,7 @@
           <span><b>ISO</b> or the original <b>disc</b></span>
           <span><b>Softcore</b></span>
           <span><b>Windows</b> / <b>Linux</b> / <b>macOS</b>, one file</span>
+          <span><b>Android</b>, no PC needed</span>
         </div>
         <p class="hero-alt"><b>No PS2 at hand?</b> The same client follows your play on any emulator with RetroAchievements. <a href="#nops2">Without a PS2</a></p>
       </div>
@@ -693,12 +694,12 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">What you need</span>
-      <h2>A PS2 on your network and a PC next to it.</h2>
+      <h2>A PS2 on your network and a PC or a phone next to it.</h2>
     </div>
     <div class="need">
       <div><span class="eyebrow">Console</span><h3>PS2 with a network adapter</h3><p>A fat with the adapter or a slim with the built-in port, running OPL through FMCB, FHDB or similar.</p></div>
       <div><span class="eyebrow">Games</span><h3>ISO or the disc</h3><p>A <code>.iso</code> image wherever OPL runs it, USB stick or internal HDD over BDM, or the original disc in the drive.</p></div>
-      <div><span class="eyebrow">PC</span><h3>On the same network</h3><p>Windows, Linux or macOS in the same subnet as the console.</p></div>
+      <div><span class="eyebrow">PC or phone</span><h3>On the same network</h3><p>Windows, Linux or macOS in the same subnet as the console, or an Android phone on the same Wi-Fi.</p></div>
       <div><span class="eyebrow">Account</span><h3>RetroAchievements</h3><p>Your login for unlocks and the Web API key from your profile.</p></div>
     </div>
   </div>
@@ -720,6 +721,7 @@
           <span class="n"></span>
           <h3>Download two files</h3>
           <p>From the <a href="https://github.com/hacan359/xerabora/releases/latest">latest release</a>: <code>OPL-RA.ELF</code> for the console and <code>xerabora.exe</code> (Windows), <code>xerabora-linux-x86_64</code> (Linux) or <code>xerabora-macos</code> (macOS) for the PC. <code>SHA256SUMS</code> lets you check them.</p>
+          <p>On an Android phone, install <code>xerabora-android.apk</code> instead of the PC client. The phone runs the whole client, so no PC is needed, and the steps below are the same in the app.</p>
           <p>You need a PS2 with a network adapter that already runs Open PS2 Loader (FMCB, FHDB or similar), your games as <code>.iso</code> images (USB stick, internal HDD over BDM) or the original disc, and a PC on the same local network with a <a href="https://retroachievements.org">RetroAchievements</a> account.</p>
         </div>
         <div class="step-vis">
@@ -729,6 +731,7 @@
 ├─ <span class="new">xerabora.exe</span>            PC client, Windows
 ├─ xerabora-linux-x86_64   PC client, Linux
 ├─ xerabora-macos          PC client, macOS
+├─ xerabora-android.apk    the same client, Android
 └─ SHA256SUMS</pre>
         </div>
       </div>
@@ -989,6 +992,10 @@
       <details>
         <summary>Can another console use this?</summary>
         <p>Yes. The PC client knows nothing about the PS2 beyond the memory it receives. Write an agent that reads your console's memory, computes the RA hash and speaks <a href="https://github.com/hacan359/xerabora/blob/main/protocol/PROTOCOL.md">the protocol</a>, and xerabora does the rest: the library, the live view, the unlocks.</p>
+      </details>
+      <details>
+        <summary>Can I follow the game from my phone?</summary>
+        <p>Two ways. The Android app runs the client on the phone itself: the console finds the phone on the Wi-Fi as it finds a PC, the phone unlocks the achievements, and each unlock shows up as a notification. With the client on a PC, press OPEN TO THE NETWORK on SETTINGS and open the page on the phone's browser; it shows LIVE and everything else, while the login and QUIT stay on the PC.</p>
       </details>
       <details>
         <summary>Do I need the console at all?</summary>
