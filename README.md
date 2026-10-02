@@ -55,7 +55,8 @@ flashes gold.
 
 - A PS2 with a network adapter and a way to run OPL (FMCB, FHDB or similar).
 - Your games as `.iso` images wherever OPL runs them (USB stick, internal
-  HDD over BDM), or the original disc in the drive.
+  HDD over BDM, an SD card in an MMCE device), or the original disc in the
+  drive.
 - A PC on the same local network, Windows, Linux or macOS, or an
   Android phone on the same Wi-Fi (the [Android app](android/README.md)).
 - A [RetroAchievements](https://retroachievements.org) account.

@@ -38,7 +38,8 @@ is configured anywhere — the console finds the client by broadcast.
    A game with an achievement set does not run from a network share;
    a game without one does. An internal HDD with an exFAT partition,
    which OPL reads over BDM, behaves like the stick for one tester; HDL
-   partitions are not hashed.
+   partitions are not hashed. An SD card in an MMCE device works too
+   (see below).
 
 A network share is not required (see "Running from USB only" below). It
 is fine for the loader itself, `conf_apps.cfg`, the watch lists and the
@@ -276,6 +277,20 @@ On Windows the client needs an inbound firewall rule for UDP (the
 installer/first run usually prompts; if broadcasts never arrive, add an
 "Allow inbound UDP" rule for `xerabora.exe`, all ports, on the active
 profile).
+
+## Games on an MMCE device
+
+An MMCE device (SD2PSX, MemCard PRO2 and others on a firmware with
+MMCE mode) sits in the memory card slot and serves the `.iso` images
+on its SD card, laid out as on a stick: `DVD/`, `CD/`, and `RA/` for
+the watch lists. Turn it on once in OPL: **Settings → MMCE Settings →
+MMCE Start Mode: Auto**, Slot: Auto, then Save Changes. The games show
+up on their own **MMCE Games** page, and the RA menu items work there
+as on USB. On an in-game reset the device switches to its boot card;
+**IGR Bootcard Slot(s)** in the same dialog picks which slots.
+
+Videos may stutter: an MMCE reads slower than a clean FMV needs.
+Achievements do not depend on it.
 
 ## Running from USB only (no share)
 
