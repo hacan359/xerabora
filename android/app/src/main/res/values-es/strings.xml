@@ -38,6 +38,10 @@
     <string name="battery_title">Seguir funcionando con la pantalla apagada</string>
     <string name="battery_text">Android puede cerrar xeRAbora en medio de una partida para ahorrar batería. ¿Permitir que funcione en segundo plano?</string>
     <string name="battery_ok">Permitir</string>
+    <string name="battery_off_title">Sin funcionar en segundo plano</string>
+    <string name="battery_off_text">Con la pantalla apagada, Android puede cerrar xeRAbora y los logros dejan de registrarse. Puedes permitirlo en Ajustes → Aplicaciones → xeRAbora → Batería.</string>
+    <string name="battery_remind">Recordar más tarde</string>
+    <string name="battery_never">No volver a mostrar</string>
 
     <string name="update_title">Actualización disponible</string>
     <string name="update_text">Salió la %1$s. ¿Instalarla ahora?</string>

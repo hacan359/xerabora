@@ -48,6 +48,7 @@ public final class MainActivity extends Activity {
     /* --bg of the page, so nothing flashes white before it loads. */
     private static final int BACKGROUND = 0xff04101c;
     private static final int ASK_NOTIFICATIONS = 1;
+    private static final int ASK_BATTERY = 2;
 
     private WebView web;
     private volatile int port = EngineService.UI_PORT;
@@ -425,27 +426,50 @@ public final class MainActivity extends Activity {
         }
     }
 
-    /* Once: battery optimisation is what kills a client in the middle of a
-       game on the more aggressive phones. */
+    /* At every start until it is allowed or the user says not to ask:
+       battery optimisation is what kills a client in the middle of a game
+       on the more aggressive phones. */
     private void askBattery() {
-        PowerManager pm = getSystemService(PowerManager.class);
-        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        if (pm.isIgnoringBatteryOptimizations(getPackageName()) || prefs.getBoolean("asked_battery", false)) {
+        if (batteryAllowed() || getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("battery_never", false)) {
             return;
         }
-        prefs.edit().putBoolean("asked_battery", true).apply();
         new AlertDialog.Builder(this)
                 .setTitle(R.string.battery_title)
                 .setMessage(R.string.battery_text)
                 .setPositiveButton(R.string.battery_ok, (d, w) -> {
                     try {
-                        startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                                Uri.parse("package:" + getPackageName())));
-                    } catch (ActivityNotFoundException ignored) {
-                        // no such screen on this phone
+                        startActivityForResult(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                                Uri.parse("package:" + getPackageName())), ASK_BATTERY);
+                    } catch (ActivityNotFoundException e) {
+                        // no such screen on this phone: say where it is
+                        batteryOff();
                     }
                 })
-                .setNegativeButton(R.string.later, null)
+                .setNegativeButton(R.string.later, (d, w) -> batteryOff())
+                .show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Not every phone reports the answer; what counts is where it stands now.
+        if (requestCode == ASK_BATTERY && !batteryAllowed()) {
+            batteryOff();
+        }
+    }
+
+    private boolean batteryAllowed() {
+        return getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(getPackageName());
+    }
+
+    /* Not allowed: where to allow it later, and whether to ask again. */
+    private void batteryOff() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.battery_off_title)
+                .setMessage(R.string.battery_off_text)
+                .setPositiveButton(R.string.battery_remind, null)
+                .setNegativeButton(R.string.battery_never, (d, w) -> getSharedPreferences(PREFS, MODE_PRIVATE)
+                        .edit().putBoolean("battery_never", true).apply())
                 .show();
     }
 }

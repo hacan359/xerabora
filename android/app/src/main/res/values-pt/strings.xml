@@ -36,6 +36,10 @@
     <string name="battery_title">Continuar com a tela apagada</string>
     <string name="battery_text">O Android pode fechar o xeRAbora no meio do jogo pra economizar bateria. Liberar pra rodar em segundo plano?</string>
     <string name="battery_ok">Liberar</string>
+    <string name="battery_off_title">Sem rodar em segundo plano</string>
+    <string name="battery_off_text">Com a tela apagada, o Android pode fechar o xeRAbora e as conquistas param de ser registradas. Dá pra liberar em Configurações → Apps → xeRAbora → Bateria.</string>
+    <string name="battery_remind">Lembrar depois</string>
+    <string name="battery_never">Não mostrar de novo</string>
 
     <string name="update_title">Atualização disponível</string>
     <string name="update_text">Saiu a %1$s. Instalar agora?</string>

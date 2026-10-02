@@ -40,6 +40,10 @@
     <string name="battery_title">Keep running with the screen off</string>
     <string name="battery_text">Android may stop xeRAbora in the middle of a game to save battery. Let it run in the background?</string>
     <string name="battery_ok">Allow</string>
+    <string name="battery_off_title">Not running in the background</string>
+    <string name="battery_off_text">With the screen off, Android may close xeRAbora and achievements stop being recorded. You can allow it in Settings → Apps → xeRAbora → Battery.</string>
+    <string name="battery_remind">Remind me later</string>
+    <string name="battery_never">Don\'t show again</string>
 
     <string name="update_title">Update available</string>
     <string name="update_text">%1$s is out. Install it now?</string>
