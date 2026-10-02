@@ -114,6 +114,46 @@ function LanBlock({ lan }) {
   </div>`;
 }
 
+/* ABOUT: the version this client runs, the newest release on GitHub,
+   and where to go with a problem. The release list includes
+   prereleases, which /releases/latest leaves out. */
+const REPO = 'https://github.com/hacan359/xerabora';
+const latestRelease = signal(null);
+let latestAsked = false;
+
+function askLatest() {
+  if (latestAsked) return;
+  latestAsked = true;
+  fetch('https://api.github.com/repos/hacan359/xerabora/releases?per_page=1')
+    .then(r => r.json())
+    .then(list => { if (Array.isArray(list) && list[0]) latestRelease.value = list[0]; })
+    .catch(() => { latestAsked = false; });
+}
+
+function AboutBlock() {
+  askLatest();
+  const v = S.version.value;
+  const rel = latestRelease.value;
+  const newer = rel && v && rel.tag_name !== 'v' + v;
+
+  return html`<div class="block">
+    <${Eyebrow}>${t('ABOUT')}<//>
+    <div>xeRAbora <span class="ok">${v ? 'v' + v : ''}</span></div>
+    ${rel && html`<div class="note">${newer
+      ? tv('{tag} is out: {link}', { tag: rel.tag_name, link: html`<a class="ok" href=${rel.html_url} target="_blank" rel="noopener">${t('download')}</a>` })
+      : t('this is the latest release')}</div>`}
+    <div class="note">${t('something does not work? Read the guide first, then open an issue with the debug build\'s logs.')}</div>
+    <div class="links">
+      <a href=${REPO + '/blob/main/docs/TROUBLESHOOTING.md'} target="_blank" rel="noopener">${t('BEFORE YOU REPORT')}</a>
+      <a href=${REPO + '/issues'} target="_blank" rel="noopener">${t('ISSUES')}</a>
+      <a href="https://discord.gg/JZVNPF7cS2" target="_blank" rel="noopener">DISCORD</a>
+      <a href=${REPO + '/releases'} target="_blank" rel="noopener">${t('RELEASES')}</a>
+      <a href="https://hacan359.github.io/xerabora/" target="_blank" rel="noopener">${t('PROJECT PAGE')}</a>
+    </div>
+    <div class="note">${t('Built on Open PS2 Loader, rcheevos and ps2sdk. The Android app by MrRexD. The PC client is MIT; the OPL fork keeps OPL\'s AFL 3.0.')}</div>
+  </div>`;
+}
+
 function SettingsTab() {
   settingsKey.value;
   const s = S.state.peek();
@@ -126,6 +166,7 @@ function SettingsTab() {
       <div>${tv('this page is open from {host}', { host: html`<span class="ok">${location.host}</span>` })}</div>
       <div class="note">${t('account, Web API key, the network switch and QUIT are changed on the PC that runs xerabora; from here you watch.')}</div>
       ${li.ok && html`<div style=${{ marginTop: '14px' }}>${tv('signed in as {user}', { user: html`<span class="ok">${li.user}</span>` })}</div>`}
+      <div style=${{ marginTop: '26px' }}><${AboutBlock} /></div>
     </div></div>`;
   }
 
@@ -133,5 +174,6 @@ function SettingsTab() {
     <${AccountBlock} li=${li} />
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
+    <${AboutBlock} />
   </div></div>`;
 }

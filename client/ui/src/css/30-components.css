@@ -157,6 +157,10 @@
 .set .block { margin-bottom: 26px; }
 .set label { display: block; color: var(--ink-mute); font: 600 10.5px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; margin: 14px 0 6px; }
 .set .note { color: var(--ink-soft); font-size: 13.5px; margin-top: 6px; }
+.set .links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; }
+.set .links a { font: 600 11px/1 var(--font-display); letter-spacing: 0.12em; color: var(--accent); text-decoration: none; }
+.set .links a:hover { color: var(--ink); }
+.set .links + .note { margin-top: 14px; }
 .set .msg { font: 13px var(--font-mono); margin-top: 10px; min-height: 1.3em; }
 .set .btn { margin-top: 12px; }
 input.f, select.f {

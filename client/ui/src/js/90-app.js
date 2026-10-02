@@ -38,6 +38,7 @@ function Header() {
       <select class="lang" aria-label="Language" value=${lang} onChange=${e => setLang(e.target.value)}>
         ${LANGS.map(([code, name]) => html`<option key=${code} value=${code} title=${name}>${(code || 'en').split('-')[0].toUpperCase()}</option>`)}
       </select>
+      ${!REMOTE && html`<${Btn} danger sm onClick=${quit}>${t('QUIT')}<//>`}
     </div>
   </div></header>`;
 }
@@ -75,7 +76,6 @@ function Footer() {
     <${Chip} on cls="static" title="every unlock is softcore">${t('SOFTCORE')}<//>
     <${Chip} on=${connected} cls="static" title="the gold flash on the TV: lit while a console streams">${t('FLASH')}<//>
     <span class="clock">${clockText}</span>
-    ${!REMOTE && html`<${Btn} danger sm onClick=${quit}>${t('QUIT')}<//>`}
   </div></footer>`;
 }
 

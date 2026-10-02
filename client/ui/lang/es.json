@@ -148,5 +148,15 @@
   "still loading; the client is busy with RetroAchievements": "todavía cargando; el cliente está ocupado con RetroAchievements",
   "try again": "intentar de nuevo",
   "from an image check, not from a running game": "de una comprobación de imagen, no de un juego en marcha",
-  "loading the achievement set for this image &mdash; a few seconds": "cargando el conjunto de logros de esta imagen &mdash; unos segundos"
+  "loading the achievement set for this image &mdash; a few seconds": "cargando el conjunto de logros de esta imagen &mdash; unos segundos",
+  "ABOUT": "ACERCA DE",
+  "{tag} is out: {link}": "ya salió {tag}: {link}",
+  "download": "descargar",
+  "this is the latest release": "es la versión más reciente",
+  "something does not work? Read the guide first, then open an issue with the debug build's logs.": "¿algo no funciona? Lee primero la guía y luego abre un issue con los logs de la versión de depuración.",
+  "BEFORE YOU REPORT": "ANTES DE REPORTAR",
+  "ISSUES": "ISSUES",
+  "RELEASES": "VERSIONES",
+  "PROJECT PAGE": "PÁGINA DEL PROYECTO",
+  "Built on Open PS2 Loader, rcheevos and ps2sdk. The Android app by MrRexD. The PC client is MIT; the OPL fork keeps OPL's AFL 3.0.": "Hecho sobre Open PS2 Loader, rcheevos y ps2sdk. La app de Android es de MrRexD. El cliente de PC es MIT; el fork de OPL mantiene la AFL 3.0 de OPL."
 }
