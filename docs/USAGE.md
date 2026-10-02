@@ -295,6 +295,9 @@ an address (DHCP is enough).
 
 ## Troubleshooting
 
+For a clean reset of everything and what to collect before opening an
+issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+
 | Symptom | Cause / fix |
 |---|---|
 | OPL+RA not listed under Apps | `conf_apps.cfg` is on a different device than OPL's config device, uses the wrong path prefix, or is malformed. Fix the path/device, or launch the ELF directly. |

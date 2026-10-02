@@ -10,6 +10,10 @@
   <a href="https://discord.gg/JZVNPF7cS2"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
+> **Something does not work?** Read [Before you report a problem](docs/TROUBLESHOOTING.md)
+> first: one version everywhere, one client, a clean reset of the PC and
+> the console, and the two logs that make a report useful.
+
 # xeRAbora
 
 **RetroAchievements on a real PlayStation 2.** You play on the console,
