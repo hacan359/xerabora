@@ -39,7 +39,8 @@ is configured anywhere — the console finds the client by broadcast.
    a game without one does. An internal HDD with an exFAT partition,
    which OPL reads over BDM, behaves like the stick for one tester; HDL
    partitions are not hashed. An SD card in an MMCE device works too
-   (see below).
+   (see below). PS1 games run from a `.VCD` in `POPS/` on a USB stick
+   through POPStarter (see "PS1 games through POPStarter").
 
 A network share is not required (see "Running from USB only" below). It
 is fine for the loader itself, `conf_apps.cfg`, the watch lists and the
@@ -292,6 +293,41 @@ as on USB. On an in-game reset the device switches to its boot card;
 Videos may stutter: an MMCE reads slower than a clean FMV needs.
 Achievements do not depend on it.
 
+## PS1 games through POPStarter
+
+OPL-RA lists `POPS/<name>.VCD` on a USB stick next to the PS2 games,
+marked **PS1**. The game runs in Sony's PS1 emulator through
+POPStarter, and the achievements come from the game's PS1 set.
+
+What goes in `POPS/` on the stick, next to `DVD/` and `CD/`:
+
+- `POPSTARTER.ELF`, krHACKen's POPStarter r13, with its files.
+- `POPS.ELF` and `POPS_IOX.PAK`, Sony's emulator. Not ours to give;
+  find them yourself.
+- The game as `<name>.VCD`. cue2pops makes one from a bin/cue.
+- For an exFAT drive, MX4SIO, iLink or an exFAT HDD: the BDMAssault
+  driver pairs, `usbd.irx.<variant>` and `usbhdfsd.irx.<variant>`.
+
+Then as with a PS2 game: **RA: check game support** once, launch. OPL
+writes `POPS/XX.<name>.ELF` and `POPS/MODULE_9.IRX` (a `MODULE_9.IRX`
+of yours gets overwritten) and starts POPStarter. The telemetry begins
+25 seconds after the launch; the first request earlier than that leaves
+the screen black. Unlocks show on the client's page as usual; there is
+no gold flash under POPS yet.
+
+A FAT32 stick works with POPStarter's own driver. An exFAT drive needs
+the `usbexfat` pair: turn on **Settings → PS1 USB drive is exFAT**, and
+OPL copies the pair to `mc0:/POPSTARTER/` before the launch, and takes
+it off again when the setting is off. One setting for every USB device,
+so switch it when you change drives. OPL cannot tell the two formats
+apart, and the pair stalls the emulator on its first video from a FAT32
+stick.
+
+MX4SIO, iLink and an exFAT HDD get their pair on the card the same way;
+we have not run those three ourselves. Not covered: PS1 games on an
+MMCE device, an APA-formatted HDD or a share, and a second device of
+the same kind.
+
 ## Running from USB only (no share)
 
 This works. The console brings the network up on demand when you use a
@@ -342,3 +378,5 @@ issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
   the same games are fine.
 - Games without `libpad` may not start telemetry (the hook rides the
   in-game reset path).
+- PS1 games: tested from USB (FAT32 and exFAT); no gold flash under
+  POPS; the telemetry starts 25 seconds in.

@@ -18,7 +18,8 @@
 
 **RetroAchievements on a real PlayStation 2.** You play on the console,
 and the achievements you earn go to your RetroAchievements profile. The
-TV flashes gold on each one. No emulator.
+TV flashes gold on each one. No emulator. PS1 games too, through
+POPStarter, with their own sets.
 
 Without a PS2, the same client shows your play on any emulator with
 RetroAchievements: library, achievements, leaderboards. See
@@ -56,7 +57,8 @@ flashes gold.
 - A PS2 with a network adapter and a way to run OPL (FMCB, FHDB or similar).
 - Your games as `.iso` images wherever OPL runs them (USB stick, internal
   HDD over BDM, an SD card in an MMCE device), or the original disc in the
-  drive.
+  drive. PS1 games as `.VCD` images in `POPS/` on a USB stick, played
+  through POPStarter.
 - A PC on the same local network, Windows, Linux or macOS, or an
   Android phone on the same Wi-Fi (the [Android app](android/README.md)).
 - A [RetroAchievements](https://retroachievements.org) account.
