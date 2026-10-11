@@ -361,11 +361,14 @@ issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 | Game from a share stops loading after about a minute | A game with an achievement set does not run from a share yet. Put the image on a USB stick or use the disc. |
 | Unlock on the page, no flash on the console | Look for `console acknowledged unlock notice` in `xerabora.log`. Missing: the notice never reached the console, check that both are on the same subnet. Present: the console got it; report the game. |
 | Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it from its footer, or end it in Task Manager. |
+| Game breaks with the in-game reset on: items missing, inputs dead (Sly Cooper does this) | Turn on **Mode 6** in the game's compatibility settings. Achievements keep working without the IGR. |
 
 ## Notes and limits
 
 - Console and PC must be on the same subnet (the client learns the
   console's MAC from its request).
+- Mode 6 turns the in-game reset off and keeps the achievements. RESET
+  CONSOLE from the client needs the IGR, so it does nothing in that mode.
 - Images may be named `Title.iso` or the OPL Manager way,
   `SLUS_123.45.Title.iso`. ZSO/UL images and ELFs outside the image root
   are not covered.
