@@ -30,6 +30,11 @@ int config_save_apikey(const char *key);
 int config_load_lan(void);
 int config_save_lan(int on);
 
+/* Whether an unlock is shown on the TV. On by default; off for the
+   games whose picture the notice breaks. */
+int config_load_notice(void);
+int config_save_notice(int on);
+
 /* Whether the client follows the account's play on other devices
    through the Web API. On by default: it costs a key and nothing else. */
 int config_load_follow(void);

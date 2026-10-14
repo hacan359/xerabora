@@ -397,6 +397,126 @@ static int memref_needed(rc_client_t *client, const rc_memref_t *m)
     return 0;
 }
 
+/* The window the console reads, ee_core/src/ra.c RA_RAM_LOW..HIGH.
+   RA itself maps the 16 KB scratchpad right above the 32 MB of RAM. */
+#define CONSOLE_RAM_LOW   0x00080000u
+#define CONSOLE_RAM_HIGH  0x02000000u
+#define RA_SCRATCH_HIGH   0x02004000u
+
+#define ZONE_SCRATCH 1
+#define ZONE_LOW     2
+
+static int addr_zone(uint32_t addr)
+{
+    if (addr >= CONSOLE_RAM_HIGH && addr < RA_SCRATCH_HIGH)
+        return ZONE_SCRATCH;
+    if (addr < CONSOLE_RAM_LOW)
+        return ZONE_LOW;
+    return 0;
+}
+
+/* rcheevos folds AddSource and AddAddress into modified memrefs, so a
+   condition can reach a plain address only through their parents. */
+static int memref_zones(const rc_memref_t *m)
+{
+    const rc_modified_memref_t *mm;
+    int z = 0;
+
+    if (m == NULL)
+        return 0;
+    if (m->value.memref_type != RC_MEMREF_TYPE_MODIFIED_MEMREF)
+        return addr_zone(m->address);
+
+    mm = (const rc_modified_memref_t *)m;
+    if (rc_operand_is_memref(&mm->parent))
+        z |= memref_zones(mm->parent.value.memref);
+    if (rc_operand_is_memref(&mm->modifier))
+        z |= memref_zones(mm->modifier.value.memref);
+    return z;
+}
+
+static int condset_zones(const rc_condset_t *cs)
+{
+    const rc_condition_t *c;
+    int z = 0;
+
+    for (c = cs != NULL ? cs->conditions : NULL; c != NULL; c = c->next) {
+        if (rc_operand_is_memref(&c->operand1))
+            z |= memref_zones(c->operand1.value.memref);
+        if (rc_operand_is_memref(&c->operand2))
+            z |= memref_zones(c->operand2.value.memref);
+    }
+    return z;
+}
+
+static int trigger_zones(const rc_trigger_t *t)
+{
+    const rc_condset_t *cs;
+    int z = condset_zones(t->requirement);
+
+    for (cs = t->alternative; cs != NULL; cs = cs->next)
+        z |= condset_zones(cs);
+    return z;
+}
+
+/* Counts addresses, not memrefs: rcheevos keeps one memref per
+   address and size, and a byte read as 8 and 16 bits is one address. */
+static void count_unread(rc_client_t *client, struct watch_survey *out)
+{
+    const rc_memref_list_t *ml;
+    const rc_client_subset_info_t *subset;
+    uint32_t *seen;
+    int total = 0, nseen = 0, i;
+
+    for (ml = &client->game->runtime.memrefs->memrefs; ml != NULL; ml = ml->next)
+        total += ml->count;
+    seen = calloc((size_t)(total > 0 ? total : 1), sizeof(*seen));
+    if (seen == NULL)
+        return;
+
+    for (ml = &client->game->runtime.memrefs->memrefs; ml != NULL; ml = ml->next) {
+        uint16_t k;
+
+        for (k = 0; k < ml->count; k++) {
+            uint32_t addr = ml->items[k].address;
+            int zone = addr_zone(addr);
+
+            if (zone == 0)
+                continue;
+            for (i = 0; i < nseen && seen[i] != addr; i++)
+                ;
+            if (i < nseen)
+                continue;
+            seen[nseen++] = addr;
+            if (zone == ZONE_SCRATCH)
+                out->scratch++;
+            else
+                out->low++;
+            log_info("survey: address %08X is read as zero on the console", (unsigned)addr);
+        }
+    }
+    free(seen);
+    if (out->scratch == 0 && out->low == 0)
+        return;
+
+    for (subset = client->game->subsets; subset != NULL; subset = subset->next) {
+        const rc_client_achievement_info_t *a = subset->achievements;
+        const rc_client_achievement_info_t *a_end = a + subset->public_.num_achievements;
+
+        for (; a < a_end; a++) {
+            int z;
+
+            if (a->trigger == NULL)
+                continue;
+            z = trigger_zones(a->trigger);
+            if (z & ZONE_SCRATCH)
+                log_trace("achievement %u \"%s\" reads the scratchpad", a->public_.id, a->public_.title);
+            out->scratch_ach += (z & ZONE_SCRATCH) != 0;
+            out->low_ach += (z & ZONE_LOW) != 0;
+        }
+    }
+}
+
 void watchlist_survey(rc_client_t *client, struct watch_survey *out)
 {
     rc_memrefs_t *pool;
@@ -491,6 +611,8 @@ void watchlist_survey(rc_client_t *client, struct watch_survey *out)
         }
     }
 
+    count_unread(client, out);
+
     out->snapshot = out->bytes + out->chains_ok * RA_NODE_PAIR_BYTES;
     out->need_snapshot = out->need_bytes + out->need_chains_ok * RA_NODE_PAIR_BYTES;
     free(need.items);
@@ -518,6 +640,8 @@ void watchlist_log_survey(rc_client_t *client)
     log_info("survey: locked + leaderboards: %d addresses, %d bytes direct, %d chains (%d compile), snapshot %d bytes, %d parts",
              s.need_entries, s.need_bytes, s.need_chains, s.need_chains_ok,
              s.need_snapshot, parts_for(s.need_snapshot));
+    log_info("survey: read as zero by the console: %d scratchpad addresses (%d achievements), %d below 0x80000 (%d achievements)",
+             s.scratch, s.scratch_ach, s.low, s.low_ach);
 }
 
 int watchlist_indirect_count(void)

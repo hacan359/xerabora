@@ -40,6 +40,10 @@ struct watch_survey
     /* The same five numbers for what locked achievements and
        leaderboards read. */
     int need_entries, need_bytes, need_chains, need_chains_ok, need_snapshot;
+    /* Direct addresses the console reads as zero: the scratchpad,
+       which RA maps at 0x02000000, and kernel RAM below 0x80000; and
+       the achievements that read one of them. */
+    int scratch, low, scratch_ach, low_ach;
 };
 void watchlist_survey(rc_client_t *client, struct watch_survey *out);
 /* Why the last watchlist_build failed, one short sentence the console

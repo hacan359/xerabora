@@ -455,6 +455,8 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
         p += snprintf(p, (size_t)(end - p), "},");
     }
 
+    p += snprintf(p, (size_t)(end - p), "\"notice\":{\"on\":%s},", console_notice() ? "true" : "false");
+
     /* Following: the account's play elsewhere, from the Web API. It
        shows on LIVE only while the console is not the source. */
     {
@@ -510,8 +512,9 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                 p += snprintf(p, (size_t)(end - p), ",");
                 json_field(&p, end, "badge", a->badge);
                 p += snprintf(p, (size_t)(end - p),
-                              ",\"measured\":\"\",\"points\":%u,\"state\":%u,\"percent\":0,\"type\":%u,\"bucket\":%u}",
-                              a->points, done ? 2u : 1u, type, done ? 2u : 1u);
+                              ",\"measured\":\"\",\"points\":%u,\"state\":%u,\"percent\":0,\"type\":%u,\"bucket\":%u,\"mode\":%u}",
+                              a->points, done ? 2u : 1u, type, done ? 2u : 1u,
+                              (a->earned_softcore ? 1u : 0u) | (a->earned_hardcore ? 2u : 0u));
             }
             p += snprintf(p, (size_t)(end - p), "],\"tracking\":[]},");
             goto unlocks;
@@ -541,6 +544,17 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                    info != NULL && info->title[0] != '\0' ? info->title : g.title);
         p += snprintf(p, (size_t)(end - p), ",\"checked_only\":%d",
                       (info != NULL && !running) ? 1 : 0);
+
+        /* rcheevos' rich presence line, only while the loaded set is
+           the one the console runs. */
+        {
+            char rp[256] = "";
+
+            if (info != NULL && running && rc_client_has_rich_presence(client))
+                rc_client_get_rich_presence_message(client, rp, sizeof(rp));
+            p += snprintf(p, (size_t)(end - p), ",");
+            json_field(&p, end, "rp", rp);
+        }
     }
 
     /* Achievements come from rc_client, which is where the live
@@ -578,10 +592,11 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
                     p += snprintf(p, (size_t)(end - p), ",");
                     json_field(&p, end, "measured", ach->measured_progress);
                     p += snprintf(p, (size_t)(end - p),
-                                  ",\"points\":%u,\"state\":%u,\"percent\":%.4f,\"type\":%u,\"bucket\":%u,\"subset\":%u}",
+                                  ",\"points\":%u,\"state\":%u,\"percent\":%.4f,\"type\":%u,\"bucket\":%u,\"subset\":%u,\"mode\":%u}",
                                   ach->points, ach->state, ach->measured_percent,
                                   (unsigned)ach->type, list->buckets[b].bucket_type,
-                                  list->buckets[b].subset_id);
+                                  list->buckets[b].subset_id,
+                                  (unsigned)(ach->unlocked & RC_CLIENT_ACHIEVEMENT_UNLOCKED_BOTH));
                 }
             }
             rc_client_destroy_achievement_list(list);
@@ -906,9 +921,10 @@ static int build_game(char *buf, size_t size, unsigned id)
                     break;
                 }
             p += snprintf(p, (size_t)(end - p),
-                          ",\"points\":%u,\"order\":%u,\"players\":%u,\"median\":%u}",
+                          ",\"points\":%u,\"order\":%u,\"players\":%u,\"median\":%u,\"mode\":%u}",
                           g_gp_ach[i].points, g_gp_ach[i].display_order,
-                          g_gp_ach[i].num_awarded, median);
+                          g_gp_ach[i].num_awarded, median,
+                          (g_gp_ach[i].earned_softcore ? 1u : 0u) | (g_gp_ach[i].earned_hardcore ? 2u : 0u));
         }
     }
     p += snprintf(p, (size_t)(end - p), "]}");
@@ -1083,6 +1099,20 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
         g_rebind = 1;
         log_info(g_lan ? "interface opened to the network from the page"
                        : "interface closed to the network from the page");
+        n = snprintf(out, sizeof(out), "{\"ok\":true}");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
+    if (strncmp(req, "POST /notice", 12) == 0) {
+        char on[8] = "";
+
+        form_field(body, "on", on, sizeof(on));
+        console_set_notice(on[0] == '1');
+        if (config_save_notice(console_notice()) != 0)
+            log_warn("could not save the notice setting; it holds until exit");
+        log_info(console_notice() ? "unlock notices to the TV turned on from the page"
+                                  : "unlock notices to the TV turned off from the page");
         n = snprintf(out, sizeof(out), "{\"ok\":true}");
         respond(c, "application/json; charset=utf-8", out, n);
         return 1;

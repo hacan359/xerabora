@@ -70,7 +70,8 @@ struct raweb_achievement
     unsigned num_awarded;       /* how many players have it */
     unsigned display_order;     /* the set author's own ordering */
     char date_earned[32];       /* empty when locked */
-    int earned_hardcore;
+    int earned_softcore;        /* DateEarned set */
+    int earned_hardcore;        /* DateEarnedHardcore set; usually both are */
 };
 
 /* Three orders, all wanted: the author's DisplayOrder, the type

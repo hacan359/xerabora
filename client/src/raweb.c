@@ -454,10 +454,16 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
         a->points = obj_uint(&j, e + 1, "Points");
         a->num_awarded = obj_uint(&j, e + 1, "NumAwarded");
         a->display_order = obj_uint(&j, e + 1, "DisplayOrder");
-        obj_str(&j, e + 1, "DateEarned", a->date_earned, sizeof(a->date_earned));
-        if (a->date_earned[0] == '\0') {
-            obj_str(&j, e + 1, "DateEarnedHardcore", a->date_earned, sizeof(a->date_earned));
-            a->earned_hardcore = a->date_earned[0] != '\0';
+        /* Each flag follows its own date; a hardcore unlock sets both. */
+        {
+            char hc[32] = "";
+
+            obj_str(&j, e + 1, "DateEarned", a->date_earned, sizeof(a->date_earned));
+            obj_str(&j, e + 1, "DateEarnedHardcore", hc, sizeof(hc));
+            a->earned_softcore = a->date_earned[0] != '\0';
+            a->earned_hardcore = hc[0] != '\0';
+            if (a->date_earned[0] == '\0' && hc[0] != '\0')
+                snprintf(a->date_earned, sizeof(a->date_earned), "%s", hc);
         }
         n++;
     }

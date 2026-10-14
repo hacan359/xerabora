@@ -176,8 +176,7 @@ saved next to your other games when a USB stick or share is available).
 
 Boots the disc under OPL's in-game hooks. Telemetry and unlocks then work
 as from USB. Not available in this mode: OPL's virtual memory cards,
-per-game compatibility patches and cheats, and the in-game power-off
-combo. START+SELECT to leave the game works.
+per-game compatibility patches, and the in-game power-off combo. START+SELECT to leave the game works.
 
 Tested with Shadow of the Colossus: identified, launched, 60 snapshots a
 second for a full session, unlocks from the disc.
@@ -216,7 +215,7 @@ Windows, `~/.config/xerabora` on Linux and macOS).
 
 Five tabs: **LIVE**, **LIBRARY**, **GAME**, **BOARDS** (leaderboards
 with live trackers; softcore, so no entries are posted) and **SETTINGS**
-(login, key, the network switch). The language menu sits in the header
+(login, key, the network switch, the TV notice switch). The language menu sits in the header
 next to your name, the FOLLOW MY PLAY switch at the top of LIVE, and the
 red QUIT button in the footer.
 
@@ -226,9 +225,11 @@ sources:
 - *The console.* When a PS2 with OPL-RA streams, LIVE is that game as
   the console sees it: measured progress (3 of 10), UP NEXT by the median
   time players take, missables you are about to lose, live leaderboard
-  trackers, and a CONSOLE panel with the link, the snapshot rate and the
-  losses. Unlocks happen here, with a toast, a sound and the gold flash
-  on the TV. The console always has priority.
+  trackers, and a CONSOLE panel with the link, the snapshot rate, the
+  losses and the rich presence line the game is sending. Unlocks happen
+  here, with a toast, a sound and the gold flash on the TV; UNLOCK ON
+  THE TV on SETTINGS turns the flash off for a game whose picture it
+  breaks. The console always has priority.
 - *Your account elsewhere.* When no console streams, LIVE follows your
   RetroAchievements account: start a game in any emulator that has
   RetroAchievements turned on, and within half a minute the page shows
@@ -248,13 +249,21 @@ subsets lists each subset under its own heading. When the console goes quiet for
 link is marked lost, the session clock stops, and following takes LIVE
 back if it is on.
 
+Under the strip, ACHIEVEMENTS and LEADERBOARDS are two sub-tabs.
+ACHIEVEMENTS comes as a list, each row with its median unlock time, or
+as GRID: the badges alone, the way the site shows a set, with the words
+in the tooltip. An unlocked badge wears a ring for the mode it was
+earned in: blue softcore, gold hardcore, half and half when both.
+LEADERBOARDS lists the live trackers and the set's boards. The same
+LIST / GRID choice sits on GAME; the page remembers both.
+
 **On a phone or a second screen.** The page is served to this PC only
 until you press OPEN TO THE NETWORK on SETTINGS. The tab then shows an
 address such as `http://192.168.1.5:18280/`; type it into any phone,
 tablet or PC on the same Wi-Fi and add the page to the home screen. Up to
 four pages can watch at once, all live. Other devices see everything;
-the login, the key, the network switch, FOLLOW MY PLAY and QUIT work
-only from the PC that runs the client. On Windows, allow `xerabora.exe` through the firewall
+the login, the key, the network and TV notice switches, FOLLOW MY PLAY
+and QUIT work only from the PC that runs the client. On Windows, allow `xerabora.exe` through the firewall
 when it asks (private networks). The setting is remembered between runs.
 On a narrow screen the tabs sit along the bottom.
 
@@ -365,6 +374,8 @@ issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Notes and limits
 
+- OPL-RA carries no cheat engine and reads no `CHT/` files; stock OPL
+  is for play with cheats.
 - Console and PC must be on the same subnet (the client learns the
   console's MAC from its request).
 - Mode 6 turns the in-game reset off and keeps the achievements. RESET

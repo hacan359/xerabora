@@ -119,38 +119,40 @@ int config_save_apikey(const char *key)
     return 0;
 }
 
-static int config_lan_path(char *out, size_t size)
+/* An on/off setting is a file named after it holding "0" or "1";
+   a missing file means the default. */
+static int flag_path(char *out, size_t size, const char *name)
 {
     char dir[512];
 
     if (platform_config_dir(dir, sizeof(dir)) != 0)
         return -1;
-    snprintf(out, size, "%s" SEP "lan", dir);
+    snprintf(out, size, "%s" SEP "%s", dir, name);
     return 0;
 }
 
-int config_load_lan(void)
+static int load_flag(const char *name, int def)
 {
     char path[600], line[8] = "";
     FILE *f;
 
-    if (config_lan_path(path, sizeof(path)) != 0)
-        return 0;
+    if (flag_path(path, sizeof(path), name) != 0)
+        return def;
     f = fopen(path, "r");
     if (f == NULL)
-        return 0;
+        return def;
     if (fgets(line, (int)sizeof(line), f) == NULL)
         line[0] = '\0';
     fclose(f);
-    return line[0] == '1';
+    return line[0] == '1' ? 1 : line[0] == '0' ? 0 : def;
 }
 
-int config_save_lan(int on)
+static int save_flag(const char *name, int on)
 {
     char path[600];
     FILE *f;
 
-    if (config_lan_path(path, sizeof(path)) != 0)
+    if (flag_path(path, sizeof(path), name) != 0)
         return -1;
     f = fopen(path, "w");
     if (f == NULL)
@@ -160,46 +162,12 @@ int config_save_lan(int on)
     return 0;
 }
 
-static int config_follow_path(char *out, size_t size)
-{
-    char dir[512];
-
-    if (platform_config_dir(dir, sizeof(dir)) != 0)
-        return -1;
-    snprintf(out, size, "%s" SEP "follow", dir);
-    return 0;
-}
-
-int config_load_follow(void)
-{
-    char path[600], line[8] = "";
-    FILE *f;
-
-    if (config_follow_path(path, sizeof(path)) != 0)
-        return 1;
-    f = fopen(path, "r");
-    if (f == NULL)
-        return 1; /* no file: on */
-    if (fgets(line, (int)sizeof(line), f) == NULL)
-        line[0] = '\0';
-    fclose(f);
-    return line[0] != '0';
-}
-
-int config_save_follow(int on)
-{
-    char path[600];
-    FILE *f;
-
-    if (config_follow_path(path, sizeof(path)) != 0)
-        return -1;
-    f = fopen(path, "w");
-    if (f == NULL)
-        return -1;
-    fprintf(f, "%d\n", on ? 1 : 0);
-    fclose(f);
-    return 0;
-}
+int config_load_lan(void) { return load_flag("lan", 0); }
+int config_save_lan(int on) { return save_flag("lan", on); }
+int config_load_notice(void) { return load_flag("notice", 1); }
+int config_save_notice(int on) { return save_flag("notice", on); }
+int config_load_follow(void) { return load_flag("follow", 1); }
+int config_save_follow(int on) { return save_flag("follow", on); }
 
 int config_games_path(char *out, size_t size)
 {

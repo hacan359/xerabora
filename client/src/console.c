@@ -517,11 +517,27 @@ int console_send_reset(void)
     return 1;
 }
 
+static int g_notice = 1;
+
+void console_set_notice(int on)
+{
+    g_notice = on ? 1 : 0;
+}
+
+int console_notice(void)
+{
+    return g_notice;
+}
+
 int console_notify_unlock(unsigned id, unsigned points)
 {
     char msg[64];
     int n;
 
+    if (!g_notice) {
+        log_info("unlock notice kept off the TV by the setting");
+        return 0;
+    }
     if (!g_console_known || g_console_sock == SOCK_INVALID) {
         log_warn("no console address yet, the unlock notice stays here");
         return 0;

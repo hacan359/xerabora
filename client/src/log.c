@@ -90,10 +90,11 @@ static void emit(const char *level, const char *fmt, va_list ap)
         va_end(copy);
     }
 
-    printf("%s %s", stamp, level);
-    vprintf(fmt, ap);
-    putchar('\n');
-    fflush(stdout);
+    /* stderr, so "--survey-console 21 > out.tsv" gets the table alone. */
+    fprintf(stderr, "%s %s", stamp, level);
+    vfprintf(stderr, fmt, ap);
+    fputc('\n', stderr);
+    fflush(stderr);
 }
 
 void log_info(const char *fmt, ...)

@@ -57,13 +57,32 @@ void platform_console_init(void)
 #endif
 }
 
+#ifdef _WIN32
+static int std_redirected(DWORD which)
+{
+    DWORD type = GetFileType(GetStdHandle(which));
+
+    return type == FILE_TYPE_DISK || type == FILE_TYPE_PIPE;
+}
+#endif
+
 void platform_attach_console(int force)
 {
 #ifdef _WIN32
+    /* A stream sent to a file or a pipe stays there: "> survey.tsv"
+       keeps the table, and the errors still reach the console. */
+    int out_kept = std_redirected(STD_OUTPUT_HANDLE);
+    int err_kept = std_redirected(STD_ERROR_HANDLE);
+
+    if (out_kept && err_kept)
+        return;
     if (AttachConsole(ATTACH_PARENT_PROCESS) || (force && AllocConsole())) {
-        freopen("CONOUT$", "w", stdout);
-        freopen("CONOUT$", "w", stderr);
-        freopen("CONIN$", "r", stdin);
+        if (!out_kept && freopen("CONOUT$", "w", stdout) == NULL)
+            return;
+        if (!err_kept && freopen("CONOUT$", "w", stderr) == NULL)
+            return;
+        if (!std_redirected(STD_INPUT_HANDLE))
+            (void)freopen("CONIN$", "r", stdin);
     }
 #else
     (void)force;

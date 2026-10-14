@@ -548,7 +548,7 @@ static int survey_console(rc_client_t *client, unsigned console_id, unsigned min
            n, console_id, min_ach);
     if (n == 8192)
         printf("# the list is capped at 8192 rows; this console may have more\n");
-    printf("# id\tparts\taddresses\tbytes\tchains\tachievements\ttitle\n");
+    printf("# id\tparts\taddresses\tbytes\tchains\tachievements\tscratch\tscratch_ach\tlow\tlow_ach\ttitle\n");
     fflush(stdout);
 
     for (i = 0; i < n; i++) {
@@ -562,21 +562,22 @@ static int survey_console(rc_client_t *client, unsigned console_id, unsigned min
         if (strstr(rows[i].title, " [Subset - ") != NULL)
             continue;
         if (raweb_game_hashes(rows[i].id, md5, names, 1) < 1) {
-            printf("%u\t-\t-\t-\t-\t%u\t%s\t(no hash on RA)\n",
+            printf("%u\t-\t-\t-\t-\t%u\t-\t-\t-\t-\t%s\t(no hash on RA)\n",
                    rows[i].id, rows[i].achievements, rows[i].title);
             fflush(stdout);
             continue;
         }
         if (!ra_load_game(client, md5[0])) {
-            printf("%u\t-\t-\t-\t-\t%u\t%s\t(set would not load)\n",
+            printf("%u\t-\t-\t-\t-\t%u\t-\t-\t-\t-\t%s\t(set would not load)\n",
                    rows[i].id, rows[i].achievements, rows[i].title);
             fflush(stdout);
             continue;
         }
         watchlist_survey(client, &s);
         parts = (s.snapshot + RA_SNAP_CHUNK_BYTES - 1) / RA_SNAP_CHUNK_BYTES;
-        printf("%u\t%d\t%d\t%d\t%d\t%d\t%s\n",
-               rows[i].id, parts, s.entries, s.snapshot, s.chains, s.achievements, rows[i].title);
+        printf("%u\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\n",
+               rows[i].id, parts, s.entries, s.snapshot, s.chains, s.achievements,
+               s.scratch, s.scratch_ach, s.low, s.low_ach, rows[i].title);
         fflush(stdout);
         done++;
         platform_sleep_ms(250);
@@ -836,6 +837,7 @@ int main(int argc, char **argv)
         }
         webui_set_lan(config_load_lan());
         follow_set_enabled(config_load_follow());
+    console_set_notice(config_load_notice());
         only = webui_start(XERABORA_UI_PORT);
         if (only == SOCK_INVALID)
             return 1;
@@ -898,6 +900,7 @@ int main(int argc, char **argv)
        used to end the program here, which looked like a program that does
        not open. */
     follow_set_enabled(config_load_follow());
+    console_set_notice(config_load_notice());
     if (ui_wanted) {
         webui_set_lan(config_load_lan());
         ui = webui_start(ui_port);
