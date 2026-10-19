@@ -73,8 +73,9 @@ shows nothing for it.
 
 1. Download `OPL-RA.ELF` and the client for your PC from the
    [releases](../../releases): `xerabora.exe` (Windows),
-   `xerabora-linux-x86_64` (Linux) or `xerabora-macos` (macOS, Intel and
-   Apple Silicon in one file). On Linux and macOS, `chmod +x` the file
+   `xerabora-linux-x86_64` (Linux on a PC), `xerabora-linux-aarch64`
+   (Linux on 64-bit ARM: a Raspberry Pi 4 or 5) or `xerabora-macos`
+   (macOS, Intel and Apple Silicon in one file). On Linux and macOS, `chmod +x` the file
    after downloading. On an Android phone, install `xerabora-android.apk`
    instead; the steps below are the same in the app.
 2. Put `OPL-RA.ELF` where you keep your OPL and launch it instead of OPL.

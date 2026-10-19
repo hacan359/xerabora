@@ -18,8 +18,9 @@ There are two parts:
   image, asks the PC which achievements to watch, then reads console
   memory every frame during play and streams snapshots to the PC.
 - **The PC client** (`xerabora.exe` on Windows, `xerabora-linux-x86_64`
-  on Linux, `xerabora-macos` on macOS) talks to the RetroAchievements server, tells the console what
-  to watch, receives the snapshots, and unlocks achievements.
+  or `xerabora-linux-aarch64` on Linux, `xerabora-macos` on macOS) talks
+  to the RetroAchievements server, tells the console what to watch,
+  receives the snapshots, and unlocks achievements.
 
 The console and the PC talk over the local network by UDP. No PC address
 is configured anywhere — the console finds the client by broadcast.
