@@ -44,7 +44,7 @@ function GameTab() {
   if (!g) return html`<div class="tab"><${Loading} id=${id} /></div>`;
   if (g.error) return html`<div class="tab"><${Empty}>${t('could not reach the client')}<//></div>`;
 
-  const sort = S.gameSort.value, filter = S.gameFilter.value;
+  const sort = S.gameSort.value, filter = S.gameFilter.value, view = S.achView.value;
   const all = g.achievements || [];
   const list = sortAchievements(all.filter(a =>
     filter === 'all' ? true :
@@ -76,12 +76,18 @@ function GameTab() {
     <div class="filters">
       ${GAME_SORTS.map(([k, label]) => html`<${Chip} key=${k} on=${sort === k}
         onClick=${() => { S.gameSort.value = k; }}>${t(label)}<//>`)}
+      <span class="sp"></span>
+      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
+      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>
     </div>
-    ${list.map(a => html`<${AchRow} key=${a.id} a=${a} state=${a.earned ? 'done' : 'locked'}
+    ${view === 'grid'
+      ? html`<div class="tiles">${list.map(a => html`<${GameTile} key=${a.id} a=${a} />`)}</div>`
+      : list.map(a => html`<${AchRow} key=${a.id} a=${a} state=${a.earned ? 'done' : 'locked'} mode=${a.earned ? a.mode : 0}
       right=${html`<${Fragment}>
         ${a.earned ? html`<span class="lead ok">${a.earned.slice(0, 10)}</span>`
                    : html`<span class="lead">${t('locked')}</span>`}
-        <${Pts} a=${a} extra=${a.median > 0 ? '~' + medianText(a.median) : null} />
+        <${Pts} a=${a} extra=${[a.earned ? html`<${ModeTag} a=${a} />` : null,
+                                a.median > 0 ? '~' + medianText(a.median) : null].filter(Boolean)} />
       <//>`} />`)}
   </div>`;
 }

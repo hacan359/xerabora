@@ -86,6 +86,22 @@
 .chip.sm { padding: 4px 9px; font-size: 10px; letter-spacing: 0.06em; }
 .eyebrow .chip { text-transform: none; }
 
+/* ---- LIVE sub-navigation and the badge grid ---- */
+.subnav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 12px; }
+.subnav .sp { flex: 1; }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+.tile { width: 52px; height: 52px; border-radius: 8px; background: var(--bg-sunken); object-fit: cover; }
+.tile.done { box-shadow: 0 0 0 2px rgba(95, 211, 138, 0.6); }
+.tile.near { box-shadow: 0 0 0 2px var(--accent); }
+.tile.locked, .tile.na { filter: saturate(0.4) brightness(0.65); }
+.tile.na { opacity: 0.6; }
+/* The ring says where an unlock was earned: blue softcore, gold hardcore, half and half both. */
+.tile.done.m1, .row.done.m1 .badge { box-shadow: 0 0 0 2px var(--blue); }
+.tile.done.m2, .row.done.m2 .badge { box-shadow: 0 0 0 2px var(--gold); }
+.tile.done.m3, .row.done.m3 .badge { box-shadow: -2px -2px 0 0 var(--gold), -2px 2px 0 0 var(--gold), 2px -2px 0 0 var(--blue), 2px 2px 0 0 var(--blue); }
+.filters .sp { flex: 1; }
+
+
 /* ---- Library cards ---- */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
 .card {

@@ -30,8 +30,21 @@ const S = {
   powerOn: signal(0),           /* bumped when the console starts streaming */
   closed: signal(false),
   error: signal(''),
+  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach' or 'lb' */
+  achView: signal(loadPref('achView', 'list')),  /* 'list' or 'grid' */
   hidden: signal(loadHidden())  /* game id -> achievement ids kept out of UP NEXT */
 };
+
+/* Small per-browser choices: the LIVE sub-tab and the list or grid view. */
+function loadPref(key, def) {
+  try { return localStorage.getItem(key) || def; } catch (e) { return def; }
+}
+
+function setPref(key, val) {
+  S[key].value = val;
+  try { localStorage.setItem(key, val); } catch (e) { /* private window */ }
+}
+
 
 /* Hidden achievements live in this browser's localStorage under 'hidden'. */
 function loadHidden() {

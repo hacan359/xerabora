@@ -45,9 +45,9 @@ function Empty({ children }) { return html`<div class="empty">${children}</div>`
 
 /* Achievement row: badge, title, description, a right column of
    lines. `state` picks the look: done, near, na, locked. */
-function AchRow({ a, state, big, right, below }) {
+function AchRow({ a, state, big, right, below, mode }) {
   const locked = state !== 'done';
-  return html`<div class=${'row ' + state + (big ? ' big' : '')}>
+  return html`<div class=${'row ' + state + (big ? ' big' : '') + (mode ? ' m' + mode : '')}>
     <img class="badge" src=${badgeUrl(a, locked)} alt="" loading="lazy" />
     <div class="body">
       <div class="t">${a.title}</div>

@@ -1,17 +1,17 @@
 /* ---- BOARDS: leaderboards, with the live trackers on top --------------- */
 
-function BoardsTab() {
-  const id = S.gameId.value;
+/* The live trackers and the set's leaderboards; LIVE shows it for the
+   running game, BOARDS for the one picked in the library. */
+function BoardsBody({ id }) {
   S.boardsTick.value; /* re-render when a fetch lands */
   useEffect(() => { loadBoards(id); }, [id]);
 
-  if (!id) return html`<div class="tab"><${Empty}>${t('pick a game in the library')}<//></div>`;
   const b = S.boardsCache[id];
-  if (!b || b.loading) return html`<div class="tab"><${Empty}>${t('loading...')}<//></div>`;
-  if (b.error) return html`<div class="tab"><${Empty}>${t('could not reach the client')}<//></div>`;
+  if (!b || b.loading) return html`<${Empty}>${t('loading...')}<//>`;
+  if (b.error) return html`<${Empty}>${t('could not reach the client')}<//>`;
 
   const s = S.state.value;
-  const tracking = (s && s.game.tracking) || [];
+  const tracking = (s && s.game.id === id && s.game.tracking) || [];
   const open = S.openBoards.value;
   const toggle = bid => {
     const next = new Set(open);
@@ -19,7 +19,7 @@ function BoardsTab() {
     S.openBoards.value = next;
   };
 
-  return html`<div class="tab">
+  return html`<${Fragment}>
     ${tracking.length > 0 && html`<${Eyebrow}>${t('TRACKING NOW &middot; FROM CONSOLE MEMORY')}<//>
       ${tracking.map(tr => html`<div class="row near" key=${tr.id}>
         <div class="body"><div class="t">${tr.title}</div></div>
@@ -39,5 +39,11 @@ function BoardsTab() {
         </div>
       </div>`;
     })}
-  </div>`;
+  <//>`;
+}
+
+function BoardsTab() {
+  const id = S.gameId.value;
+  if (!id) return html`<div class="tab"><${Empty}>${t('pick a game in the library')}<//></div>`;
+  return html`<div class="tab"><${BoardsBody} id=${id} /></div>`;
 }

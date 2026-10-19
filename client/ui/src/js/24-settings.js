@@ -5,8 +5,8 @@
 const settingsKey = computed(() => {
   const s = S.state.value;
   if (!s) return '';
-  const li = s.login || {}, lan = s.lan || {};
-  return [li.ok, li.user, li.webapi, lan.on, lan.url].join('|');
+  const li = s.login || {}, lan = s.lan || {}, notice = s.notice || {};
+  return [li.ok, li.user, li.webapi, lan.on, lan.url, notice.on].join('|');
 });
 
 function Msg({ text, good }) {
@@ -114,6 +114,33 @@ function LanBlock({ lan }) {
   </div>`;
 }
 
+function NoticeBlock({ notice }) {
+  const [msg, setMsg] = useState(['', true]);
+  const [busy, setBusy] = useState(false);
+
+  const flip = async () => {
+    setBusy(true); setMsg(['', true]);
+    try {
+      const r = await postForm('/notice', { on: notice.on ? '0' : '1' });
+      if (!r.ok) { setMsg([r.error || t('failed'), false]); setBusy(false); return; }
+      await refreshState();
+    } catch (err) { setMsg([t('could not reach the client'), false]); }
+    setBusy(false);
+  };
+
+  return html`<div class="block">
+    <${Eyebrow}>${t('UNLOCK ON THE TV')}<//>
+    ${notice.on
+      ? html`<div>${t('an unlock shows on the TV: the badge and the title over the game.')}</div>
+          <div class="note">${t('some games break their picture under it. Turn it off for those; unlocks still show here.')}</div>
+          <${Btn} onClick=${flip} disabled=${busy}>${t('KEEP IT OFF THE TV')}<//>`
+      : html`<div class="note">${t('unlocks show on this page only; the TV stays untouched.')}</div>
+          <${Btn} onClick=${flip} primary disabled=${busy}>${t('SHOW ON THE TV')}<//>`}
+    <${Msg} text=${msg[0]} good=${msg[1]} />
+  </div>`;
+}
+
+
 /* ABOUT: the version this client runs, the newest release on GitHub,
    and where to go with a problem. The release list includes
    prereleases, which /releases/latest leaves out. */
@@ -159,6 +186,7 @@ function SettingsTab() {
   const s = S.state.peek();
   const li = (s && s.login) || { ok: false, user: '', webapi: false };
   const lan = (s && s.lan) || { on: false, url: '' };
+  const notice = (s && s.notice) || { on: true };
 
   if (REMOTE) {
     return html`<div class="tab"><div class="set">
@@ -174,6 +202,7 @@ function SettingsTab() {
     <${AccountBlock} li=${li} />
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
+    <${NoticeBlock} notice=${notice} />
     <${AboutBlock} />
   </div></div>`;
 }

@@ -340,6 +340,22 @@ footer .clock { margin-left: auto; font: 13px var(--font-mono); color: var(--ink
 .chip.sm { padding: 4px 9px; font-size: 10px; letter-spacing: 0.06em; }
 .eyebrow .chip { text-transform: none; }
 
+/* ---- LIVE sub-navigation and the badge grid ---- */
+.subnav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 12px; }
+.subnav .sp { flex: 1; }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+.tile { width: 52px; height: 52px; border-radius: 8px; background: var(--bg-sunken); object-fit: cover; }
+.tile.done { box-shadow: 0 0 0 2px rgba(95, 211, 138, 0.6); }
+.tile.near { box-shadow: 0 0 0 2px var(--accent); }
+.tile.locked, .tile.na { filter: saturate(0.4) brightness(0.65); }
+.tile.na { opacity: 0.6; }
+/* The ring says where an unlock was earned: blue softcore, gold hardcore, half and half both. */
+.tile.done.m1, .row.done.m1 .badge { box-shadow: 0 0 0 2px var(--blue); }
+.tile.done.m2, .row.done.m2 .badge { box-shadow: 0 0 0 2px var(--gold); }
+.tile.done.m3, .row.done.m3 .badge { box-shadow: -2px -2px 0 0 var(--gold), -2px 2px 0 0 var(--gold), 2px -2px 0 0 var(--blue), 2px 2px 0 0 var(--blue); }
+.filters .sp { flex: 1; }
+
+
 /* ---- Library cards ---- */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
 .card {
@@ -634,6 +650,11 @@ const LANG = {
     "UP NEXT &middot; BY MEDIAN UNLOCK TIME": "LO SIGUIENTE &middot; POR TIEMPO MEDIANO DE DESBLOQUEO",
     "TRACKING NOW": "RASTREANDO AHORA",
     "ALL ACHIEVEMENTS": "TODOS LOS LOGROS",
+    "LEADERBOARDS": "TABLAS",
+    "LIST": "LISTA",
+    "GRID": "CUADRÍCULA",
+    "softcore": "softcore",
+    "hardcore and softcore": "hardcore y softcore",
     "unlocked": "desbloqueado",
     "not on hardware": "no disponible en hardware",
     "locked": "bloqueado",
@@ -682,6 +703,12 @@ const LANG = {
     "CLOSE TO THIS PC": "CERRAR A ESTE PC",
     "the page is reachable from this PC only. Open it to the network and any phone, tablet or second PC on the same Wi-Fi can watch this tracker.": "la página solo es accesible desde este PC. Ábrela a la red y cualquier móvil, tablet o segundo PC en la misma Wi-Fi podrá ver este seguimiento.",
     "OPEN TO THE NETWORK": "ABRIR A LA RED",
+    "UNLOCK ON THE TV": "LOGRO EN LA TV",
+    "an unlock shows on the TV: the badge and the title over the game.": "un logro aparece en la TV: la insignia y el título sobre el juego.",
+    "some games break their picture under it. Turn it off for those; unlocks still show here.": "algunos juegos rompen su imagen debajo. Apágalo para ellos; los logros siguen apareciendo aquí.",
+    "KEEP IT OFF THE TV": "NO MOSTRAR EN LA TV",
+    "unlocks show on this page only; the TV stays untouched.": "los logros aparecen solo en esta página; la TV queda intacta.",
+    "SHOW ON THE TV": "MOSTRAR EN LA TV",
     "signing in...": "entrando...",
     "failed": "falló",
     "Quit xerabora? Console telemetry and unlocks stop.": "¿Salir de xerabora? La telemetría de la consola y los desbloqueos se detienen.",
@@ -796,6 +823,11 @@ const LANG = {
     "UP NEXT &middot; BY MEDIAN UNLOCK TIME": "A SEGUIR &middot; PELO TEMPO MEDIANO DE DESBLOQUEIO",
     "TRACKING NOW": "RASTREANDO AGORA",
     "ALL ACHIEVEMENTS": "TODAS AS CONQUISTAS",
+    "LEADERBOARDS": "PLACARES",
+    "LIST": "LISTA",
+    "GRID": "GRADE",
+    "softcore": "softcore",
+    "hardcore and softcore": "hardcore e softcore",
     "unlocked": "desbloqueada",
     "not on hardware": "indisponível em hardware",
     "locked": "bloqueada",
@@ -844,6 +876,12 @@ const LANG = {
     "CLOSE TO THIS PC": "FECHAR NESTE PC",
     "the page is reachable from this PC only. Open it to the network and any phone, tablet or second PC on the same Wi-Fi can watch this tracker.": "a página só é acessível deste PC. Abra para a rede e qualquer celular, tablet ou segundo PC na mesma Wi-Fi pode acompanhar este rastreador.",
     "OPEN TO THE NETWORK": "ABRIR PARA A REDE",
+    "UNLOCK ON THE TV": "CONQUISTA NA TV",
+    "an unlock shows on the TV: the badge and the title over the game.": "uma conquista aparece na TV: o emblema e o título sobre o jogo.",
+    "some games break their picture under it. Turn it off for those; unlocks still show here.": "alguns jogos quebram a imagem embaixo dele. Desligue para esses; as conquistas continuam aparecendo aqui.",
+    "KEEP IT OFF THE TV": "NÃO MOSTRAR NA TV",
+    "unlocks show on this page only; the TV stays untouched.": "as conquistas aparecem só nesta página; a TV fica intacta.",
+    "SHOW ON THE TV": "MOSTRAR NA TV",
     "signing in...": "entrando...",
     "failed": "falhou",
     "Quit xerabora? Console telemetry and unlocks stop.": "Sair do xerabora? A telemetria do console e os desbloqueios param.",
@@ -1105,8 +1143,21 @@ const S = {
   powerOn: signal(0),           /* bumped when the console starts streaming */
   closed: signal(false),
   error: signal(''),
+  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach' or 'lb' */
+  achView: signal(loadPref('achView', 'list')),  /* 'list' or 'grid' */
   hidden: signal(loadHidden())  /* game id -> achievement ids kept out of UP NEXT */
 };
+
+/* Small per-browser choices: the LIVE sub-tab and the list or grid view. */
+function loadPref(key, def) {
+  try { return localStorage.getItem(key) || def; } catch (e) { return def; }
+}
+
+function setPref(key, val) {
+  S[key].value = val;
+  try { localStorage.setItem(key, val); } catch (e) { /* private window */ }
+}
+
 
 /* Hidden achievements live in this browser's localStorage under 'hidden'. */
 function loadHidden() {
@@ -1392,9 +1443,9 @@ function Empty({ children }) { return html`<div class="empty">${children}</div>`
 
 /* Achievement row: badge, title, description, a right column of
    lines. `state` picks the look: done, near, na, locked. */
-function AchRow({ a, state, big, right, below }) {
+function AchRow({ a, state, big, right, below, mode }) {
   const locked = state !== 'done';
-  return html`<div class=${'row ' + state + (big ? ' big' : '')}>
+  return html`<div class=${'row ' + state + (big ? ' big' : '') + (mode ? ' m' + mode : '')}>
     <img class="badge" src=${badgeUrl(a, locked)} alt="" loading="lazy" />
     <div class="body">
       <div class="t">${a.title}</div>
@@ -1602,6 +1653,7 @@ function ConsolePanel({ s }) {
   return html`<${Fragment}>
     <${Eyebrow}>${t('CONSOLE')}<//>
     ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
+    ${s.game.rp && html`<div class="banner ok">${s.game.rp}</div>`}
     <div class="stats">
       <${Cell} k=${t('LINK')} v=${c.connected ? c.ip : html`<span class="mute">${t('lost')}</span>`} />
       <${Cell} k=${t('GAME')} v=${s.game.serial || '—'} />
@@ -1677,24 +1729,72 @@ function AchievementGroups({ list, subsets, row }) {
 
 /* One row of ALL ACHIEVEMENTS; reads the achievement's live signal for
    the measured value and the progress. */
-function LiveRow({ a, missed, hidden }) {
+function LiveRow({ a, missed, hidden, med }) {
   const isDone = a.state === 2;
   /* state 3 is rc_client's disabled state: 'not on hardware'. */
   const na = a.state === 3;
   const lv = liveVal(a.id).value;
   const near = !isDone && !na && lv.p > 0;
   const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
-  return html`<${AchRow} a=${a} state=${state}
+  return html`<${AchRow} a=${a} state=${state} mode=${isDone ? a.mode : 0}
     below=${!isDone && !na && html`<${Mini} id=${a.id} />`}
     right=${html`<${Fragment}>
       ${isDone ? html`<span class="lead ok">${t('unlocked')}</span>`
         : na ? html`<span class="lead warn">${t('not on hardware')}</span>`
         : lv.m ? html`<span class="lead acc">${lv.m}</span>`
         : html`<span class="lead">${t('locked')}</span>`}
-      <${Pts} a=${a} extra=${hidden ? html`<span class="mute">${t('hidden')}</span>`
-                               : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null} />
+      <${Pts} a=${a} extra=${[isDone ? html`<${ModeTag} a=${a} />` : null,
+                               med > 0 ? '~' + medianText(med) : null,
+                               hidden ? html`<span class="mute">${t('hidden')}</span>`
+                               : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null].filter(Boolean)} />
     <//>`} />`;
 }
+
+/* Where an unlock was earned: 1 softcore, 2 hardcore, 3 both (a hardcore unlock sets both). */
+function modeText(a) {
+  return a.mode === 3 ? t('hardcore and softcore') : a.mode === 2 ? t('hardcore') : t('softcore');
+}
+function ModeTag({ a }) { return html`<span class=${a.mode >= 2 ? 'gold' : 'acc'}>${modeText(a)}</span>`; }
+
+/* The set as the site shows it: badges only, the words in the tooltip. */
+function AchTile({ a, state, tip }) {
+  return html`<img class=${'tile ' + state + (state === 'done' && a.mode ? ' m' + a.mode : '')}
+    src=${badgeUrl(a, state !== 'done')} alt=${a.title} title=${tip} loading="lazy" />`;
+}
+
+function LiveTile({ a, med, missed }) {
+  const isDone = a.state === 2, na = a.state === 3;
+  const lv = liveVal(a.id).value;
+  const near = !isDone && !na && lv.p > 0;
+  const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
+  const tip = [a.title, t('{points} pts', { points: a.points }), a.description, lv.m || '',
+               isDone ? modeText(a) : '', med > 0 ? '~' + medianText(med) : '',
+               na ? t('not on hardware') : '', missed ? t('possibly skipped') : ''].filter(Boolean).join('\n');
+  return html`<${AchTile} a=${a} state=${state} tip=${tip} />`;
+}
+
+function GameTile({ a }) {
+  const tip = [a.title, t('{points} pts', { points: a.points }), a.description,
+               a.earned ? a.earned.slice(0, 10) + ' · ' + modeText(a) : '',
+               a.median > 0 ? '~' + medianText(a.median) : ''].filter(Boolean).join('\n');
+  return html`<${AchTile} a=${a} state=${a.earned ? 'done' : 'locked'} tip=${tip} />`;
+}
+
+
+function AchievementTiles({ list, subsets, medOf, missed }) {
+  const tile = a => html`<${LiveTile} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} />`;
+  if (!subsets || subsets.length < 2) return html`<div class="tiles">${list.map(tile)}</div>`;
+  return subsets.map(sub => {
+    const mine = list.filter(a => a.subset === sub.id);
+    if (!mine.length) return null;
+    const done = mine.filter(a => a.state === 2).length;
+    return html`<${Fragment} key=${sub.id}>
+      <${Eyebrow} count=${done + ' / ' + mine.length}>${sub.title.toUpperCase()}<//>
+      <div class="tiles">${mine.map(tile)}</div>
+    <//>`;
+  });
+}
+
 
 function LiveTab() {
   const s = S.state.value;
@@ -1750,14 +1850,6 @@ function LiveTab() {
     }
   }
 
-  const trackers = (s.game.tracking || []).length
-    ? html`<${Eyebrow}>${t('TRACKING NOW')}<//>
-        ${s.game.tracking.map(tr => html`<div class="row near" key=${tr.id}>
-          <div class="body"><div class="t">${tr.title}</div></div>
-          <div class="m"><span class="lead acc">${trackVal(tr.id)}</span></div>
-        </div>`)}`
-    : null;
-
   const strip = html`<div class="stats">
     <${Cell} k=${t('ACHIEVEMENTS')} v=${done + ' / ' + list.length} />
     <${Cell} k=${t('POINTS')} v=${html`<span class="gold">${ptsDone}</span> / ${ptsAll}`} />
@@ -1767,9 +1859,22 @@ function LiveTab() {
     <${Cell} k=${t('MISSABLES LEFT')} v=${list.filter(a => a.state !== 2 && achType(a) === 'missable').length} />
   </div>`;
 
-  const row = a => html`<${LiveRow} key=${a.id} a=${a} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
+  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
 
-  const showAll = ahead || trackers || (s.game.subsets || []).length > 1;
+  const showAll = ahead || (s.game.subsets || []).length > 1;
+
+  /* Achievements and leaderboards each get a sub-tab; the achievements
+     come as the list or as the site's badge grid. Both choices stay in
+     this browser. */
+  const sub = S.liveSub.value, view = S.achView.value;
+  const nTrack = (s.game.tracking || []).length;
+  const nav = html`<div class="subnav">
+    <${Chip} on=${sub === 'ach'} onClick=${() => setPref('liveSub', 'ach')} n=${done + ' / ' + list.length}>${t('ACHIEVEMENTS')}<//>
+    <${Chip} on=${sub === 'lb'} onClick=${() => setPref('liveSub', 'lb')} n=${nTrack || null}>${t('LEADERBOARDS')}<//>
+    ${sub === 'ach' && html`<span class="sp"></span>
+      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
+      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>`}
+  </div>`;
 
   return html`<div class="tab">
     <${FollowSwitch} s=${s} />
@@ -1778,10 +1883,15 @@ function LiveTab() {
     <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll}
       icon=${(meta && lm.icon) || s.game.icon || ''} />
     ${strip}
-    ${ahead}
-    ${trackers}
-    ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
-    <${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />
+    ${nav}
+    ${sub === 'lb' ? html`<${BoardsBody} id=${s.game.id} />`
+      : html`<${Fragment}>
+          ${ahead}
+          ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
+          ${view === 'grid'
+            ? html`<${AchievementTiles} list=${list} subsets=${s.game.subsets} medOf=${medOf} missed=${missed} />`
+            : html`<${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />`}
+        <//>`}
   </div>`;
 }
 
@@ -1922,7 +2032,7 @@ function GameTab() {
   if (!g) return html`<div class="tab"><${Loading} id=${id} /></div>`;
   if (g.error) return html`<div class="tab"><${Empty}>${t('could not reach the client')}<//></div>`;
 
-  const sort = S.gameSort.value, filter = S.gameFilter.value;
+  const sort = S.gameSort.value, filter = S.gameFilter.value, view = S.achView.value;
   const all = g.achievements || [];
   const list = sortAchievements(all.filter(a =>
     filter === 'all' ? true :
@@ -1954,12 +2064,18 @@ function GameTab() {
     <div class="filters">
       ${GAME_SORTS.map(([k, label]) => html`<${Chip} key=${k} on=${sort === k}
         onClick=${() => { S.gameSort.value = k; }}>${t(label)}<//>`)}
+      <span class="sp"></span>
+      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
+      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>
     </div>
-    ${list.map(a => html`<${AchRow} key=${a.id} a=${a} state=${a.earned ? 'done' : 'locked'}
+    ${view === 'grid'
+      ? html`<div class="tiles">${list.map(a => html`<${GameTile} key=${a.id} a=${a} />`)}</div>`
+      : list.map(a => html`<${AchRow} key=${a.id} a=${a} state=${a.earned ? 'done' : 'locked'} mode=${a.earned ? a.mode : 0}
       right=${html`<${Fragment}>
         ${a.earned ? html`<span class="lead ok">${a.earned.slice(0, 10)}</span>`
                    : html`<span class="lead">${t('locked')}</span>`}
-        <${Pts} a=${a} extra=${a.median > 0 ? '~' + medianText(a.median) : null} />
+        <${Pts} a=${a} extra=${[a.earned ? html`<${ModeTag} a=${a} />` : null,
+                                a.median > 0 ? '~' + medianText(a.median) : null].filter(Boolean)} />
       <//>`} />`)}
   </div>`;
 }
@@ -1967,18 +2083,18 @@ function GameTab() {
 /* ==== 23-boards.js ==== */
 /* ---- BOARDS: leaderboards, with the live trackers on top --------------- */
 
-function BoardsTab() {
-  const id = S.gameId.value;
+/* The live trackers and the set's leaderboards; LIVE shows it for the
+   running game, BOARDS for the one picked in the library. */
+function BoardsBody({ id }) {
   S.boardsTick.value; /* re-render when a fetch lands */
   useEffect(() => { loadBoards(id); }, [id]);
 
-  if (!id) return html`<div class="tab"><${Empty}>${t('pick a game in the library')}<//></div>`;
   const b = S.boardsCache[id];
-  if (!b || b.loading) return html`<div class="tab"><${Empty}>${t('loading...')}<//></div>`;
-  if (b.error) return html`<div class="tab"><${Empty}>${t('could not reach the client')}<//></div>`;
+  if (!b || b.loading) return html`<${Empty}>${t('loading...')}<//>`;
+  if (b.error) return html`<${Empty}>${t('could not reach the client')}<//>`;
 
   const s = S.state.value;
-  const tracking = (s && s.game.tracking) || [];
+  const tracking = (s && s.game.id === id && s.game.tracking) || [];
   const open = S.openBoards.value;
   const toggle = bid => {
     const next = new Set(open);
@@ -1986,7 +2102,7 @@ function BoardsTab() {
     S.openBoards.value = next;
   };
 
-  return html`<div class="tab">
+  return html`<${Fragment}>
     ${tracking.length > 0 && html`<${Eyebrow}>${t('TRACKING NOW &middot; FROM CONSOLE MEMORY')}<//>
       ${tracking.map(tr => html`<div class="row near" key=${tr.id}>
         <div class="body"><div class="t">${tr.title}</div></div>
@@ -2006,7 +2122,13 @@ function BoardsTab() {
         </div>
       </div>`;
     })}
-  </div>`;
+  <//>`;
+}
+
+function BoardsTab() {
+  const id = S.gameId.value;
+  if (!id) return html`<div class="tab"><${Empty}>${t('pick a game in the library')}<//></div>`;
+  return html`<div class="tab"><${BoardsBody} id=${id} /></div>`;
 }
 
 /* ==== 24-settings.js ==== */
@@ -2017,8 +2139,8 @@ function BoardsTab() {
 const settingsKey = computed(() => {
   const s = S.state.value;
   if (!s) return '';
-  const li = s.login || {}, lan = s.lan || {};
-  return [li.ok, li.user, li.webapi, lan.on, lan.url].join('|');
+  const li = s.login || {}, lan = s.lan || {}, notice = s.notice || {};
+  return [li.ok, li.user, li.webapi, lan.on, lan.url, notice.on].join('|');
 });
 
 function Msg({ text, good }) {
@@ -2126,6 +2248,33 @@ function LanBlock({ lan }) {
   </div>`;
 }
 
+function NoticeBlock({ notice }) {
+  const [msg, setMsg] = useState(['', true]);
+  const [busy, setBusy] = useState(false);
+
+  const flip = async () => {
+    setBusy(true); setMsg(['', true]);
+    try {
+      const r = await postForm('/notice', { on: notice.on ? '0' : '1' });
+      if (!r.ok) { setMsg([r.error || t('failed'), false]); setBusy(false); return; }
+      await refreshState();
+    } catch (err) { setMsg([t('could not reach the client'), false]); }
+    setBusy(false);
+  };
+
+  return html`<div class="block">
+    <${Eyebrow}>${t('UNLOCK ON THE TV')}<//>
+    ${notice.on
+      ? html`<div>${t('an unlock shows on the TV: the badge and the title over the game.')}</div>
+          <div class="note">${t('some games break their picture under it. Turn it off for those; unlocks still show here.')}</div>
+          <${Btn} onClick=${flip} disabled=${busy}>${t('KEEP IT OFF THE TV')}<//>`
+      : html`<div class="note">${t('unlocks show on this page only; the TV stays untouched.')}</div>
+          <${Btn} onClick=${flip} primary disabled=${busy}>${t('SHOW ON THE TV')}<//>`}
+    <${Msg} text=${msg[0]} good=${msg[1]} />
+  </div>`;
+}
+
+
 /* ABOUT: the version this client runs, the newest release on GitHub,
    and where to go with a problem. The release list includes
    prereleases, which /releases/latest leaves out. */
@@ -2171,6 +2320,7 @@ function SettingsTab() {
   const s = S.state.peek();
   const li = (s && s.login) || { ok: false, user: '', webapi: false };
   const lan = (s && s.lan) || { on: false, url: '' };
+  const notice = (s && s.notice) || { on: true };
 
   if (REMOTE) {
     return html`<div class="tab"><div class="set">
@@ -2186,6 +2336,7 @@ function SettingsTab() {
     <${AccountBlock} li=${li} />
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
+    <${NoticeBlock} notice=${notice} />
     <${AboutBlock} />
   </div></div>`;
 }

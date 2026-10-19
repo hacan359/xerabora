@@ -79,6 +79,7 @@ function ConsolePanel({ s }) {
   return html`<${Fragment}>
     <${Eyebrow}>${t('CONSOLE')}<//>
     ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
+    ${s.game.rp && html`<div class="banner ok">${s.game.rp}</div>`}
     <div class="stats">
       <${Cell} k=${t('LINK')} v=${c.connected ? c.ip : html`<span class="mute">${t('lost')}</span>`} />
       <${Cell} k=${t('GAME')} v=${s.game.serial || '—'} />
@@ -154,24 +155,72 @@ function AchievementGroups({ list, subsets, row }) {
 
 /* One row of ALL ACHIEVEMENTS; reads the achievement's live signal for
    the measured value and the progress. */
-function LiveRow({ a, missed, hidden }) {
+function LiveRow({ a, missed, hidden, med }) {
   const isDone = a.state === 2;
   /* state 3 is rc_client's disabled state: 'not on hardware'. */
   const na = a.state === 3;
   const lv = liveVal(a.id).value;
   const near = !isDone && !na && lv.p > 0;
   const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
-  return html`<${AchRow} a=${a} state=${state}
+  return html`<${AchRow} a=${a} state=${state} mode=${isDone ? a.mode : 0}
     below=${!isDone && !na && html`<${Mini} id=${a.id} />`}
     right=${html`<${Fragment}>
       ${isDone ? html`<span class="lead ok">${t('unlocked')}</span>`
         : na ? html`<span class="lead warn">${t('not on hardware')}</span>`
         : lv.m ? html`<span class="lead acc">${lv.m}</span>`
         : html`<span class="lead">${t('locked')}</span>`}
-      <${Pts} a=${a} extra=${hidden ? html`<span class="mute">${t('hidden')}</span>`
-                               : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null} />
+      <${Pts} a=${a} extra=${[isDone ? html`<${ModeTag} a=${a} />` : null,
+                               med > 0 ? '~' + medianText(med) : null,
+                               hidden ? html`<span class="mute">${t('hidden')}</span>`
+                               : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null].filter(Boolean)} />
     <//>`} />`;
 }
+
+/* Where an unlock was earned: 1 softcore, 2 hardcore, 3 both (a hardcore unlock sets both). */
+function modeText(a) {
+  return a.mode === 3 ? t('hardcore and softcore') : a.mode === 2 ? t('hardcore') : t('softcore');
+}
+function ModeTag({ a }) { return html`<span class=${a.mode >= 2 ? 'gold' : 'acc'}>${modeText(a)}</span>`; }
+
+/* The set as the site shows it: badges only, the words in the tooltip. */
+function AchTile({ a, state, tip }) {
+  return html`<img class=${'tile ' + state + (state === 'done' && a.mode ? ' m' + a.mode : '')}
+    src=${badgeUrl(a, state !== 'done')} alt=${a.title} title=${tip} loading="lazy" />`;
+}
+
+function LiveTile({ a, med, missed }) {
+  const isDone = a.state === 2, na = a.state === 3;
+  const lv = liveVal(a.id).value;
+  const near = !isDone && !na && lv.p > 0;
+  const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
+  const tip = [a.title, t('{points} pts', { points: a.points }), a.description, lv.m || '',
+               isDone ? modeText(a) : '', med > 0 ? '~' + medianText(med) : '',
+               na ? t('not on hardware') : '', missed ? t('possibly skipped') : ''].filter(Boolean).join('\n');
+  return html`<${AchTile} a=${a} state=${state} tip=${tip} />`;
+}
+
+function GameTile({ a }) {
+  const tip = [a.title, t('{points} pts', { points: a.points }), a.description,
+               a.earned ? a.earned.slice(0, 10) + ' · ' + modeText(a) : '',
+               a.median > 0 ? '~' + medianText(a.median) : ''].filter(Boolean).join('\n');
+  return html`<${AchTile} a=${a} state=${a.earned ? 'done' : 'locked'} tip=${tip} />`;
+}
+
+
+function AchievementTiles({ list, subsets, medOf, missed }) {
+  const tile = a => html`<${LiveTile} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} />`;
+  if (!subsets || subsets.length < 2) return html`<div class="tiles">${list.map(tile)}</div>`;
+  return subsets.map(sub => {
+    const mine = list.filter(a => a.subset === sub.id);
+    if (!mine.length) return null;
+    const done = mine.filter(a => a.state === 2).length;
+    return html`<${Fragment} key=${sub.id}>
+      <${Eyebrow} count=${done + ' / ' + mine.length}>${sub.title.toUpperCase()}<//>
+      <div class="tiles">${mine.map(tile)}</div>
+    <//>`;
+  });
+}
+
 
 function LiveTab() {
   const s = S.state.value;
@@ -227,14 +276,6 @@ function LiveTab() {
     }
   }
 
-  const trackers = (s.game.tracking || []).length
-    ? html`<${Eyebrow}>${t('TRACKING NOW')}<//>
-        ${s.game.tracking.map(tr => html`<div class="row near" key=${tr.id}>
-          <div class="body"><div class="t">${tr.title}</div></div>
-          <div class="m"><span class="lead acc">${trackVal(tr.id)}</span></div>
-        </div>`)}`
-    : null;
-
   const strip = html`<div class="stats">
     <${Cell} k=${t('ACHIEVEMENTS')} v=${done + ' / ' + list.length} />
     <${Cell} k=${t('POINTS')} v=${html`<span class="gold">${ptsDone}</span> / ${ptsAll}`} />
@@ -244,9 +285,22 @@ function LiveTab() {
     <${Cell} k=${t('MISSABLES LEFT')} v=${list.filter(a => a.state !== 2 && achType(a) === 'missable').length} />
   </div>`;
 
-  const row = a => html`<${LiveRow} key=${a.id} a=${a} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
+  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
 
-  const showAll = ahead || trackers || (s.game.subsets || []).length > 1;
+  const showAll = ahead || (s.game.subsets || []).length > 1;
+
+  /* Achievements and leaderboards each get a sub-tab; the achievements
+     come as the list or as the site's badge grid. Both choices stay in
+     this browser. */
+  const sub = S.liveSub.value, view = S.achView.value;
+  const nTrack = (s.game.tracking || []).length;
+  const nav = html`<div class="subnav">
+    <${Chip} on=${sub === 'ach'} onClick=${() => setPref('liveSub', 'ach')} n=${done + ' / ' + list.length}>${t('ACHIEVEMENTS')}<//>
+    <${Chip} on=${sub === 'lb'} onClick=${() => setPref('liveSub', 'lb')} n=${nTrack || null}>${t('LEADERBOARDS')}<//>
+    ${sub === 'ach' && html`<span class="sp"></span>
+      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
+      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>`}
+  </div>`;
 
   return html`<div class="tab">
     <${FollowSwitch} s=${s} />
@@ -255,9 +309,14 @@ function LiveTab() {
     <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll}
       icon=${(meta && lm.icon) || s.game.icon || ''} />
     ${strip}
-    ${ahead}
-    ${trackers}
-    ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
-    <${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />
+    ${nav}
+    ${sub === 'lb' ? html`<${BoardsBody} id=${s.game.id} />`
+      : html`<${Fragment}>
+          ${ahead}
+          ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
+          ${view === 'grid'
+            ? html`<${AchievementTiles} list=${list} subsets=${s.game.subsets} medOf=${medOf} missed=${missed} />`
+            : html`<${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />`}
+        <//>`}
   </div>`;
 }
