@@ -85,6 +85,10 @@ void webui_set_stats(unsigned long frames, unsigned long gaps,
                      unsigned long dupes, unsigned long torn,
                      unsigned parts, unsigned bytes, unsigned addresses);
 
+/* Stores the console's link counters for the page. */
+struct snapshot_stats;
+void webui_set_hw(const struct snapshot_stats *st);
+
 /* True once a page has been open and none has been heard from for
    `grace_seconds`: the last page was closed. The main loop then exits,
    so a windowless client does not outlive its only window. */

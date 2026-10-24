@@ -68,6 +68,8 @@ struct raweb_achievement
     char type[24];              /* "progression", "missable", "win_condition", "" */
     unsigned points;
     unsigned num_awarded;       /* how many players have it */
+    unsigned num_awarded_hardcore;
+    unsigned true_ratio;        /* RetroPoints */
     unsigned display_order;     /* the set author's own ordering */
     char date_earned[32];       /* empty when locked */
     int earned_softcore;        /* DateEarned set */
@@ -92,7 +94,12 @@ struct raweb_game_progress
     unsigned awarded_hardcore;
     unsigned points_total;
     unsigned points_earned;
+    unsigned players;           /* players of the game */
 };
+
+/* Reads the account's rank and points in a game; both 0 without
+   an unlock there. */
+int raweb_user_game_rank(unsigned game_id, unsigned *rank, unsigned *score);
 
 /* A subset is a separate game on the server, titled
    "<Parent> [Subset - Name]", and the Web API has no call that lists
@@ -159,6 +166,15 @@ struct raweb_unlock
 };
 
 int raweb_game_leaderboards(unsigned game_id, struct raweb_leaderboard *rows, int max);
+
+/* One player comment on an achievement. */
+struct raweb_comment
+{
+    char user[64];
+    char date[32];      /* "YYYY-MM-DD" */
+    char text[600];
+};
+int raweb_achievement_comments(unsigned achievement_id, struct raweb_comment *rows, int max);
 int raweb_recent_unlocks(int minutes, struct raweb_unlock *rows, int max);
 
 /* The image hashes RetroAchievements knows for a game. This is what

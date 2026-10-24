@@ -252,4 +252,4 @@ jobs:
           files: out/*
           body_path: ${{ steps.notes.outputs.from_tag == 'true' && 'release_notes.md' || '' }}
           generate_release_notes: ${{ steps.notes.outputs.from_tag != 'true' }}
-          prerelease: true
+          prerelease: ${{ contains(github.ref_name, '-') }}

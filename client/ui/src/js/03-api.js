@@ -74,8 +74,8 @@ async function loadBoards(id) {
   S.boardsTick.value++;
 }
 
-/* Fetches /game for the running game and keeps its medians and types
-   by id in S.liveMeta. The answer fills S.gameCache too. */
+/* Fetches /game for the running game into S.liveMeta: medians, types,
+   rarity, RetroPoints, players and rank. */
 let liveMetaLoading = false;
 function loadLiveMeta(id) {
   if (liveMetaLoading || !id) return;
@@ -83,12 +83,31 @@ function loadLiveMeta(id) {
   getJSON('/game?id=' + id).then(g => {
     const byId = {};
     for (const a of g.achievements || [])
-      byId[a.id] = { median: a.median || 0, type: a.type || '' };
+      byId[a.id] = { median: a.median || 0, type: a.type || '', players: a.players || 0, rp: a.rp || 0, order: a.order || 0 };
     S.gameCache[id] = g;
     S.gameTick.value++;
-    S.liveMeta.value = { id, byId, icon: g.icon || '' };
+    S.liveMeta.value = { id, byId, icon: g.icon || '', game: g };
     liveMetaLoading = false;
   }).catch(() => { liveMetaLoading = false; });
+}
+
+
+/* Fetches /comments for one achievement, once. */
+async function loadComments(id) {
+  if (!id || S.commentsCache[id]) return;
+  S.commentsCache[id] = { loading: true };
+  try {
+    S.commentsCache[id] = await getJSON('/comments?id=' + id);
+  } catch (e) {
+    S.commentsCache[id] = { error: true, comments: [] };
+  }
+  S.commentsTick.value++;
+}
+
+function toggleAch(id) {
+  const open = S.openAch.value === id ? 0 : id;
+  S.openAch.value = open;
+  if (open) loadComments(open);
 }
 
 function openGame(id) {

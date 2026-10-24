@@ -18,6 +18,19 @@ struct snapshot_stats
     unsigned int count;     /* watch list entries reported by the console */
     unsigned int rxq;       /* console's receive FIFO depth, last packet */
     unsigned int rxq_max;   /* and the highest seen this session */
+
+    /* The console's link counters from the packet header; zero when
+       the console does not send them. */
+    unsigned int send_us;        /* last send time, us */
+    unsigned int send_max_us;    /* longest send time, us */
+    unsigned int send_fail;      /* failed sends */
+    unsigned int send_deferred;  /* sends put off while the network chip was busy */
+    int send_err;                /* last error code */
+    char link[8];                /* link speed and duplex, e.g. "100F" */
+    unsigned int ee_skipped;     /* frames the console skipped */
+    unsigned int console_torn;   /* broken copies the console sent again */
+    unsigned int read_cycles;    /* time the console spent reading, in ticks */
+    unsigned int frame_cycles;   /* length of a frame, in ticks */
 };
 
 /* Extracts the game serial from a packet header. Returns 1 on success. */

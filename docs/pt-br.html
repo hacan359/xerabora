@@ -29,7 +29,7 @@
   "applicationCategory": "GameApplication",
   "operatingSystem": "PlayStation 2, Windows, Linux, macOS, Android",
   "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from an ISO image or the disc, without an emulator.",
-  "softwareVersion": "0.1.0-alpha.19",
+  "softwareVersion": "1.0.0",
   "url": "https://hacan359.github.io/xerabora/",
   "downloadUrl": "https://github.com/hacan359/xerabora/releases/latest",
   "codeRepository": "https://github.com/hacan359/xerabora",
@@ -218,6 +218,12 @@
   .term .w { color: var(--term-warn); }
   .term .c { color: #5A6785; }
   .term .u { color: var(--term-unlock); font-weight: 600; }
+
+  /* Screenshots of the client on a monitor and a phone. */
+  .shot { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid #1E2F52; }
+  .hero-shot { margin-top: 0.6rem; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.8rem; }
+  @media (max-width: 800px) { .shots { grid-template-columns: 1fr; } }
 
   .demo { margin-top: 1.8rem; border: 1px solid #1E2F52; border-radius: 8px; overflow: hidden; background: #04101c; }
   .demo__bar { padding: 10px 14px; font-size: 0.82rem; color: #8FA3C7; background: #0D1A33; border-bottom: 1px solid #1E2F52; }
@@ -465,12 +471,13 @@
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v0.1.0-alpha.19</small></a>
+    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v1.0.0</small></a>
     <nav class="links" aria-label="Seções">
       <a href="#how">Como funciona</a>
       <a href="#need">What you need</a>
       <a href="#start">Como começar</a>
       <a href="#nops2">Without a PS2</a>
+      <a href="#stream">Streaming</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/hacan359/xerabora">GitHub</a>
     </nav>
@@ -488,7 +495,7 @@
         <h1>RetroAchievements on a <span>real</span> PlayStation&nbsp;2.</h1>
         <p class="lede">A patched Open PS2 Loader sends the game's memory to your PC every frame. xeRAbora checks it against the achievement set, unlocks the achievement on your RetroAchievements profile and flashes the TV gold. No emulator.</p>
         <div class="hero-cta">
-          <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Baixar alpha.19</a>
+          <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Baixar v1.0.0</a>
           <a class="btn" href="#start">Como começar</a>
         </div>
         <div class="hero-meta">
@@ -499,6 +506,7 @@
         </div>
         <p class="hero-alt"><b>No PS2 at hand?</b> The same client follows your play on any emulator with RetroAchievements. <a href="#nops2">Without a PS2</a></p>
       </div>
+      <img class="shot hero-shot" src="screenshots/console.png" width="1600" height="1000" alt="xeRAbora em um PC e em um celular enquanto o console roda Need for Speed: Underground 2">
   </div>
 </section>
 
@@ -792,7 +800,7 @@
   Rename
   Delete
 
-<span class="notice">  cliente PC encontrado em 192.168.1.10 xerabora/0.1.0-alpha.19</span>
+<span class="notice">  cliente PC encontrado em 192.168.1.10 xerabora/1.0.0</span>
 <span class="notice">  Resposta em 3 ms, console em 192.168.1.142</span></pre>
           </div>
           <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">AO VIVO</span><span class="tab">BIBLIOTECA</span><span class="tab">JOGO</span><span class="tab">PLACARES</span><span class="tab">AJUSTES</span><span class="who"><b>Hacan359</b> · <i>10 847 pontos</i></span></div>
@@ -902,6 +910,7 @@
       <h2>The same window for your emulator play.</h2>
       <p>With the console off, xeRAbora follows your RetroAchievements account: the game you are in, the unlocks as they land, what to chase next, missable warnings, your library and the leaderboards. The difference is who unlocks.</p>
     </div>
+    <img class="shot" src="screenshots/companion.png" width="1600" height="1000" loading="lazy" alt="xeRAbora acompanhando Shadow of the Colossus em um emulador, com o painel de filtros aberto no celular">
     <div class="modes">
       <div class="mode ps2">
         <span class="eyebrow gold">With the PS2 · the page turns gold</span>
@@ -952,6 +961,20 @@
     <div class="demo">
       <div class="demo__bar"><span>Experimente</span> Esta é a própria página do cliente com uma sessão gravada no lugar do console. Clique nas abas, abra um jogo pela BIBLIOTECA, mude o idioma no cabeçalho, espere o desbloqueio.</div>
       <iframe src="demo.html#lang=pt-BR" title="xeRAbora, demo ao vivo da página do cliente" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<section id="stream">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow gold">Streaming</span>
+      <h2>Uma tela limpa para o OBS.</h2>
+      <p>STREAM no cabeçalho deixa só o jogo e suas conquistas: a capa, a contagem, os pontos e depois uma lista ou uma grade com os mesmos filtros e ordens do LIVE. Dois visuais, NEON CLASSIC e 8-BIT, em SETTINGS. Cada desbloqueio aparece no canto. Capture a janela no OBS ou deixe-a em um segundo monitor.</p>
+    </div>
+    <div class="shots">
+      <img class="shot" src="screenshots/stream.png" width="1600" height="1000" loading="lazy" alt="STREAM em NEON CLASSIC como lista">
+      <img class="shot" src="screenshots/stream-8bit.png" width="1600" height="1000" loading="lazy" alt="STREAM em 8-BIT como grade, com um desbloqueio no canto">
     </div>
   </div>
 </section>

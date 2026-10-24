@@ -1,0 +1,37 @@
+/* ---- Stream view --------------------------------------------------------
+   /stream is the page as one screen: the game's head and the
+   achievements, with its own top bar and nothing else. */
+.stream { max-width: 980px; margin: 0 auto; padding-bottom: 24px; animation: fadein 0.22s var(--ease); }
+.sbar { display: flex; align-items: center; gap: 12px; padding: 4px 0 14px; }
+.sbar .sp { flex: 1; }
+.stream .head h1 { font-size: 24px; }
+.stream .row .t { font-size: 16px; }
+.stream .row.big .t { font-size: 20px; }
+
+/* The source under the title: console with its address, or emulator. */
+.src {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 10.5px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-mute); border: 1px solid var(--line-strong); padding: 4px 8px; border-radius: 999px;
+}
+.src.on { color: var(--gold); border-color: rgba(224, 165, 38, 0.55); background: rgba(224, 165, 38, 0.12); }
+.src.web { color: var(--blue-bright); border-color: rgba(52, 208, 255, 0.5); background: rgba(52, 208, 255, 0.1); }
+.src .num, .src .mute { letter-spacing: 0; text-transform: none; font-size: 11px; }
+
+/* Comments under an achievement row. */
+.row.open { margin-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.comments {
+  margin: 0 0 6px; padding: 10px 14px 12px;
+  background: var(--bg-sunken); border: 1px solid var(--line); border-top: 0;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+.comments .k { display: flex; justify-content: space-between; gap: 10px; font: 600 10px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.comments .k a { font-family: var(--font-display); letter-spacing: 0.1em; }
+.comments .cm { padding: 6px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.comments .cm:first-of-type { border-top: 0; }
+.comments .who { font: 12px var(--font-mono); margin-bottom: 2px; }
+.comments .who b { color: var(--ink); font-weight: 500; }
+.comments .txt { color: var(--ink-soft); overflow-wrap: anywhere; white-space: pre-wrap; }
+.comments .empty { padding: 4px 0; }
+
+@media (prefers-reduced-motion: reduce) { .stream { animation: none; } }

@@ -1,7 +1,7 @@
 /* ---- Tokens -------------------------------------------------------------
    Colours, radii, fonts, easing. [data-theme] on <html> swaps the whole
-   set; [data-mode] shifts the accent and the washes. The palette is the
-   project site's. */
+   set (neon is the default and the project site's palette; 8bit is in
+   60-theme-8bit.css); [data-mode] shifts the accent and the washes. */
 :root {
   color-scheme: dark;
 

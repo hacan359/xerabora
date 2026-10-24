@@ -216,7 +216,9 @@ Windows, `~/.config/xerabora` on Linux and macOS).
 
 Five tabs: **LIVE**, **LIBRARY**, **GAME**, **BOARDS** (leaderboards
 with live trackers; softcore, so no entries are posted) and **SETTINGS**
-(login, key, the network switch, the TV notice switch). The language menu sits in the header
+(login, key, the network switch, the TV notice switch, the theme: NEON
+CLASSIC or 8-BIT, kept in each browser like the language; `#theme=8bit`
+in the address does the same for one window). The language menu sits in the header
 next to your name, the FOLLOW MY PLAY switch at the top of LIVE, and the
 red QUIT button in the footer.
 
@@ -237,6 +239,7 @@ sources:
   that game, your unlocks in it, UP NEXT and the missable warnings, with
   a FOLLOWING panel: the rich presence line, the platform, whether the
   server sees you playing right now, and the unlocks of this session.
+  No clock and no hardware numbers: there is no hardware.
   New unlocks land as a toast and a sound. The client asks the Web API
   every 20 seconds. Measured progress and trackers do not exist in this
   mode; they need a memory source. The switch is FOLLOW MY PLAY at the
@@ -250,13 +253,35 @@ subsets lists each subset under its own heading. When the console goes quiet for
 link is marked lost, the session clock stops, and following takes LIVE
 back if it is on.
 
-Under the strip, ACHIEVEMENTS and LEADERBOARDS are two sub-tabs.
-ACHIEVEMENTS comes as a list, each row with its median unlock time, or
-as GRID: the badges alone, the way the site shows a set, with the words
-in the tooltip. An unlocked badge wears a ring for the mode it was
-earned in: blue softcore, gold hardcore, half and half when both.
-LEADERBOARDS lists the live trackers and the set's boards. The same
-LIST / GRID choice sits on GAME; the page remembers both.
+The source is named under the title: CONSOLE with its address, or
+EMULATOR through RetroAchievements. Under the strip, ACHIEVEMENTS and
+LEADERBOARDS are two sub-tabs, and a third, CONSOLE, while a console
+is the source. ACHIEVEMENTS has
+the same filters and orders as GAME: all, locked, unlocked, missable,
+progression, win condition; author order, progression path, median
+time, rarity. They sit in a drawer: the thin bar above the list shows
+the current choice, and FILTER slides the drawer in from the right. It comes as a list, each row with its median unlock time,
+its rarity and its RetroPoints, or as GRID: the badges alone, the way
+the site shows a set, with the words in the tooltip. A click on a row
+opens the players' comments under it, from the Web API. An unlocked
+badge wears a ring for the mode it was earned in: blue softcore, gold
+hardcore, half and half when both. LEADERBOARDS lists the live trackers
+and the set's boards. CONSOLE holds everything about the hardware: the
+link, the serial, the snapshot rate, the losses, the watch list, the
+session clock, the hash, and the console's own counters from the
+telemetry header: link mode (speed and duplex), the share of a frame
+the EE spends reading, frames the EE skipped, torn copies it caught,
+send time and errors, the receive FIFO depth. The RESET CONSOLE button
+sits there too. The same LIST / GRID choice sits on GAME; the page
+remembers both.
+
+**For a stream.** The STREAM button in the header turns the page into
+one screen: the game's head with the source named under the title
+(the console and its address, or the emulator through
+RetroAchievements), the count and the points, and the achievements
+with the same filters, orders and LIST / GRID choice as LIVE. Nothing
+else, and nothing to click but BACK TO TABS. Capture that window in
+OBS, or keep it on a second screen.
 
 **On a phone or a second screen.** The page is served to this PC only
 until you press OPEN TO THE NETWORK on SETTINGS. The tab then shows an
@@ -271,7 +296,9 @@ On a narrow screen the tabs sit along the bottom.
 **Exiting.** About 15 seconds after the last page is closed, on the PC,
 a phone or in OBS, the client exits by itself and says so in the log.
 Keep one page open while you play. The red QUIT in the footer exits at
-once. One
+once. On a machine that runs the client as a service (a home server
+under systemd, say) start it with `--server`: the pages then come and
+go and the client stays up until the service stops it. One
 copy runs at a time; a second start opens the running copy's page.
 Everything the client does is also in `xerabora.log` next to the saved
 login.
@@ -281,6 +308,7 @@ Useful flags:
 - `--console`: open a console window for this run (Windows).
 - `--logout`: forget the saved token.
 - `--port N`: listen on a different UDP port (default 18194).
+- `--server`: do not exit when the last page closes; for a service.
 - `--obs DIR`: write stream labels and `data.json` for OBS.
 - `--ui-file PATH`: serve the page from a file, for working on it.
 

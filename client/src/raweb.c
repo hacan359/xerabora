@@ -420,6 +420,7 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
     info->awarded = obj_uint(&j, 0, "NumAwardedToUser");
     info->awarded_hardcore = obj_uint(&j, 0, "NumAwardedToUserHardcore");
     info->points_total = obj_uint(&j, 0, "points_total");
+    info->players = obj_uint(&j, 0, "NumDistinctPlayers");
     info->points_earned = obj_uint(&j, 0, "UserCompletion") /* percentage, not points */ * 0;
 
     /* "Achievements" is an object keyed by achievement id, not an
@@ -453,6 +454,8 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
             obj_str(&j, e + 1, "Type", a->type, sizeof(a->type));
         a->points = obj_uint(&j, e + 1, "Points");
         a->num_awarded = obj_uint(&j, e + 1, "NumAwarded");
+        a->num_awarded_hardcore = obj_uint(&j, e + 1, "NumAwardedHardcore");
+        a->true_ratio = obj_uint(&j, e + 1, "TrueRatio");
         a->display_order = obj_uint(&j, e + 1, "DisplayOrder");
         /* Each flag follows its own date; a hardcore unlock sets both. */
         {
@@ -465,6 +468,70 @@ int raweb_game_progress(unsigned game_id, struct raweb_game_progress *info,
             if (a->date_earned[0] == '\0' && hc[0] != '\0')
                 snprintf(a->date_earned, sizeof(a->date_earned), "%s", hc);
         }
+        n++;
+    }
+
+    json_free(&j);
+    return n;
+}
+
+int raweb_user_game_rank(unsigned game_id, unsigned *rank, unsigned *score)
+{
+    struct json j;
+    char query[64];
+    int e;
+
+    *rank = 0;
+    *score = 0;
+    snprintf(query, sizeof(query), "g=%u", game_id);
+    if (!json_get_user(&j, "API_GetUserGameRankAndScore.php", query))
+        return 0;
+
+    /* Reads the account's row; the array is empty without unlocks. */
+    if (j.count < 1 || j.tok[0].type != JSMN_ARRAY) {
+        json_free(&j);
+        return 0;
+    }
+    for (e = 1; e < j.count; e++) {
+        if (j.tok[e].parent == 0 && j.tok[e].type == JSMN_OBJECT) {
+            *rank = obj_uint(&j, e, "UserRank");
+            *score = obj_uint(&j, e, "TotalScore");
+            break;
+        }
+    }
+
+    json_free(&j);
+    return *rank > 0;
+}
+
+int raweb_achievement_comments(unsigned achievement_id, struct raweb_comment *rows, int max)
+{
+    struct json j;
+    char query[64];
+    int arr, e, n = 0;
+
+    snprintf(query, sizeof(query), "i=%u&t=2&c=50", achievement_id);
+    if (!json_get(&j, "API_GetComments.php", query))
+        return 0;
+
+    arr = obj_get(&j, 0, "Results");
+    if (arr < 0 || j.tok[arr].type != JSMN_ARRAY) {
+        json_free(&j);
+        return 0;
+    }
+
+    for (e = arr + 1; e < j.count && n < max; e++) {
+        struct raweb_comment *c = &rows[n];
+
+        if (j.tok[e].parent != arr || j.tok[e].type != JSMN_OBJECT)
+            continue;
+        memset(c, 0, sizeof(*c));
+        obj_str(&j, e, "User", c->user, sizeof(c->user));
+        if (strcmp(c->user, "Server") == 0)
+            continue;
+        obj_str(&j, e, "Submitted", c->date, sizeof(c->date));
+        c->date[10] = '\0';
+        obj_str(&j, e, "CommentText", c->text, sizeof(c->text));
         n++;
     }
 

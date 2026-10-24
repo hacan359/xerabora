@@ -25,13 +25,21 @@ const S = {
   boardsCache: {},
   boardsTick: signal(0),
   openBoards: signal(new Set()),
-  liveMeta: signal({ id: 0, byId: null, icon: '' }),  /* medians for the running game */
+  liveMeta: signal({ id: 0, byId: null, icon: '', game: null }),  /* /game for the running game: medians, rarity, rank */
+  view: signal(viewFromPath(location.pathname)),   /* 'tabs' or 'stream' */
   toast: signal(null),
   powerOn: signal(0),           /* bumped when the console starts streaming */
   closed: signal(false),
   error: signal(''),
-  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach' or 'lb' */
+  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach', 'lb' or 'src' */
   achView: signal(loadPref('achView', 'list')),  /* 'list' or 'grid' */
+  theme: signal(new URLSearchParams(location.hash.slice(1)).get('theme') || loadPref('theme', 'neon')),  /* 'neon' or '8bit'; #theme= in the address sets it for this window */
+  upNext: signal(loadPref('upNext', 'open')),    /* 'open' or 'shut' */
+  liveFilter: signal('all'),
+  liveSort: signal(loadPref('liveSort', 'author')),
+  openAch: signal(0),           /* the achievement whose comments are open */
+  commentsCache: {},            /* id -> /comments answer */
+  commentsTick: signal(0),
   hidden: signal(loadHidden())  /* game id -> achievement ids kept out of UP NEXT */
 };
 
@@ -65,12 +73,20 @@ function hideAch(gameId, id) {
 
 function showHidden(gameId) { setHidden(gameId, []); }
 
+/* Switches the view and puts it in the address bar. */
+function go(view) {
+  S.view.value = view;
+  const path = view === 'tabs' ? '/' : '/' + view;
+  try { history.pushState(null, '', path + location.search + location.hash); } catch (e) { /* no history on a file: page */ }
+}
+
 /* Fast state: the numbers a delta carries every snapshot, one signal
    each. */
 const fast = {
   frames: signal(0), packets: signal(0), gaps: signal(0), dupes: signal(0), torn: signal(0),
   seconds: signal(0), rate: signal(0), loss: signal(0),
-  fSince: signal(0), fPolled: signal(-1), fSeen: signal(-1)
+  fSeen: signal(-1),
+  hw: signal({})                /* the console's own counters, see write_hw */
 };
 
 /* Measured progress per achievement and the value per tracked
@@ -122,6 +138,7 @@ function setFast(c) {
   fast.dupes.value = c.dupes || 0;
   fast.torn.value = c.torn || 0;
   fast.seconds.value = c.seconds || 0;
+  if (c.hw) fast.hw.value = c.hw;
   measure(c);
 }
 
@@ -152,8 +169,6 @@ function applyState(s) {
     setFast(c);
     setLive(s.game.achievements, s.game.tracking);
     if (f.active) {
-      fast.fSince.value = f.since || 0;
-      fast.fPolled.value = f.polled_ago >= 0 ? f.polled_ago : -1;
       fast.fSeen.value = f.rp_ago >= 0 ? f.rp_ago : -1;
     }
     S.state.value = s;
@@ -170,10 +185,16 @@ function applyState(s) {
       /* The library is dropped and fetched again on the next visit. */
       S.library.value = null;
       S.toast.value = { id: u.id, title: u.title, badge: u.badge || '', points: u.points };
+      refreshLiveMeta(s.game.id);
       setTimeout(() => { if (S.toast.value && S.toast.value.id === u.id) S.toast.value = null; }, 6000);
     }
   });
   if (s.game.id && S.liveMeta.value.id !== s.game.id) loadLiveMeta(s.game.id);
+}
+
+/* Fetches /game again 35 s after an unlock, so rarity and rank update. */
+function refreshLiveMeta(id) {
+  setTimeout(() => { if (S.liveMeta.value.id === id) loadLiveMeta(id); }, 35000);
 }
 
 function applyDelta(d) {

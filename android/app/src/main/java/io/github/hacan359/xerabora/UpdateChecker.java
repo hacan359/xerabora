@@ -28,10 +28,10 @@ import java.util.regex.Pattern;
 
 /**
  * Looks for a newer APK among the releases of the repository the app was
- * built from, pre-releases included (every xeRAbora release so far is one),
+ * built from, pre-releases included,
  * and installs it over this one. The newest release that carries an APK
  * decides: it is newer when its tag names a later version than the one
- * this build carries (v0.1.0-alpha.12 after 0.1.0-alpha.11), or, for a tag
+ * this build carries (v1.0.0 after 0.1.0-alpha.20), or, for a tag
  * ending in -r<build>, a larger build number than this versionCode.
  */
 final class UpdateChecker {

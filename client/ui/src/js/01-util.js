@@ -9,6 +9,19 @@ const REMOTE = !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(location.hos
 
 const TABS = ['live', 'library', 'game', 'boards', 'settings'];
 
+/* The looks, chosen on SETTINGS and kept in this browser. */
+const THEMES = [['neon', 'NEON CLASSIC'], ['8bit', '8-BIT']];
+
+/* The page's views, one per address: the tabs at /, the stream screen
+   at /stream. */
+const VIEWS = ['tabs', 'stream'];
+function viewFromPath(path) {
+  /* The view from the address: the last part of the path, with or
+     without .html. */
+  const p = (path || '').replace(/\/+$/, '').split('/').pop().replace(/\.html?$/, '');
+  return VIEWS.includes(p) ? p : 'tabs';
+}
+
 function hms(s) {
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
   return h + ':' + String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
@@ -89,15 +102,48 @@ function possiblyMissed(list, med) {
   return out;
 }
 
-function sortAchievements(list, order) {
-  const byAuthor = (a, b) => a.order - b.order;
+/* Sorts achievements by author, type, median or rarity; `get(a)`
+   returns a row's order, median and players. */
+function sortAchievements(list, order, get) {
+  const g = get || (a => a);
+  const byAuthor = (a, b) => (g(a).order || 0) - (g(b).order || 0);
 
   if (order === 'median')
     /* Never-unlocked-by-anyone (median 0) goes to the end. */
     return list.sort((a, b) =>
-      (a.median > 0 ? a.median : Infinity) - (b.median > 0 ? b.median : Infinity) || byAuthor(a, b));
+      (g(a).median > 0 ? g(a).median : Infinity) - (g(b).median > 0 ? g(b).median : Infinity) || byAuthor(a, b));
+  if (order === 'rarity')
+    /* Rarest first; unknown rarity last. */
+    return list.sort((a, b) =>
+      (g(a).players > 0 ? g(a).players : Infinity) - (g(b).players > 0 ? g(b).players : Infinity) || byAuthor(a, b));
   if (order === 'type')
     return list.sort((a, b) =>
       (TYPE_RANK[achType(a)] ?? 2) - (TYPE_RANK[achType(b)] ?? 2) || byAuthor(a, b));
   return list.sort(byAuthor);
+}
+
+/* Filter, order and view choices: key, label, icon, tooltip text. */
+const ACH_FILTERS = [
+  ['all', 'ALL', 'all', 'every achievement of the set'],
+  ['locked', 'LOCKED', 'lock', 'still to unlock'],
+  ['unlocked', 'UNLOCKED', 'unlock', 'already earned'],
+  ['missable', 'MISSABLE', 'warn', 'can be lost for the rest of the playthrough'],
+  ['progression', 'PROGRESSION', 'flag', 'on the path through the game'],
+  ['win_condition', 'WIN CONDITION', 'trophy', 'beats the game']];
+const ACH_SORTS = [
+  ['author', 'AUTHOR ORDER', 'list-num', 'the order the set author gave'],
+  ['type', 'PROGRESSION PATH', 'route', 'progression first, then win conditions, then the rest'],
+  ['median', 'MEDIAN TIME', 'clock', 'the order players unlock them in, by median time'],
+  ['rarity', 'RARITY', 'gem', 'rarest first, by the share of players who have it']];
+const ACH_VIEWS = [
+  ['list', 'LIST', 'rows', 'one row per achievement, with the words'],
+  ['grid', 'GRID', 'grid', 'badges only, the way the site shows a set']];
+
+/* Keeps the rows that match the filter; `done(a)` tells an unlocked row. */
+function filterAchievements(list, filter, done) {
+  return list.filter(a =>
+    filter === 'all' ? true :
+    filter === 'locked' ? !done(a) :
+    filter === 'unlocked' ? done(a) :
+    achType(a) === filter);
 }

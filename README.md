@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/v/release/hacan359/xerabora?include_prereleases&label=release" alt="Latest release"></a>
+  <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/v/release/hacan359/xerabora?label=release" alt="Latest release"></a>
   <a href="https://github.com/hacan359/xerabora/actions/workflows/build.yml"><img src="https://github.com/hacan359/xerabora/actions/workflows/build.yml/badge.svg?branch=main" alt="Build"></a>
   <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/downloads/hacan359/xerabora/total" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/runs%20on-PS2%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20macOS%20%C2%B7%20Android-555" alt="Runs on PS2, Windows, Linux, macOS, Android">
@@ -32,11 +32,13 @@ notification. No PC needed.
 **Project page:** [hacan359.github.io/xerabora](https://hacan359.github.io/xerabora/),
 the setup as a walkthrough: [How to start](https://hacan359.github.io/xerabora/#start).
 
-> [!WARNING]
-> **Experimental.** A hobby project in alpha. Use it at your own risk.
+> [!IMPORTANT]
+> **1.0.0 is the first stable release.** Still on an alpha? Update both
+> halves, the ELF on the console and the client, to 1.0.0. Alphas get no
+> more fixes, and bug reports and pull requests should start from 1.0.0.
 
 <p align="center">
-  <img src="docs/screenshots/live.png" alt="LIVE: the console session" width="720">
+  <img src="docs/screenshots/console.png" alt="LIVE on a PC and a phone while the console plays" width="720">
 </p>
 
 ## How it works
@@ -126,14 +128,18 @@ you play on an emulator: the current game, new unlocks, what to go for
 next and what you can miss. Progress inside an achievement ("3 of 10")
 and live leaderboards work only with the PS2.
 
+<p align="center">
+  <img src="docs/screenshots/companion.png" alt="LIVE following an emulator, the filter drawer open on the phone" width="720">
+</p>
+
 ## What it shows, and where the data comes from
 
 | Tab | What you see | Source | Refresh |
 |---|---|---|---|
-| **LIVE**, console streaming | The running game as the console sees it: each achievement's state, measured progress ("3 of 10"), UP NEXT by the median time other players took (HIDE drops one you gave up on and the next median takes its slot), missable warnings, live leaderboard trackers, a CONSOLE panel with the link, the snapshot rate and the losses, and a strip with points, the time the set costs and where you stand in it. Sets with subsets list each subset under its own heading. | rcheevos on the console's snapshots; medians from the Web API | every frame |
-| **LIVE**, following | The game your account is in on any emulator with RetroAchievements, the rich presence line, whether the server sees you online, this session's unlocks, UP NEXT and the missable warnings. No measured progress and no trackers: those need a memory source. | Web API (profile, recent unlocks) | every 20 s, the online flag once a minute |
+| **LIVE**, console streaming | The running game as the console sees it: each achievement's state, measured progress ("3 of 10"), its rarity among players and its RetroPoints, UP NEXT by the median time other players took (HIDE drops one you gave up on; the heading folds the block), missable warnings, the players' comments under a clicked row, live leaderboard trackers, and a strip with points, RetroPoints, your rank in the game and the time the set costs. Filters and orders (author, progression path, median time, rarity) sit in a drawer behind one thin bar. The CONSOLE sub-tab holds the link, the snapshot rate, the losses and the console's own counters: link mode, send time and errors, frames it skipped. | rcheevos on the console's snapshots; medians, rarity, rank and comments from the Web API | every frame |
+| **LIVE**, following | The game your account is in on any emulator with RetroAchievements, the rich presence line, whether the server sees you online, this session's unlocks, UP NEXT, rarity and the missable warnings. No measured progress, no trackers and no console counters: those need a memory source. | Web API (profile, recent unlocks) | every 20 s, the online flag once a minute |
 | **LIBRARY** | Every game your account has touched, up to 500: two bars per game, softcore and hardcore, the highest award in the corner of the cover, filters by status and console. Not the whole RetroAchievements catalogue: only what you have played. | Web API (completion progress) | cached 2 min |
-| **GAME** | One set in full: the author's order, the intended path (progression, win condition, missables flagged) or the median-time order; each achievement's points, unlock date and median. A game's subsets and its main set as a strip of chips, so you move between them without leaving the tab. | Web API (game info, game progression, the console's game list for subsets) | cached 30 s |
+| **GAME** | One set in full: the author's order, the intended path (progression, win condition, missables flagged), the median-time order or rarity; each achievement's points, unlock date, median, rarity and RetroPoints, and its comments on a click. The player count and your rank in the head. A game's subsets and its main set as a strip of chips, so you move between them without leaving the tab. | Web API (game info, game progression, the console's game list for subsets) | cached 30 s |
 | **BOARDS** | A game's leaderboards with the top entry and your own, and, when the console plays, the trackers moving with the game. | Web API; trackers from the console | on open |
 | **Header** | Your name and points. The language menu: English, Brazilian Portuguese, Spanish. | Web API (profile) | on load |
 
@@ -151,13 +157,16 @@ The interface is a page the client serves to itself on `localhost`,
 compiled into the executable. One copy runs at a time; a second start
 opens the running copy's page. The client exits by itself about 15
 seconds after its last page is closed, and at once from the red **QUIT**
-in the footer.
+in the footer. Run as a service, `--server` keeps it up with no page
+open.
 
 - **The look follows the source.** Idle, the page is blue-grey. While a
   console streams it turns gold and the cover spins as a disc that slows
-  and stumbles on lost snapshots. While following an emulator it turns
-  blue, with a ring around the cover.
-- **Settings** hold the account, the Web API key and the network switch.
+  on lost snapshots. While following an emulator it turns blue. The
+  source is named under the game's title: CONSOLE with its address, or
+  EMULATOR.
+- **Settings** hold the account, the Web API key, the network switch
+  and the theme: NEON CLASSIC or 8-BIT, kept per browser.
   Login is optional: the library, the game view and the boards work on
   the key alone; unlocking needs the account.
 - **FOLLOW MY PLAY** is the switch at the top of LIVE. On by default;
@@ -172,9 +181,9 @@ in the footer.
   work only from the PC that runs the client. On a narrow screen the
   tabs move to a bar along the bottom. To run the client itself on a
   phone, with no PC at all, there is the [Android app](android/README.md).
-- **Stream-ready.** OBS takes the page as a browser source; `--obs DIR`
-  writes text labels and a `data.json` for everything else. `#tab=live`
-  opens a window straight on a tab.
+- **Stream-ready.** See [Perfect for streaming](#perfect-for-streaming).
+  `--obs DIR` writes text labels and a `data.json` for a layout of your
+  own. `#tab=live` opens a window straight on a tab.
 - **Sounds** on connect, on a stream that stops for five seconds, and on
   an unlock. `--no-sound` turns them off; your own `connect.wav`,
   `disconnect.wav` or `achievement.wav` in the `sounds` folder next to
@@ -191,6 +200,29 @@ in the footer.
 <p align="center">
   <img src="docs/screenshots/library.png" alt="LIBRARY: every system, one shelf" width="470">
   <img src="docs/screenshots/phone.png" alt="LIVE on a phone" width="234">
+</p>
+
+## Perfect for streaming
+
+The **STREAM** button in the header turns the page into one clean
+screen: the game's head with a red **● LIVE** chip, the source, the
+count and the points, then the achievements, nothing else. The same
+filters, orders and LIST / GRID as LIVE stay one click away in the side
+drawer. Capture the window in OBS, or keep it on a second monitor.
+BACK TO TABS returns.
+
+- **Two looks.** NEON CLASSIC, the default, and 8-BIT: an NES palette,
+  pixel fonts, square corners and stepped progress bars.
+- **Badges as a wall.** GRID shows the set the way the site does, the
+  earned ones ringed blue for softcore, gold for hardcore.
+- **What is next.** UP NEXT ranks the locked achievements by the median
+  time other players took; the rare ones carry their share of players.
+- **The game's own line.** The rich presence line runs as a bar across
+  the top.
+
+<p align="center">
+  <img src="docs/screenshots/stream.png" alt="STREAM in NEON CLASSIC as a list" width="400">
+  <img src="docs/screenshots/stream-8bit.png" alt="STREAM in 8-BIT as a grid, with an unlock in the corner" width="400">
 </p>
 
 ## Any hardware, one protocol

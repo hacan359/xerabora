@@ -181,6 +181,17 @@ function AboutBlock() {
   </div>`;
 }
 
+/* The look of the page, per browser like the language. */
+function ThemeBlock() {
+  return html`<div class="block">
+    <${Eyebrow}>${t('THEME')}<//>
+    <div class="subsets">
+      ${THEMES.map(([k, label]) => html`<${Chip} key=${k} on=${S.theme.value === k} onClick=${() => setPref('theme', k)}>${t(label)}<//>`)}
+    </div>
+    <div class="note">${t('kept in this browser, like the language')}</div>
+  </div>`;
+}
+
 function SettingsTab() {
   settingsKey.value;
   const s = S.state.peek();
@@ -194,7 +205,8 @@ function SettingsTab() {
       <div>${tv('this page is open from {host}', { host: html`<span class="ok">${location.host}</span>` })}</div>
       <div class="note">${t('account, Web API key, the network switch and QUIT are changed on the PC that runs xerabora; from here you watch.')}</div>
       ${li.ok && html`<div style=${{ marginTop: '14px' }}>${tv('signed in as {user}', { user: html`<span class="ok">${li.user}</span>` })}</div>`}
-      <div style=${{ marginTop: '26px' }}><${AboutBlock} /></div>
+      <div style=${{ marginTop: '26px' }}><${ThemeBlock} /></div>
+      <${AboutBlock} />
     </div></div>`;
   }
 
@@ -203,6 +215,7 @@ function SettingsTab() {
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
     <${NoticeBlock} notice=${notice} />
+    <${ThemeBlock} />
     <${AboutBlock} />
   </div></div>`;
 }

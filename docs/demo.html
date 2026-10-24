@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="plain" data-mode="idle">
+<html lang="en" data-theme="neon" data-mode="idle">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,13 +7,13 @@
 <title>xeRAbora demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Press+Start+2P&family=VT323&display=swap">
 <style>
 /* ==== 00-tokens.css ==== */
 /* ---- Tokens -------------------------------------------------------------
    Colours, radii, fonts, easing. [data-theme] on <html> swaps the whole
-   set; [data-mode] shifts the accent and the washes. The palette is the
-   project site's. */
+   set (neon is the default and the project site's palette; 8bit is in
+   60-theme-8bit.css); [data-mode] shifts the accent and the washes. */
 :root {
   color-scheme: dark;
 
@@ -340,6 +340,82 @@ footer .clock { margin-left: auto; font: 13px var(--font-mono); color: var(--ink
 .chip.sm { padding: 4px 9px; font-size: 10px; letter-spacing: 0.06em; }
 .eyebrow .chip { text-transform: none; }
 
+/* ---- The filter bar and its drawer. Every button is a deck key:
+   raised, and pressed in while chosen. ---- */
+.ichip {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 7px 0; width: 38px; flex: none; border-radius: var(--radius-xs); cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, var(--bg-hover), var(--bg-raised));
+  color: var(--ink-soft);
+  font: 600 11px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 3px 0 var(--bg-sunken), 0 5px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.08s, box-shadow 0.08s, color 0.15s, background 0.15s;
+}
+.ichip.wide { width: auto; padding: 7px 12px; }
+.ichip:hover { color: var(--ink); }
+.ichip:active, .ichip.on {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--bg-sunken), inset 0 2px 6px rgba(0, 0, 0, 0.55);
+  background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line);
+}
+.ichip svg { display: block; flex: none; }
+
+.tbar { display: flex; align-items: center; gap: 8px; margin: 2px 0 14px; min-height: 36px; }
+.tbar .sp { flex: 1; }
+.tbar .cur { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-mute); font: 600 10.5px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+.tbar .cur svg { width: 15px; height: 15px; }
+@container page (max-width: 560px) { .tbar .cur span { display: none; } }
+
+.drawer-back { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.45); animation: fadein 0.15s; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 51;
+  width: min(330px, 88vw); overflow-y: auto; padding: 14px 14px 20px;
+  background: var(--bg-raised); border-left: 1px solid var(--line-strong); box-shadow: var(--shadow);
+  animation: slidein 0.2s var(--ease);
+}
+.dhead { display: flex; align-items: center; justify-content: space-between; margin: 10px 2px 8px; font: 600 11px/1 var(--font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); }
+.dhead:first-child { margin-top: 0; }
+.dkey {
+  display: grid; grid-template-columns: 22px 1fr; column-gap: 12px; align-items: center;
+  width: 100%; margin-bottom: 8px; padding: 10px 12px; text-align: left; cursor: pointer;
+  border-radius: var(--radius-xs); border: 1px solid var(--line-strong); color: var(--ink-soft);
+  background: linear-gradient(180deg, var(--bg-hover), var(--bg-raised));
+  box-shadow: 0 3px 0 var(--bg-sunken), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.08s, box-shadow 0.08s, color 0.15s, background 0.15s;
+}
+.dkey svg { grid-row: span 2; }
+.dkey .l { font: 600 11.5px/1.2 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.dkey .d { font-size: 12.5px; color: var(--ink-mute); margin-top: 2px; }
+.dkey:active, .dkey.on {
+  transform: translateY(3px); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
+  background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent);
+}
+.dkey.on .l { color: var(--accent); }
+@keyframes slidein { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .drawer, .drawer-back { animation: none; } }
+
+/* The LIVE chip: a red dot, lit while a source feeds the page. */
+.chip.live .dot { width: 8px; height: 8px; margin-right: 2px; background: var(--ink-mute); box-shadow: none; }
+.chip.live.on { color: var(--danger); border-color: rgba(255, 107, 107, 0.55); background: rgba(255, 107, 107, 0.1); }
+.chip.live.on .dot { background: var(--danger); box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2), 0 0 10px var(--danger); }
+
+/* The rich presence line: a flat bar across the column above the cover. */
+.rpbar {
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 -20px 16px; padding: 9px 20px;
+  background: var(--bg-sunken); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  font: 13.5px var(--font-mono); color: var(--ink); overflow-wrap: anywhere;
+}
+.rpbar .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+@container page (max-width: 560px) { .rpbar { margin-left: -14px; margin-right: -14px; padding-left: 14px; padding-right: 14px; } }
+
+/* A section label that folds its block: the chevron turns when shut. */
+.eyebrow.fold { cursor: pointer; user-select: none; }
+.eyebrow.fold:hover { color: var(--ink-soft); }
+.eyebrow.fold svg { width: 14px; height: 14px; flex: none; transition: transform 0.15s; }
+.eyebrow.fold.shut svg { transform: rotate(-90deg); }
+
 /* ---- LIVE sub-navigation and the badge grid ---- */
 .subnav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 12px; }
 .subnav .sp { flex: 1; }
@@ -489,7 +565,6 @@ input.f:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3p
 @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes toastin { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(224, 165, 38, 0.2), 0 0 14px var(--gold); } 50% { box-shadow: 0 0 0 7px rgba(224, 165, 38, 0.08), 0 0 22px var(--gold); } }
-@keyframes ring { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.35); opacity: 0; } }
 @keyframes sweep {
   0% { background-position: 180% 0; opacity: 0; }
   10% { opacity: 1; }
@@ -513,9 +588,8 @@ input.f:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3p
 }
 
 /* The disc: the cover in .face, which JS rotates; .iris and .grooves
-   turn with it. .sheen, .rim and .hole are outside .face and stay put.
-   .stall darkens the face and lights the hole red. */
-.disc { position: relative; width: 96px; height: 96px; flex: none; border-radius: 50%; box-shadow: var(--shadow), 0 0 24px var(--accent-glow); transition: box-shadow var(--mode-t); }
+   turn with it. .sheen, .rim and .hole are outside .face and stay put. */
+.disc { position: relative; width: 96px; height: 96px; flex: none; border-radius: 50%; box-shadow: var(--shadow); }
 .disc .face { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; background: var(--bg-sunken); will-change: transform; }
 .disc .face img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .disc .iris {
@@ -541,26 +615,141 @@ input.f:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3p
   border-radius: 50%; background: var(--bg);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22), 0 0 0 5px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.8);
 }
-.disc.stall .face { filter: brightness(0.7) contrast(1.1); }
-.disc.stall .hole { box-shadow: 0 0 0 2px var(--danger), 0 0 0 5px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.8); }
-
-/* Following: the cover with a ring that grows and fades on a loop. */
-.cover-wrap { position: relative; flex: none; }
-.cover-wrap .ring { position: absolute; inset: -2px; border-radius: 16px; border: 2px solid var(--accent); animation: ring 2.4s ease-out infinite; pointer-events: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .poweron, .cover-wrap .ring { display: none; }
+  .poweron { display: none; }
   .tab { animation: none; }
   :root[data-mode="console"] .dot.on { animation: none; }
   .bar i, .mini i { transition: none; }
 }
+
+/* ==== 50-stream.css ==== */
+/* ---- Stream view --------------------------------------------------------
+   /stream is the page as one screen: the game's head and the
+   achievements, with its own top bar and nothing else. */
+.stream { max-width: 980px; margin: 0 auto; padding-bottom: 24px; animation: fadein 0.22s var(--ease); }
+.sbar { display: flex; align-items: center; gap: 12px; padding: 4px 0 14px; }
+.sbar .sp { flex: 1; }
+.stream .head h1 { font-size: 24px; }
+.stream .row .t { font-size: 16px; }
+.stream .row.big .t { font-size: 20px; }
+
+/* The source under the title: console with its address, or emulator. */
+.src {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 10.5px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-mute); border: 1px solid var(--line-strong); padding: 4px 8px; border-radius: 999px;
+}
+.src.on { color: var(--gold); border-color: rgba(224, 165, 38, 0.55); background: rgba(224, 165, 38, 0.12); }
+.src.web { color: var(--blue-bright); border-color: rgba(52, 208, 255, 0.5); background: rgba(52, 208, 255, 0.1); }
+.src .num, .src .mute { letter-spacing: 0; text-transform: none; font-size: 11px; }
+
+/* Comments under an achievement row. */
+.row.open { margin-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.comments {
+  margin: 0 0 6px; padding: 10px 14px 12px;
+  background: var(--bg-sunken); border: 1px solid var(--line); border-top: 0;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+.comments .k { display: flex; justify-content: space-between; gap: 10px; font: 600 10px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.comments .k a { font-family: var(--font-display); letter-spacing: 0.1em; }
+.comments .cm { padding: 6px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.comments .cm:first-of-type { border-top: 0; }
+.comments .who { font: 12px var(--font-mono); margin-bottom: 2px; }
+.comments .who b { color: var(--ink); font-weight: 500; }
+.comments .txt { color: var(--ink-soft); overflow-wrap: anywhere; white-space: pre-wrap; }
+.comments .empty { padding: 4px 0; }
+
+@media (prefers-reduced-motion: reduce) { .stream { animation: none; } }
+
+/* ==== 60-theme-8bit.css ==== */
+/* ---- Theme: 8-bit ------------------------------------------------------
+   NES palette, square corners, hard shadows, pixel fonts, stepped bars.
+   font-size-adjust scales the pixel fonts to the sizes the rules use. */
+:root[data-theme="8bit"] {
+  --bg: #0D0D1A;
+  --bg-raised: #1A1A33;
+  --bg-sunken: #000000;
+  --bg-hover: #26264D;
+  --line: #3C3C78;
+  --line-strong: #6464B4;
+  --ink: #FCFCFC;
+  --ink-soft: #BCBCFC;
+  --ink-mute: #8484C8;
+
+  --blue: #3CBCFC;
+  --blue-bright: #68E8FC;
+  --gold: #F8B800;
+  --ok: #58D854;
+  --warn: #FCA044;
+  --danger: #F83800;
+
+  --accent: #F878F8;
+  --accent-ink: #000000;
+  --accent-soft: rgba(248, 120, 248, 0.16);
+  --accent-line: #F878F8;
+  --accent-glow: transparent;
+  --bar: #F878F8;
+  --wash-blue: 0;
+  --wash-gold: 0;
+
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-xs: 0;
+  --shadow: 4px 4px 0 #000000;
+
+  --font-display: "Press Start 2P", "Courier New", monospace;
+  --font-body: "VT323", "Courier New", monospace;
+  --font-mono: "VT323", "Courier New", monospace;
+}
+/* Every rule's font shorthand resets font-size-adjust, so it is set on
+   every element. */
+:root[data-theme="8bit"] * { font-size-adjust: 0.5 !important; }
+:root[data-theme="8bit"][data-mode="console"] { --accent: var(--gold); --accent-soft: rgba(248, 184, 0, 0.16); --accent-line: var(--gold); --bar: var(--gold); }
+:root[data-theme="8bit"][data-mode="follow"] { --accent: var(--blue); --accent-soft: rgba(60, 188, 252, 0.16); --accent-line: var(--blue); --bar: var(--blue); }
+
+/* A scanline grid behind the page instead of the washes. */
+:root[data-theme="8bit"] body { background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px); background-size: 100% 3px; }
+
+/* Hard edges: 2 px borders and offset shadows, no blur. */
+:root[data-theme="8bit"] .row, :root[data-theme="8bit"] .cell, :root[data-theme="8bit"] .card,
+:root[data-theme="8bit"] .switch, :root[data-theme="8bit"] .banner, :root[data-theme="8bit"] .comments {
+  border-width: 2px; box-shadow: 3px 3px 0 #000000;
+}
+:root[data-theme="8bit"] .chip, :root[data-theme="8bit"] .btn, :root[data-theme="8bit"] .mode,
+:root[data-theme="8bit"] .src, :root[data-theme="8bit"] .award { border-radius: 0; border-width: 2px; }
+:root[data-theme="8bit"] .ichip, :root[data-theme="8bit"] .dkey { border-width: 2px; background: var(--bg-raised); box-shadow: 0 4px 0 #000000; }
+:root[data-theme="8bit"] .ichip:active, :root[data-theme="8bit"] .ichip.on,
+:root[data-theme="8bit"] .dkey:active, :root[data-theme="8bit"] .dkey.on { transform: translateY(4px); box-shadow: none; background: var(--accent); color: var(--accent-ink); }
+:root[data-theme="8bit"] .dkey.on .l, :root[data-theme="8bit"] .dkey.on .d { color: var(--accent-ink); }
+:root[data-theme="8bit"] .drawer { border-left-width: 3px; box-shadow: -6px 0 0 #000000; }
+:root[data-theme="8bit"] .dot, :root[data-theme="8bit"] .rpbar .dot { border-radius: 0; box-shadow: none; }
+:root[data-theme="8bit"] .eyebrow, :root[data-theme="8bit"] .cell .k, :root[data-theme="8bit"] .chip,
+:root[data-theme="8bit"] nav.tabs button, :root[data-theme="8bit"] .btn { letter-spacing: 0.02em; }
+:root[data-theme="8bit"] .row .t { font-family: var(--font-display); font-weight: 400; line-height: 1.5; }
+
+/* Stepped progress bars. */
+:root[data-theme="8bit"] .bar, :root[data-theme="8bit"] .mini { border-radius: 0; border-width: 2px; }
+:root[data-theme="8bit"] .bar i, :root[data-theme="8bit"] .mini i,
+:root[data-theme="8bit"] .bar.sc i, :root[data-theme="8bit"] .bar.hc i {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--bar) 0 6px, transparent 6px 8px);
+}
+:root[data-theme="8bit"] .bar.sc i { --bar: var(--blue); }
+:root[data-theme="8bit"] .bar.hc i { --bar: var(--gold); }
+
+/* Badges without smoothing. */
+:root[data-theme="8bit"] .badge, :root[data-theme="8bit"] .tile, :root[data-theme="8bit"] .cover,
+:root[data-theme="8bit"] .toast img { image-rendering: pixelated; border-radius: 0; }
+:root[data-theme="8bit"] .toast { border-radius: 0; border-width: 3px; box-shadow: 6px 6px 0 #000000; }
+:root[data-theme="8bit"] .tile.done.m3, :root[data-theme="8bit"] .row.done.m3 .badge { box-shadow: 0 0 0 2px var(--gold); }
 
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-const DEMO_VERSION = '0.1.0-alpha.19';
+const DEMO_VERSION = '1.0.0';
 /* The recorded session behind docs/demo.html: one NFS Underground 2
    run, replayed by faking the client's own endpoints. Nothing here
    talks to a PC or a console. tools/make-demo.py joins this with
@@ -844,6 +1033,60 @@ const LANG = {
     "RELEASES": "VERSIONES",
     "PROJECT PAGE": "PÁGINA DEL PROYECTO",
     "Built on Open PS2 Loader, rcheevos and ps2sdk. The Android app by MrRexD. The PC client is MIT; the OPL fork keeps OPL's AFL 3.0.": "Hecho sobre Open PS2 Loader, rcheevos y ps2sdk. La app de Android es de MrRexD. El cliente de PC es MIT; el fork de OPL mantiene la AFL 3.0 de OPL.",
+    "STREAM": "STREAM",
+    "BACK TO TABS": "VOLVER A LAS PESTANAS",
+    "compact view for a stream or a second screen": "vista compacta para un stream o una segunda pantalla",
+    "RETROPOINTS": "RETROPOINTS",
+    "RANK IN GAME": "RANGO EN EL JUEGO",
+    "RP {n}": "RP {n}",
+    "{pct}% of players": "{pct}% de los jugadores",
+    "following via RetroAchievements": "siguiendo vía RetroAchievements",
+    "rank #{n}": "rango #{n}",
+    "{n} players": "{n} jugadores",
+    "HARDWARE": "HARDWARE",
+    "LINK MODE": "MODO DE ENLACE",
+    "EE READ": "LECTURA EE",
+    "EE SKIPPED": "SALTADOS POR EE",
+    "TORN ON CONSOLE": "ROTOS EN CONSOLA",
+    "SEND TIME": "TIEMPO DE ENVIO",
+    "SEND ERRORS": "ERRORES DE ENVIO",
+    "RX FIFO": "FIFO RX",
+    "LAST ERROR": "ULTIMO ERROR",
+    "no link": "sin enlace",
+    "full duplex": "dúplex completo",
+    "half duplex": "semidúplex",
+    "{us} us &middot; max {mx} us": "{us} us &middot; máx {mx} us",
+    "{fail} failed &middot; {sk} deferred": "{fail} fallidos &middot; {sk} aplazados",
+    "{q} now &middot; max {mx}": "{q} ahora &middot; máx {mx}",
+    "RARITY": "RAREZA",
+    "nothing matches": "nada coincide",
+    "COMMENTS": "COMENTARIOS",
+    "no player comments yet": "aún sin comentarios de jugadores",
+    "EMULATOR": "EMULADOR",
+    "via RetroAchievements": "vía RetroAchievements",
+    "every achievement of the set": "todos los logros del set",
+    "still to unlock": "aún por desbloquear",
+    "already earned": "ya conseguidos",
+    "can be lost for the rest of the playthrough": "se puede perder para el resto de la partida",
+    "on the path through the game": "en el camino por el juego",
+    "beats the game": "termina el juego",
+    "the order the set author gave": "el orden que dio el autor del set",
+    "progression first, then win conditions, then the rest": "progresión primero, luego condiciones de victoria, luego el resto",
+    "the order players unlock them in, by median time": "el orden en que los jugadores los desbloquean, por tiempo mediano",
+    "rarest first, by the share of players who have it": "los más raros primero, por la parte de jugadores que lo tienen",
+    "one row per achievement, with the words": "una fila por logro, con el texto",
+    "badges only, the way the site shows a set": "solo insignias, como muestra el set la web",
+    "OFFLINE": "DESCONECTADO",
+    "THEME": "TEMA",
+    "NEON CLASSIC": "NEÓN CLÁSICO",
+    "8-BIT": "8 BITS",
+    "kept in this browser, like the language": "se guarda en este navegador, como el idioma",
+    "FILTER": "FILTRO",
+    "ORDER": "ORDEN",
+    "CLOSE": "CERRAR",
+    "filter and order": "filtro y orden",
+    "show UP NEXT": "mostrar LO SIGUIENTE",
+    "hide UP NEXT": "ocultar LO SIGUIENTE",
   },
   "pt-BR": {
     "LIVE": "AO VIVO",
@@ -1017,6 +1260,60 @@ const LANG = {
     "RELEASES": "VERSÕES",
     "PROJECT PAGE": "PÁGINA DO PROJETO",
     "Built on Open PS2 Loader, rcheevos and ps2sdk. The Android app by MrRexD. The PC client is MIT; the OPL fork keeps OPL's AFL 3.0.": "Feito sobre Open PS2 Loader, rcheevos e ps2sdk. O app de Android é do MrRexD. O cliente de PC é MIT; o fork do OPL mantém a AFL 3.0 do OPL.",
+    "STREAM": "STREAM",
+    "BACK TO TABS": "VOLTAR ÀS ABAS",
+    "compact view for a stream or a second screen": "visão compacta para uma stream ou uma segunda tela",
+    "RETROPOINTS": "RETROPOINTS",
+    "RANK IN GAME": "POSIÇÃO NO JOGO",
+    "RP {n}": "RP {n}",
+    "{pct}% of players": "{pct}% dos jogadores",
+    "following via RetroAchievements": "seguindo via RetroAchievements",
+    "rank #{n}": "posição #{n}",
+    "{n} players": "{n} jogadores",
+    "HARDWARE": "HARDWARE",
+    "LINK MODE": "MODO DO LINK",
+    "EE READ": "LEITURA EE",
+    "EE SKIPPED": "PULADOS PELO EE",
+    "TORN ON CONSOLE": "RASGADOS NO CONSOLE",
+    "SEND TIME": "TEMPO DE ENVIO",
+    "SEND ERRORS": "ERROS DE ENVIO",
+    "RX FIFO": "FIFO RX",
+    "LAST ERROR": "ÚLTIMO ERRO",
+    "no link": "sem link",
+    "full duplex": "full duplex",
+    "half duplex": "half duplex",
+    "{us} us &middot; max {mx} us": "{us} us &middot; máx {mx} us",
+    "{fail} failed &middot; {sk} deferred": "{fail} falhas &middot; {sk} adiados",
+    "{q} now &middot; max {mx}": "{q} agora &middot; máx {mx}",
+    "RARITY": "RARIDADE",
+    "nothing matches": "nada corresponde",
+    "COMMENTS": "COMENTÁRIOS",
+    "no player comments yet": "ainda sem comentários de jogadores",
+    "EMULATOR": "EMULADOR",
+    "via RetroAchievements": "via RetroAchievements",
+    "every achievement of the set": "todas as conquistas do set",
+    "still to unlock": "ainda por desbloquear",
+    "already earned": "já conquistadas",
+    "can be lost for the rest of the playthrough": "pode ser perdida pelo resto da jogatina",
+    "on the path through the game": "no caminho pelo jogo",
+    "beats the game": "termina o jogo",
+    "the order the set author gave": "a ordem que o autor do set deu",
+    "progression first, then win conditions, then the rest": "progressão primeiro, depois condições de vitória, depois o resto",
+    "the order players unlock them in, by median time": "a ordem em que os jogadores desbloqueiam, pelo tempo mediano",
+    "rarest first, by the share of players who have it": "mais raras primeiro, pela parcela de jogadores que a têm",
+    "one row per achievement, with the words": "uma linha por conquista, com o texto",
+    "badges only, the way the site shows a set": "só os emblemas, como o site mostra um set",
+    "OFFLINE": "OFFLINE",
+    "THEME": "TEMA",
+    "NEON CLASSIC": "NEON CLÁSSICO",
+    "8-BIT": "8 BITS",
+    "kept in this browser, like the language": "fica salvo neste navegador, como o idioma",
+    "FILTER": "FILTRO",
+    "ORDER": "ORDEM",
+    "CLOSE": "FECHAR",
+    "filter and order": "filtro e ordem",
+    "show UP NEXT": "mostrar A SEGUIR",
+    "hide UP NEXT": "ocultar A SEGUIR",
   },
 };
 
@@ -1090,6 +1387,19 @@ const MEDIA = 'https://media.retroachievements.org';
 const REMOTE = false;
 
 const TABS = ['live', 'library', 'game', 'boards', 'settings'];
+
+/* The looks, chosen on SETTINGS and kept in this browser. */
+const THEMES = [['neon', 'NEON CLASSIC'], ['8bit', '8-BIT']];
+
+/* The page's views, one per address: the tabs at /, the stream screen
+   at /stream. */
+const VIEWS = ['tabs', 'stream'];
+function viewFromPath(path) {
+  /* The view from the address: the last part of the path, with or
+     without .html. */
+  const p = (path || '').replace(/\/+$/, '').split('/').pop().replace(/\.html?$/, '');
+  return VIEWS.includes(p) ? p : 'tabs';
+}
 
 function hms(s) {
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
@@ -1171,17 +1481,50 @@ function possiblyMissed(list, med) {
   return out;
 }
 
-function sortAchievements(list, order) {
-  const byAuthor = (a, b) => a.order - b.order;
+/* Sorts achievements by author, type, median or rarity; `get(a)`
+   returns a row's order, median and players. */
+function sortAchievements(list, order, get) {
+  const g = get || (a => a);
+  const byAuthor = (a, b) => (g(a).order || 0) - (g(b).order || 0);
 
   if (order === 'median')
     /* Never-unlocked-by-anyone (median 0) goes to the end. */
     return list.sort((a, b) =>
-      (a.median > 0 ? a.median : Infinity) - (b.median > 0 ? b.median : Infinity) || byAuthor(a, b));
+      (g(a).median > 0 ? g(a).median : Infinity) - (g(b).median > 0 ? g(b).median : Infinity) || byAuthor(a, b));
+  if (order === 'rarity')
+    /* Rarest first; unknown rarity last. */
+    return list.sort((a, b) =>
+      (g(a).players > 0 ? g(a).players : Infinity) - (g(b).players > 0 ? g(b).players : Infinity) || byAuthor(a, b));
   if (order === 'type')
     return list.sort((a, b) =>
       (TYPE_RANK[achType(a)] ?? 2) - (TYPE_RANK[achType(b)] ?? 2) || byAuthor(a, b));
   return list.sort(byAuthor);
+}
+
+/* Filter, order and view choices: key, label, icon, tooltip text. */
+const ACH_FILTERS = [
+  ['all', 'ALL', 'all', 'every achievement of the set'],
+  ['locked', 'LOCKED', 'lock', 'still to unlock'],
+  ['unlocked', 'UNLOCKED', 'unlock', 'already earned'],
+  ['missable', 'MISSABLE', 'warn', 'can be lost for the rest of the playthrough'],
+  ['progression', 'PROGRESSION', 'flag', 'on the path through the game'],
+  ['win_condition', 'WIN CONDITION', 'trophy', 'beats the game']];
+const ACH_SORTS = [
+  ['author', 'AUTHOR ORDER', 'list-num', 'the order the set author gave'],
+  ['type', 'PROGRESSION PATH', 'route', 'progression first, then win conditions, then the rest'],
+  ['median', 'MEDIAN TIME', 'clock', 'the order players unlock them in, by median time'],
+  ['rarity', 'RARITY', 'gem', 'rarest first, by the share of players who have it']];
+const ACH_VIEWS = [
+  ['list', 'LIST', 'rows', 'one row per achievement, with the words'],
+  ['grid', 'GRID', 'grid', 'badges only, the way the site shows a set']];
+
+/* Keeps the rows that match the filter; `done(a)` tells an unlocked row. */
+function filterAchievements(list, filter, done) {
+  return list.filter(a =>
+    filter === 'all' ? true :
+    filter === 'locked' ? !done(a) :
+    filter === 'unlocked' ? done(a) :
+    achType(a) === filter);
 }
 
 /* ==== 02-store.js ==== */
@@ -1212,13 +1555,21 @@ const S = {
   boardsCache: {},
   boardsTick: signal(0),
   openBoards: signal(new Set()),
-  liveMeta: signal({ id: 0, byId: null, icon: '' }),  /* medians for the running game */
+  liveMeta: signal({ id: 0, byId: null, icon: '', game: null }),  /* /game for the running game: medians, rarity, rank */
+  view: signal(viewFromPath(location.pathname)),   /* 'tabs' or 'stream' */
   toast: signal(null),
   powerOn: signal(0),           /* bumped when the console starts streaming */
   closed: signal(false),
   error: signal(''),
-  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach' or 'lb' */
+  liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach', 'lb' or 'src' */
   achView: signal(loadPref('achView', 'list')),  /* 'list' or 'grid' */
+  theme: signal(new URLSearchParams(location.hash.slice(1)).get('theme') || loadPref('theme', 'neon')),  /* 'neon' or '8bit'; #theme= in the address sets it for this window */
+  upNext: signal(loadPref('upNext', 'open')),    /* 'open' or 'shut' */
+  liveFilter: signal('all'),
+  liveSort: signal(loadPref('liveSort', 'author')),
+  openAch: signal(0),           /* the achievement whose comments are open */
+  commentsCache: {},            /* id -> /comments answer */
+  commentsTick: signal(0),
   hidden: signal(loadHidden())  /* game id -> achievement ids kept out of UP NEXT */
 };
 
@@ -1252,12 +1603,20 @@ function hideAch(gameId, id) {
 
 function showHidden(gameId) { setHidden(gameId, []); }
 
+/* Switches the view and puts it in the address bar. */
+function go(view) {
+  S.view.value = view;
+  const path = view === 'tabs' ? '/' : '/' + view;
+  try { history.pushState(null, '', path + location.search + location.hash); } catch (e) { /* no history on a file: page */ }
+}
+
 /* Fast state: the numbers a delta carries every snapshot, one signal
    each. */
 const fast = {
   frames: signal(0), packets: signal(0), gaps: signal(0), dupes: signal(0), torn: signal(0),
   seconds: signal(0), rate: signal(0), loss: signal(0),
-  fSince: signal(0), fPolled: signal(-1), fSeen: signal(-1)
+  fSeen: signal(-1),
+  hw: signal({})                /* the console's own counters, see write_hw */
 };
 
 /* Measured progress per achievement and the value per tracked
@@ -1309,6 +1668,7 @@ function setFast(c) {
   fast.dupes.value = c.dupes || 0;
   fast.torn.value = c.torn || 0;
   fast.seconds.value = c.seconds || 0;
+  if (c.hw) fast.hw.value = c.hw;
   measure(c);
 }
 
@@ -1339,8 +1699,6 @@ function applyState(s) {
     setFast(c);
     setLive(s.game.achievements, s.game.tracking);
     if (f.active) {
-      fast.fSince.value = f.since || 0;
-      fast.fPolled.value = f.polled_ago >= 0 ? f.polled_ago : -1;
       fast.fSeen.value = f.rp_ago >= 0 ? f.rp_ago : -1;
     }
     S.state.value = s;
@@ -1357,10 +1715,16 @@ function applyState(s) {
       /* The library is dropped and fetched again on the next visit. */
       S.library.value = null;
       S.toast.value = { id: u.id, title: u.title, badge: u.badge || '', points: u.points };
+      refreshLiveMeta(s.game.id);
       setTimeout(() => { if (S.toast.value && S.toast.value.id === u.id) S.toast.value = null; }, 6000);
     }
   });
   if (s.game.id && S.liveMeta.value.id !== s.game.id) loadLiveMeta(s.game.id);
+}
+
+/* Fetches /game again 35 s after an unlock, so rarity and rank update. */
+function refreshLiveMeta(id) {
+  setTimeout(() => { if (S.liveMeta.value.id === id) loadLiveMeta(id); }, 35000);
 }
 
 function applyDelta(d) {
@@ -1447,8 +1811,8 @@ async function loadBoards(id) {
   S.boardsTick.value++;
 }
 
-/* Fetches /game for the running game and keeps its medians and types
-   by id in S.liveMeta. The answer fills S.gameCache too. */
+/* Fetches /game for the running game into S.liveMeta: medians, types,
+   rarity, RetroPoints, players and rank. */
 let liveMetaLoading = false;
 function loadLiveMeta(id) {
   if (liveMetaLoading || !id) return;
@@ -1456,12 +1820,31 @@ function loadLiveMeta(id) {
   getJSON('/game?id=' + id).then(g => {
     const byId = {};
     for (const a of g.achievements || [])
-      byId[a.id] = { median: a.median || 0, type: a.type || '' };
+      byId[a.id] = { median: a.median || 0, type: a.type || '', players: a.players || 0, rp: a.rp || 0, order: a.order || 0 };
     S.gameCache[id] = g;
     S.gameTick.value++;
-    S.liveMeta.value = { id, byId, icon: g.icon || '' };
+    S.liveMeta.value = { id, byId, icon: g.icon || '', game: g };
     liveMetaLoading = false;
   }).catch(() => { liveMetaLoading = false; });
+}
+
+
+/* Fetches /comments for one achievement, once. */
+async function loadComments(id) {
+  if (!id || S.commentsCache[id]) return;
+  S.commentsCache[id] = { loading: true };
+  try {
+    S.commentsCache[id] = await getJSON('/comments?id=' + id);
+  } catch (e) {
+    S.commentsCache[id] = { error: true, comments: [] };
+  }
+  S.commentsTick.value++;
+}
+
+function toggleAch(id) {
+  const open = S.openAch.value === id ? 0 : id;
+  S.openAch.value = open;
+  if (open) loadComments(open);
 }
 
 function openGame(id) {
@@ -1515,11 +1898,77 @@ function Chip({ on, onClick, children, n, cls, title }) {
 
 function Empty({ children }) { return html`<div class="empty">${children}</div>`; }
 
+/* Line icons, 24-unit grid, stroked with the current colour. */
+const ICONS = {
+  'all': 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  'lock': 'M6 11V8a6 6 0 0 1 12 0v3M5 11h14v10H5zM12 15v3',
+  'unlock': 'M6 11V8a6 6 0 0 1 11.5-2.3M5 11h14v10H5zM12 15v3',
+  'warn': 'M12 3 2.5 20h19zM12 10v4M12 17v.5',
+  'flag': 'M5 21V4M5 4h12l-3 4 3 4H5',
+  'trophy': 'M8 4h8v5a4 4 0 0 1-8 0zM8 6H4a4 4 0 0 0 4 4M16 6h4a4 4 0 0 1-4 4M12 13v4M8 21h8M9 17h6',
+  'list-num': 'M4 6h2M4 12h2M4 18h2M9 6h11M9 12h11M9 18h11',
+  'route': 'M4 19h5a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h11M17 4l3 3-3 3',
+  'clock': 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2',
+  'gem': 'M7 3h10l4 6-9 12L3 9zM3 9h18M9 9l3 12M15 9l-3 12',
+  'rows': 'M4 6h16M4 12h16M4 18h16',
+  'grid': 'M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z',
+  'sliders': 'M4 7h10M18 7h2M14 5v4M4 17h4M12 17h8M8 15v4M4 12h16',
+  'close': 'M6 6l12 12M18 6 6 18',
+  'chevron': 'M6 9l6 6 6-6'
+};
+function Icon({ name }) {
+  return html`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ICONS[name] || ''} /></svg>`;
+}
+
+/* The filter bar: a button that opens the drawer, the current filter
+   and order, LIST / GRID. */
+function ToolsBar({ filter, sort, view, onFilter, onSort, onView }) {
+  const [open, setOpen] = useState(false);
+  const f = ACH_FILTERS.find(x => x[0] === filter) || ACH_FILTERS[0];
+  const o = ACH_SORTS.find(x => x[0] === sort) || ACH_SORTS[0];
+  const changed = filter !== 'all' || sort !== 'author';
+  const tip = x => t(x[1]) + ' — ' + t(x[3]);
+  return html`<div class="tbar">
+    <button type="button" class=${'ichip sm wide' + (changed ? ' on' : '')} onClick=${() => setOpen(true)}
+      title=${t('filter and order')}><${Icon} name="sliders" /><span>${t('FILTER')}</span></button>
+    <span class="cur" title=${tip(f)}><${Icon} name=${f[2]} /><span>${t(f[1])}</span></span>
+    <span class="cur" title=${tip(o)}><${Icon} name=${o[2]} /><span>${t(o[1])}</span></span>
+    <span class="sp"></span>
+    ${ACH_VIEWS.map(x => html`<button key=${x[0]} type="button" class=${'ichip sm' + (view === x[0] ? ' on' : '')}
+      title=${tip(x)} aria-label=${t(x[1])} onClick=${() => onView(x[0])}><${Icon} name=${x[2]} /></button>`)}
+    ${open && html`<${Drawer} filter=${filter} sort=${sort} onFilter=${onFilter} onSort=${onSort} onClose=${() => setOpen(false)} />`}
+  </div>`;
+}
+
+/* The drawer with the filters and the orders; closes on Esc, a click
+   outside or the cross. */
+function Drawer({ filter, sort, onFilter, onSort, onClose }) {
+  useEffect(() => {
+    const k = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, []);
+  const keys = (items, on, pick) => items.map(([k, label, icon, text]) => html`<button key=${k} type="button"
+    class=${'dkey' + (k === on ? ' on' : '')} onClick=${() => pick(k)}>
+    <${Icon} name=${icon} /><span class="l">${t(label)}</span><span class="d">${t(text)}</span></button>`);
+  return html`<${Fragment}>
+    <div class="drawer-back" onClick=${onClose} />
+    <aside class="drawer" role="dialog" aria-label=${t('filter and order')}>
+      <div class="dhead"><span>${t('FILTER')}</span>
+        <button type="button" class="ichip sm" onClick=${onClose} title=${t('CLOSE')} aria-label=${t('CLOSE')}><${Icon} name="close" /></button></div>
+      ${keys(ACH_FILTERS, filter, onFilter)}
+      <div class="dhead"><span>${t('ORDER')}</span></div>
+      ${keys(ACH_SORTS, sort, onSort)}
+    </aside>
+  <//>`;
+}
+
 /* Achievement row: badge, title, description, a right column of
    lines. `state` picks the look: done, near, na, locked. */
-function AchRow({ a, state, big, right, below, mode }) {
+function AchRow({ a, state, big, right, below, mode, open, onClick }) {
   const locked = state !== 'done';
-  return html`<div class=${'row ' + state + (big ? ' big' : '') + (mode ? ' m' + mode : '')}>
+  return html`<div class=${'row ' + state + (big ? ' big' : '') + (mode ? ' m' + mode : '') + (onClick ? ' clickable' : '') + (open ? ' open' : '')}
+      onClick=${onClick}>
     <img class="badge" src=${badgeUrl(a, locked)} alt="" loading="lazy" />
     <div class="body">
       <div class="t">${a.title}</div>
@@ -1527,6 +1976,25 @@ function AchRow({ a, state, big, right, below, mode }) {
       ${below}
     </div>
     <div class="m">${right}</div>
+  </div>
+  ${open && html`<${Comments} id=${a.id} />`}`;
+}
+
+/* The players' comments under an achievement row. */
+function Comments({ id }) {
+  S.commentsTick.value;
+  const c = S.commentsCache[id];
+  const list = c && c.comments ? c.comments : [];
+  return html`<div class="comments" onClick=${e => e.stopPropagation()}>
+    <div class="k">${t('COMMENTS')}
+      <a href=${'https://retroachievements.org/achievement/' + id} target="_blank" rel="noopener">${t('on retroachievements.org')}</a></div>
+    ${!c || c.loading ? html`<div class="empty">${t('loading...')}</div>`
+      : c.error ? html`<div class="empty">${t('could not reach the client')}</div>`
+      : !list.length ? html`<div class="empty">${t('no player comments yet')}</div>`
+      : list.slice(-12).reverse().map((m, i) => html`<div class="cm" key=${i}>
+          <div class="who"><b>${m.user}</b> <span class="mute">${m.date}</span></div>
+          <div class="txt">${m.text}</div>
+        </div>`)}
   </div>`;
 }
 
@@ -1562,7 +2030,7 @@ function Btn({ children, onClick, primary, danger, sm, disabled, type, id }) {
 
 /* The disc: the cover turned by a requestAnimationFrame loop. Speed
    follows the snapshot rate; the loss share slows it; each new gap
-   knocks the speed down for a moment and lights the hole red. */
+   knocks the speed down for a moment. */
 function Disc({ src }) {
   const face = useRef();
   const disc = useRef();
@@ -1571,7 +2039,7 @@ function Disc({ src }) {
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (still) return undefined;
     let angle = 0, last = performance.now(), raf = 0;
-    let gaps = fast.gaps.peek(), kick = 0, stalled = false;
+    let gaps = fast.gaps.peek(), kick = 0;
 
     const loop = now => {
       const dt = Math.min(0.1, (now - last) / 1000);
@@ -1587,12 +2055,6 @@ function Disc({ src }) {
       const speed = base * (1 - 0.75 * fast.loss.peek()) * (1 - 0.92 * kick);
       angle = (angle + speed * dt) % 360;
       if (face.current) face.current.style.transform = 'rotate(' + angle.toFixed(2) + 'deg)';
-
-      const stall = kick > 0.35;
-      if (stall !== stalled && disc.current) {
-        disc.current.classList.toggle('stall', stall);
-        stalled = stall;
-      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -1609,13 +2071,10 @@ function Disc({ src }) {
 }
 
 /* The cover of the game on LIVE: a disc while the console streams, a
-   still cover with a signal ring while following, plain otherwise. */
+   still cover otherwise. */
 function Cover({ src }) {
-  const m = mode.value;
-  if (m === 'console') return html`<${Disc} src=${src} />`;
-  const img = src ? html`<img class="cover" src=${src} alt="" />` : html`<div class="cover" />`;
-  if (m === 'follow') return html`<div class="cover-wrap">${img}<div class="ring" /></div>`;
-  return img;
+  if (mode.value === 'console') return html`<${Disc} src=${src} />`;
+  return src ? html`<img class="cover" src=${src} alt="" />` : html`<div class="cover" />`;
 }
 
 function Toast() {
@@ -1663,8 +2122,6 @@ const framesText = computed(() => {
             : t('{packets} packets', { packets: fast.packets.value.toLocaleString() });
 });
 const sessionText = computed(() => fast.seconds.value ? hms(fast.seconds.value) : '—');
-const fSinceText = computed(() => fast.fSince.value ? hms(fast.fSince.value) : '—');
-const fPolledText = computed(() => fast.fPolled.value >= 0 ? agoText(fast.fPolled.value) : '—');
 
 /* FOLLOW MY PLAY: hidden on REMOTE and without a Web API key. Posts
    /follow and fetches the state again. */
@@ -1711,13 +2168,45 @@ async function resetConsole() {
   } catch (err) { alert(t('The client did not answer.')); }
 }
 
+/* The pipeline status and the rich presence bar. */
+function LiveBanners({ s }) {
+  const c = s.console;
+  const st = c.connected || c.packets ? STATUS[c.status] : null;
+  const f = s.follow || {};
+  const rp = s.game.rp || (f.active ? f.rp : '');
+  return html`<${Fragment}>
+    ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
+    ${rp && html`<div class="rpbar"><span class="dot" />${rp}</div>`}
+  <//>`;
+}
+
+/* The console's own numbers from the telemetry header. */
+function Hardware() {
+  const h = fast.hw.value || {};
+  const has = h.link || h.send_us || h.ee_share || h.rxq_max;
+  if (!has) return null;
+  const link = h.link ? (h.link.slice(0, 3) === '999' ? t('no link') : parseInt(h.link, 10) + ' Mbit ' + (h.link[3] === 'F' ? t('full duplex') : t('half duplex'))) : '—';
+  return html`<${Fragment}>
+    <${Eyebrow}>${t('HARDWARE')}<//>
+    <div class="stats">
+      <${Cell} k=${t('LINK MODE')} v=${link} />
+      <${Cell} k=${t('EE READ')} v=${h.ee_share > 0 ? h.ee_share.toFixed(1) + ' %' : '—'} />
+      <${Cell} k=${t('EE SKIPPED')} v=${h.ee_skipped || 0} />
+      <${Cell} k=${t('TORN ON CONSOLE')} v=${h.console_torn || 0} />
+      <${Cell} k=${t('SEND TIME')} v=${lines(t('{us} us &middot; max {mx} us', { us: h.send_us || 0, mx: h.send_max_us || 0 }))} />
+      <${Cell} k=${t('SEND ERRORS')} v=${lines(t('{fail} failed &middot; {sk} deferred', { fail: h.send_fail || 0, sk: h.send_deferred || 0 }))} cls=${h.send_fail ? 'warn' : ''} />
+      <${Cell} k=${t('RX FIFO')} v=${lines(t('{q} now &middot; max {mx}', { q: h.rxq || 0, mx: h.rxq_max || 0 }))} />
+      <${Cell} k=${t('LAST ERROR')} v=${h.send_err ? h.send_err : '—'} />
+    </div>
+  <//>`;
+}
+
 /* CONSOLE panel: link, serial, counters, watch list, session clock. */
 function ConsolePanel({ s }) {
   const c = s.console;
   if (!c.connected && !c.packets) return null;
   if (!c.connected && (s.follow || {}).active) return null;
 
-  const st = STATUS[c.status];
   const w = c.watch || {};
   const watch = w.addresses
     ? lines(t('{addresses} addr &middot; {bytes} B &middot; {parts} parts',
@@ -1726,8 +2215,6 @@ function ConsolePanel({ s }) {
 
   return html`<${Fragment}>
     <${Eyebrow}>${t('CONSOLE')}<//>
-    ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
-    ${s.game.rp && html`<div class="banner ok">${s.game.rp}</div>`}
     <div class="stats">
       <${Cell} k=${t('LINK')} v=${c.connected ? c.ip : html`<span class="mute">${t('lost')}</span>`} />
       <${Cell} k=${t('GAME')} v=${s.game.serial || '—'} />
@@ -1737,6 +2224,7 @@ function ConsolePanel({ s }) {
       <${Cell} k=${t('SESSION')} v=${sessionText} />
     </div>
     ${s.game.hash && html`<div class="hash">${t('hash {hash}', { hash: s.game.hash })}</div>`}
+    <${Hardware} />
     ${!REMOTE && c.connected && html`<div class="subsets"><${Btn} danger sm onClick=${resetConsole}>${t('RESET CONSOLE')}<//></div>`}
   <//>`;
 }
@@ -1752,13 +2240,11 @@ function FollowPanel({ s }) {
 
   return html`<${Fragment}>
     <${Eyebrow}>${t('FOLLOWING')}<//>
-    <div class="banner ok">${f.rp ? f.rp : t('no rich presence line yet')}</div>
+    ${!f.rp && html`<div class="banner">${t('no rich presence line yet')}</div>`}
     <div class="stats">
       <${Cell} k=${t('PLATFORM')} v=${s.game.console || '—'} />
       <${Cell} k=${t('LAST SEEN')} v=${seen} />
       <${Cell} k=${t('SOURCE')} v=${t('RetroAchievements &middot; every 20 s')} />
-      <${Cell} k=${t('POLLED')} v=${fPolledText} />
-      <${Cell} k=${t('SESSION')} v=${fSinceText} />
       <${Cell} k=${t('UNLOCKS')} v=${session.length} />
     </div>
     ${f.failures ? html`<div class="note warn">${t('the Web API is not answering; retrying')}</div>` : null}
@@ -1772,6 +2258,16 @@ function FollowPanel({ s }) {
   <//>`;
 }
 
+/* Names the source under the title: the console with its address,
+   or the emulator. */
+function SourceTag({ s }) {
+  const c = s.console || {}, f = s.follow || {};
+  if (c.connected) return html`<span class="src on">${t('CONSOLE')} <span class="num">${c.ip}</span></span>`;
+  if (f.active) return html`<span class="src web">${t('EMULATOR')} <span class="mute">${t('via RetroAchievements')}</span></span>`;
+  if (c.packets) return html`<span class="src">${t('CONSOLE')} <span class="mute">${t('lost')}</span></span>`;
+  return null;
+}
+
 /* The game's head: cover, title, progress bar, counts. */
 function LiveHead({ s, list, done, ptsDone, ptsAll, icon }) {
   return html`<div class="head">
@@ -1780,6 +2276,7 @@ function LiveHead({ s, list, done, ptsDone, ptsAll, icon }) {
       <h1>${s.game.title || s.game.serial}</h1>
       <${Bar} value=${pct(done, list.length)} />
       <div class="sub">
+        <${SourceTag} s=${s} />
         <span>${s.game.checked_only ? t('from an image check, not from a running game') : (s.game.serial || s.game.console || '')}</span>
         <span class="right"><b>${done}</b> / ${list.length} <span class="mute">·</span> <span class="gold">${ptsDone}</span><span class="mute"> / ${t('{points} pts', { points: ptsAll })}</span></span>
       </div>
@@ -1803,7 +2300,7 @@ function AchievementGroups({ list, subsets, row }) {
 
 /* One row of ALL ACHIEVEMENTS; reads the achievement's live signal for
    the measured value and the progress. */
-function LiveRow({ a, missed, hidden, med }) {
+function LiveRow({ a, missed, hidden, med, lm }) {
   const isDone = a.state === 2;
   /* state 3 is rc_client's disabled state: 'not on hardware'. */
   const na = a.state === 3;
@@ -1811,6 +2308,7 @@ function LiveRow({ a, missed, hidden, med }) {
   const near = !isDone && !na && lv.p > 0;
   const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
   return html`<${AchRow} a=${a} state=${state} mode=${isDone ? a.mode : 0}
+    open=${S.openAch.value === a.id} onClick=${() => toggleAch(a.id)}
     below=${!isDone && !na && html`<${Mini} id=${a.id} />`}
     right=${html`<${Fragment}>
       ${isDone ? html`<span class="lead ok">${t('unlocked')}</span>`
@@ -1818,6 +2316,7 @@ function LiveRow({ a, missed, hidden, med }) {
         : lv.m ? html`<span class="lead acc">${lv.m}</span>`
         : html`<span class="lead">${t('locked')}</span>`}
       <${Pts} a=${a} extra=${[isDone ? html`<${ModeTag} a=${a} />` : null,
+                               ...rarityExtras(lm, a),
                                med > 0 ? '~' + medianText(med) : null,
                                hidden ? html`<span class="mute">${t('hidden')}</span>`
                                : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null].filter(Boolean)} />
@@ -1870,15 +2369,93 @@ function AchievementTiles({ list, subsets, medOf, missed }) {
 }
 
 
+/* Everything the achievement views need, computed once per render. */
+function liveModel(s) {
+  const list = s.game.achievements || [];
+  const done = list.filter(a => a.state === 2).length;
+  const ptsDone = list.filter(a => a.state === 2).reduce((n, a) => n + (a.points || 0), 0);
+  const ptsAll = list.reduce((n, a) => n + (a.points || 0), 0);
+  const lm = S.liveMeta.value;
+  const meta = lm.id === s.game.id ? lm.byId : null;
+  const lmeta = meta ? lm : null;
+  const medOf = a => meta ? ((meta[a.id] || {}).median || 0) : 0;
+  const missed = meta ? possiblyMissed(list, medOf) : new Set();
+  const position = meta ? Math.max(0, ...list.filter(a => a.state === 2).map(medOf)) : 0;
+  const est = meta ? setEstimates(list, medOf) : null;
+  const rpDone = list.filter(a => a.state === 2).reduce((n, a) => n + rpOf(lmeta, a), 0);
+  const rank = lmeta && lm.game && lm.game.rank && lm.game.rank.rank > 0 ? lm.game.rank.rank : 0;
+  const hidden = new Set(S.hidden.value[s.game.id] || []);
+  const icon = (meta && lm.icon) || s.game.icon || '';
+  return { list, done, ptsDone, ptsAll, lm, meta, lmeta, medOf, missed, position, est, rpDone, rank, hidden, icon };
+}
+
+/* The achievement block: filter bar, UP NEXT, then the list or the
+   grid. LIVE and STREAM both draw it. */
+function AchBlock({ s, m }) {
+  const { list, done, meta, lm, lmeta, medOf, missed, position, hidden } = m;
+
+  /* UP NEXT: the nearest locked achievements by median, drawn big.
+     Hidden ones are left out and the next median takes the slot; the
+     chip in the label brings them all back. */
+  let ahead = null;
+  if (meta) {
+    const picked = upNextPick(list.filter(a => !hidden.has(a.id)), medOf);
+    const restore = hidden.size > 0
+      ? html`<span class="chip sm" onClick=${() => showHidden(s.game.id)}>${t('{n} hidden', { n: hidden.size })} · ${t('SHOW ALL')}</span>`
+      : null;
+    const shut = S.upNext.value === 'shut';
+    if (picked.next.length || restore) {
+      ahead = html`<h2 class=${'eyebrow fold' + (shut ? ' shut' : '')} onClick=${() => setPref('upNext', shut ? 'open' : 'shut')}
+          title=${shut ? t('show UP NEXT') : t('hide UP NEXT')}>
+          <${Icon} name="chevron" />${t('UP NEXT &middot; BY MEDIAN UNLOCK TIME')}
+          <span class="count" onClick=${e => e.stopPropagation()}>${shut ? picked.next.length : restore}</span></h2>
+        ${!shut && picked.next.map(a => html`<${AchRow} key=${a.id} a=${a} state="near" big
+          open=${S.openAch.value === a.id} onClick=${() => toggleAch(a.id)}
+          below=${html`<${Mini} id=${a.id} />`}
+          right=${html`<${Fragment}>
+            <${Measured} id=${a.id} />
+            ${a === picked.prog && html`<span class="tag acc">${t('next in progression')}</span>`}
+            ${missed.has(a.id) ? html`<span class="tag warn">${t('possibly skipped')}</span>`
+              : medOf(a) <= position ? html`<span class="tag warn">${t('usually done by now')}</span>` : null}
+            <${Pts} a=${a} extra=${[...rarityExtras(lmeta, a), '~' + medianText(medOf(a))]} />
+            <span class="hide" onClick=${e => { e.stopPropagation(); hideAch(s.game.id, a.id); }} title=${t('hide from UP NEXT')}>✕ ${t('HIDE')}</span>
+          <//>`} />`)}`;
+    }
+  }
+
+  /* A filter or an order other than the author's shows one list
+     without subset headings. */
+  const filter = S.liveFilter.value, sort = S.liveSort.value, view = S.achView.value;
+  const plain = filter === 'all' && sort === 'author';
+  const getMeta = a => (meta && meta[a.id]) || {};
+  const shown = plain ? list
+    : sortAchievements(filterAchievements(list.slice(), filter, a => a.state === 2), sort, getMeta);
+  const showAll = !!ahead || (plain && (s.game.subsets || []).length > 1);
+  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} lm=${lmeta} />`;
+
+  return html`<${Fragment}>
+    <${ToolsBar} filter=${filter} sort=${sort} view=${view}
+      onFilter=${k => { S.liveFilter.value = k; }} onSort=${k => setPref('liveSort', k)} onView=${k => setPref('achView', k)} />
+    ${ahead}
+    ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
+    ${!shown.length ? html`<${Empty}>${t('nothing matches')}<//>`
+      : view === 'grid'
+      ? html`<${AchievementTiles} list=${shown} subsets=${plain ? s.game.subsets : null} medOf=${medOf} missed=${missed} />`
+      : html`<${AchievementGroups} list=${shown} subsets=${plain ? s.game.subsets : null} row=${row} />`}
+  <//>`;
+}
+
 function LiveTab() {
   const s = S.state.value;
   if (!s) return html`<${Empty}>${t('loading...')}<//>`;
 
   const list = s.game.achievements || [];
   const f = s.follow || {};
+  const c = s.console || {};
 
   if (!list.length) {
     return html`<div class="tab">
+      <${LiveBanners} s=${s} />
       <${FollowSwitch} s=${s} /><${ConsolePanel} s=${s} />
       <${Empty}>${s.console.connected
         ? t('console connected, waiting for a game with achievements')
@@ -1888,84 +2465,40 @@ function LiveTab() {
     </div>`;
   }
 
-  const done = list.filter(a => a.state === 2).length;
-  const ptsDone = list.filter(a => a.state === 2).reduce((n, a) => n + (a.points || 0), 0);
-  const ptsAll = list.reduce((n, a) => n + (a.points || 0), 0);
-
-  const lm = S.liveMeta.value;
-  const meta = lm.id === s.game.id ? lm.byId : null;
-  const medOf = a => meta ? ((meta[a.id] || {}).median || 0) : 0;
-  const missed = meta ? possiblyMissed(list, medOf) : new Set();
-  const position = meta ? Math.max(0, ...list.filter(a => a.state === 2).map(medOf)) : 0;
-  const est = meta ? setEstimates(list, medOf) : null;
-
-  /* UP NEXT: the nearest locked achievements by median, drawn big.
-     Hidden ones are left out and the next median takes the slot; the
-     chip in the label brings them all back. */
-  const hidden = new Set(S.hidden.value[s.game.id] || []);
-  let ahead = null;
-  if (meta) {
-    const picked = upNextPick(list.filter(a => !hidden.has(a.id)), medOf);
-    const restore = hidden.size > 0
-      ? html`<span class="chip sm" onClick=${() => showHidden(s.game.id)}>${t('{n} hidden', { n: hidden.size })} · ${t('SHOW ALL')}</span>`
-      : null;
-    if (picked.next.length || restore) {
-      ahead = html`<${Eyebrow} count=${restore}>${t('UP NEXT &middot; BY MEDIAN UNLOCK TIME')}<//>
-        ${picked.next.map(a => html`<${AchRow} key=${a.id} a=${a} state="near" big
-          below=${html`<${Mini} id=${a.id} />`}
-          right=${html`<${Fragment}>
-            <${Measured} id=${a.id} />
-            ${a === picked.prog && html`<span class="tag acc">${t('next in progression')}</span>`}
-            ${missed.has(a.id) ? html`<span class="tag warn">${t('possibly skipped')}</span>`
-              : medOf(a) <= position ? html`<span class="tag warn">${t('usually done by now')}</span>` : null}
-            <${Pts} a=${a} extra=${'~' + medianText(medOf(a))} />
-            <span class="hide" onClick=${() => hideAch(s.game.id, a.id)} title=${t('hide from UP NEXT')}>✕ ${t('HIDE')}</span>
-          <//>`} />`)}`;
-    }
-  }
+  const m = liveModel(s);
+  const { done, ptsDone, ptsAll, est, position, rpDone, rank } = m;
 
   const strip = html`<div class="stats">
     <${Cell} k=${t('ACHIEVEMENTS')} v=${done + ' / ' + list.length} />
     <${Cell} k=${t('POINTS')} v=${html`<span class="gold">${ptsDone}</span> / ${ptsAll}`} />
+    <${Cell} k=${t('RETROPOINTS')} v=${rpDone > 0 ? rpDone.toLocaleString() : '—'} />
+    <${Cell} k=${t('RANK IN GAME')} v=${rank ? '#' + rank.toLocaleString() : '—'} />
     <${Cell} k=${t('BEATEN AT')} v=${est && est.beaten ? '~' + medianText(est.beaten) : '—'} />
     <${Cell} k=${t('FULL SET AT')} v=${est && est.full ? '~' + medianText(est.full) : '—'} />
     <${Cell} k=${t('YOUR POSITION')} v=${position ? '~' + medianText(position) : '—'} />
     <${Cell} k=${t('MISSABLES LEFT')} v=${list.filter(a => a.state !== 2 && achType(a) === 'missable').length} />
   </div>`;
 
-  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
-
-  const showAll = ahead || (s.game.subsets || []).length > 1;
-
-  /* Achievements and leaderboards each get a sub-tab; the achievements
-     come as the list or as the site's badge grid. Both choices stay in
-     this browser. */
-  const sub = S.liveSub.value, view = S.achView.value;
+  /* Sub-tabs: achievements, leaderboards, and the console while a
+     console is the source. */
+  const sub = S.liveSub.value;
+  const hasConsole = !!(c.connected || (c.packets && !f.active));
   const nTrack = (s.game.tracking || []).length;
   const nav = html`<div class="subnav">
     <${Chip} on=${sub === 'ach'} onClick=${() => setPref('liveSub', 'ach')} n=${done + ' / ' + list.length}>${t('ACHIEVEMENTS')}<//>
     <${Chip} on=${sub === 'lb'} onClick=${() => setPref('liveSub', 'lb')} n=${nTrack || null}>${t('LEADERBOARDS')}<//>
-    ${sub === 'ach' && html`<span class="sp"></span>
-      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
-      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>`}
+    ${hasConsole && html`<${Chip} on=${sub === 'src'} onClick=${() => setPref('liveSub', 'src')} n=${c.connected ? c.ip : null}>${t('CONSOLE')}<//>`}
   </div>`;
 
   return html`<div class="tab">
+    <${LiveBanners} s=${s} />
     <${FollowSwitch} s=${s} />
-    <${FollowPanel} s=${s} />
-    <${ConsolePanel} s=${s} />
-    <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll}
-      icon=${(meta && lm.icon) || s.game.icon || ''} />
+    <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll} icon=${m.icon} />
     ${strip}
     ${nav}
     ${sub === 'lb' ? html`<${BoardsBody} id=${s.game.id} />`
-      : html`<${Fragment}>
-          ${ahead}
-          ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
-          ${view === 'grid'
-            ? html`<${AchievementTiles} list=${list} subsets=${s.game.subsets} medOf=${medOf} missed=${missed} />`
-            : html`<${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />`}
-        <//>`}
+      : sub === 'src' && hasConsole ? html`<${ConsolePanel} s=${s} />`
+      : html`<${Fragment}><${FollowPanel} s=${s} /><${AchBlock} s=${s} m=${m} /><//>`}
   </div>`;
 }
 
@@ -2062,10 +2595,6 @@ function LibraryTab() {
 /* ==== 22-game.js ==== */
 /* ---- GAME: one set in full, from the Web API --------------------------- */
 
-const GAME_FILTERS = [['all', 'ALL'], ['locked', 'LOCKED'], ['unlocked', 'UNLOCKED'],
-                      ['missable', 'MISSABLE'], ['progression', 'PROGRESSION'],
-                      ['win_condition', 'WIN CONDITION']];
-const GAME_SORTS = [['author', 'AUTHOR ORDER'], ['type', 'PROGRESSION PATH'], ['median', 'MEDIAN TIME']];
 
 /* The base game and its subsets as chips, the open one lit. A click
    opens that game id. */
@@ -2108,12 +2637,11 @@ function GameTab() {
 
   const sort = S.gameSort.value, filter = S.gameFilter.value, view = S.achView.value;
   const all = g.achievements || [];
-  const list = sortAchievements(all.filter(a =>
-    filter === 'all' ? true :
-    filter === 'locked' ? !a.earned :
-    filter === 'unlocked' ? !!a.earned :
-    achType(a) === filter), sort);
+  const list = sortAchievements(filterAchievements(all, filter, a => !!a.earned), sort);
   const est = setEstimates(all, a => a.median || 0);
+  const players = g.distinct_players || 0;
+  const rar = a => players && a.players ? a.players * 100 / players : 0;
+  const rank = g.rank && g.rank.rank > 0 ? g.rank.rank : 0;
 
   return html`<div class="tab">
     <div class="head">
@@ -2122,6 +2650,8 @@ function GameTab() {
         <h1>${g.title}${lib && awardBadge(lib) && html` <span class="h1-award">${awardBadge(lib)}</span>`}</h1>
         <div class="note" style=${{ marginBottom: '10px' }}>
           ${g.console} · ${t('{n} achievements', { n: all.length })}
+          ${players > 0 && html` · ${t('{n} players', { n: players.toLocaleString() })}`}
+          ${rank > 0 && html` · <span class="gold">${t('rank #{n}', { n: rank.toLocaleString() })}</span>`}
           ${est.full > 0 && html` · <span class="acc">${est.beaten > 0 && t('beaten ~{time}', { time: medianText(est.beaten) }) + ' · '}${t('full set ~{time}', { time: medianText(est.full) })}</span> <span class="mute">${t('by median unlocks')}</span>`}
         </div>
         <${Bars} labels awarded=${g.awarded} hardcore=${lib ? lib.hardcore : 0} total=${g.total} />
@@ -2131,24 +2661,18 @@ function GameTab() {
       </div>
     </div>
     <${Family} g=${g} />
-    <div class="filters">
-      ${GAME_FILTERS.map(([k, label]) => html`<${Chip} key=${k} on=${filter === k}
-        onClick=${() => { S.gameFilter.value = k; }}>${t(label)}<//>`)}
-    </div>
-    <div class="filters">
-      ${GAME_SORTS.map(([k, label]) => html`<${Chip} key=${k} on=${sort === k}
-        onClick=${() => { S.gameSort.value = k; }}>${t(label)}<//>`)}
-      <span class="sp"></span>
-      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
-      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>
-    </div>
+    <${ToolsBar} filter=${filter} sort=${sort} view=${view}
+      onFilter=${k => { S.gameFilter.value = k; }} onSort=${k => { S.gameSort.value = k; }} onView=${k => setPref('achView', k)} />
     ${view === 'grid'
       ? html`<div class="tiles">${list.map(a => html`<${GameTile} key=${a.id} a=${a} />`)}</div>`
       : list.map(a => html`<${AchRow} key=${a.id} a=${a} state=${a.earned ? 'done' : 'locked'} mode=${a.earned ? a.mode : 0}
+      open=${S.openAch.value === a.id} onClick=${() => toggleAch(a.id)}
       right=${html`<${Fragment}>
         ${a.earned ? html`<span class="lead ok">${a.earned.slice(0, 10)}</span>`
                    : html`<span class="lead">${t('locked')}</span>`}
         <${Pts} a=${a} extra=${[a.earned ? html`<${ModeTag} a=${a} />` : null,
+                                rar(a) > 0 ? rarityText(rar(a)) : null,
+                                a.rp > 0 ? t('RP {n}', { n: a.rp }) : null,
                                 a.median > 0 ? '~' + medianText(a.median) : null].filter(Boolean)} />
       <//>`} />`)}
   </div>`;
@@ -2389,6 +2913,17 @@ function AboutBlock() {
   </div>`;
 }
 
+/* The look of the page, per browser like the language. */
+function ThemeBlock() {
+  return html`<div class="block">
+    <${Eyebrow}>${t('THEME')}<//>
+    <div class="subsets">
+      ${THEMES.map(([k, label]) => html`<${Chip} key=${k} on=${S.theme.value === k} onClick=${() => setPref('theme', k)}>${t(label)}<//>`)}
+    </div>
+    <div class="note">${t('kept in this browser, like the language')}</div>
+  </div>`;
+}
+
 function SettingsTab() {
   settingsKey.value;
   const s = S.state.peek();
@@ -2402,7 +2937,8 @@ function SettingsTab() {
       <div>${tv('this page is open from {host}', { host: html`<span class="ok">${location.host}</span>` })}</div>
       <div class="note">${t('account, Web API key, the network switch and QUIT are changed on the PC that runs xerabora; from here you watch.')}</div>
       ${li.ok && html`<div style=${{ marginTop: '14px' }}>${tv('signed in as {user}', { user: html`<span class="ok">${li.user}</span>` })}</div>`}
-      <div style=${{ marginTop: '26px' }}><${AboutBlock} /></div>
+      <div style=${{ marginTop: '26px' }}><${ThemeBlock} /></div>
+      <${AboutBlock} />
     </div></div>`;
   }
 
@@ -2411,8 +2947,61 @@ function SettingsTab() {
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
     <${NoticeBlock} notice=${notice} />
+    <${ThemeBlock} />
     <${AboutBlock} />
   </div></div>`;
+}
+
+/* ==== 25-stream.js ==== */
+/* ---- STREAM: the page as one screen for a stream ----------------------- */
+
+/* Rarity as a share of the game's players, and RetroPoints; 0 until
+   /game answers. */
+function rarityOf(lm, a) {
+  const g = lm && lm.game, m = lm && lm.byId[a.id];
+  return g && m && g.distinct_players ? m.players * 100 / g.distinct_players : 0;
+}
+function rpOf(lm, a) { const m = lm && lm.byId[a.id]; return m ? m.rp || 0 : 0; }
+function rarityText(r) { return r <= 0 ? '' : t('{pct}% of players', { pct: r < 1 ? '<1' : Math.round(r) }); }
+
+/* The two lines LIVE and STREAM add to an achievement's right column. */
+function rarityExtras(lm, a) {
+  const r = rarityOf(lm, a), rp = rpOf(lm, a);
+  return [r > 0 ? rarityText(r) : null, rp > 0 ? t('RP {n}', { n: rp }) : null].filter(Boolean);
+}
+
+function noGameText(s) {
+  return s.console.connected ? t('console connected, waiting for a game with achievements')
+    : (s.follow || {}).active ? t('following via RetroAchievements')
+    : t('waiting for the console');
+}
+
+/* The red dot: lit while a source feeds the page. */
+function LiveChip({ s }) {
+  const on = !!(s && (s.console.connected || (s.follow || {}).active));
+  return html`<span class=${'chip static live' + (on ? ' on' : '')}><span class="dot" />${on ? t('LIVE') : t('OFFLINE')}</span>`;
+}
+
+/* The stream view: the game's head and the achievement block. */
+function StreamView() {
+  const s = S.state.value;
+  const bar = html`<div class="sbar">
+    <a class="brand" href="#" onClick=${e => { e.preventDefault(); go('tabs'); }}><span>xe<span class="r">R</span><span class="a">A</span>bora</span></a>
+    <span class="mode">${t('STREAM')}</span>
+    <${LiveChip} s=${s} /><span class="sp"></span>
+    <${Btn} sm onClick=${() => go('tabs')}>${t('BACK TO TABS')}<//></div>`;
+  if (!s) return html`<div class="stream">${bar}<${Empty}>${t('loading...')}<//></div>`;
+
+  const list = s.game.achievements || [];
+  if (!list.length) return html`<div class="stream">${bar}<${LiveBanners} s=${s} /><${Empty}>${noGameText(s)}<//></div>`;
+
+  const m = liveModel(s);
+  return html`<div class="stream">
+    ${bar}
+    <${LiveBanners} s=${s} />
+    <${LiveHead} s=${s} list=${list} done=${m.done} ptsDone=${m.ptsDone} ptsAll=${m.ptsAll} icon=${m.icon} />
+    <${AchBlock} s=${s} m=${m} />
+  </div>`;
 }
 
 /* ==== 90-app.js ==== */
@@ -2426,13 +3015,8 @@ const linkStats = computed(() => {
   return pk ? t('{packets} packets', { packets: pk.toLocaleString() }) : '';
 });
 
-/* The footer clock: the console session, or the following session. */
-const clockText = computed(() => {
-  const m = mode.value;
-  if (m === 'console') return fast.seconds.value ? hms(fast.seconds.value) : '';
-  if (m === 'follow') return fast.fSince.value ? hms(fast.fSince.value) : '';
-  return '';
-});
+/* The footer clock: the console session time. */
+const clockText = computed(() => mode.value === 'console' && fast.seconds.value ? hms(fast.seconds.value) : '');
 
 function Header() {
   const tab = S.tab.value;
@@ -2453,6 +3037,7 @@ function Header() {
     </nav>
     <div class="hdr-right">
       <span class="who">${who}</span>
+      <${Btn} sm onClick=${() => go('stream')} title=${t('compact view for a stream or a second screen')}>${t('STREAM')}<//>
       <select class="lang" aria-label="Language" value=${lang} onChange=${e => setLang(e.target.value)}>
         ${LANGS.map(([code, name]) => html`<option key=${code} value=${code} title=${name}>${(code || 'en').split('-')[0].toUpperCase()}</option>`)}
       </select>
@@ -2501,6 +3086,9 @@ function App() {
   if (S.closed.value)
     return html`<div class="closed">${t('xerabora is closed. This tab can be closed too.')}</div>`;
 
+  if (S.view.value === 'stream')
+    return html`<div class="app"><main class="wrap"><${StreamView} /></main><${Toast} /><${PowerOn} /></div>`;
+
   const tab = S.tab.value;
   const err = S.error.value;
   return html`<div class="app">
@@ -2525,8 +3113,11 @@ function showError(err) { S.error.value = String(err && err.stack ? err.stack : 
 window.addEventListener('error', e => showError(e.error || e.message));
 window.addEventListener('unhandledrejection', e => showError(e.reason));
 
-/* data-mode on <html>: the accent and the washes follow it in CSS. */
+/* data-mode on <html>: the accent and the washes follow it in CSS.
+   data-theme: the palette, the fonts and the shapes. */
 effect(() => { document.documentElement.dataset.mode = mode.value; });
+effect(() => { document.documentElement.dataset.theme = THEMES.some(([k]) => k === S.theme.value) ? S.theme.value : 'neon'; });
+window.addEventListener('popstate', () => { S.view.value = viewFromPath(location.pathname); });
 
 /* #tab=boards opens straight on a tab; #game=5761 opens that game's card. */
 {

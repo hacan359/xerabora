@@ -4,7 +4,7 @@
   "How to start": "Como começar",
   "Language": "Idioma",
   "Download": "Baixar",
-  "Download alpha.19": "Baixar alpha.19",
+  "Download v1.0.0": "Baixar v1.0.0",
   "<b>Windows</b> / <b>Linux</b> / <b>macOS</b>, one file": "<b>Windows</b> / <b>Linux</b> / <b>macOS</b>, um arquivo",
   "<b>Android</b>, no PC needed": "<b>Android</b>, sem PC",
   "Your PS2": "Seu PS2",
@@ -49,7 +49,7 @@
   "On the console: Apps → <strong>OPL+RA</strong>. It looks and behaves like OPL 1.2.0. Highlight a game, press <kbd>△</kbd> for its menu and choose <strong>RA: test PC connection</strong>. A notice tells you whether xerabora answered, from which address and how fast.": "No console: Apps → <strong>OPL+RA</strong>. Parece e funciona como o OPL 1.2.0. Marque um jogo, aperte <kbd>△</kbd> para o menu dele e escolha <strong>RA: test PC connection</strong>. Um aviso diz se o xerabora respondeu, de qual endereço e em quanto tempo.",
   "Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, the client is running.": "Nada responde? Mesma sub-rede, firewall do PC liberando UDP 18194 de entrada, e o cliente rodando.",
   "PS2 · OPL+RA · game menu": "PS2 · OPL+RA · menu do jogo",
-  "PC client found at 192.168.1.10 xerabora/0.1.0-alpha.19": "cliente PC encontrado em 192.168.1.10 xerabora/0.1.0-alpha.19",
+  "PC client found at 192.168.1.10 xerabora/1.0.0": "cliente PC encontrado em 192.168.1.10 xerabora/1.0.0",
   "Reply in 3 ms, console at 192.168.1.142": "Resposta em 3 ms, console em 192.168.1.142",
   "10 847 points": "10 847 pontos",
   "start a game on the console, or browse your library above": "comece um jogo no console, ou explore sua biblioteca acima",
@@ -197,5 +197,12 @@
   "A hobby experiment, run from a USB stick on two consoles. Use it at your own risk.": "Um experimento de hobby, rodado de um pendrive em dois consoles. Use por sua conta e risco.",
   "Any PS2 game with an achievement set. Sets of any size load, and pointer chains are followed up to 128 per game. The check in the game's menu tells you the counts for your game before you play: total, unlocked, and how many cannot unlock on real hardware yet.": "Qualquer jogo de PS2 com conjunto de conquistas. Conjuntos de qualquer tamanho carregam, e as cadeias de ponteiros são seguidas até 128 por jogo. A verificação no menu do jogo te diz as contas antes de jogar: total, desbloqueadas, e quantas ainda não podem desbloquear em hardware real.",
   "Do I need a network share or an internal HDD?": "Preciso de um compartilhamento de rede ou de um HD interno?",
-  "Neither. A USB stick with your images, or the disc, is the tested setup. A share is fine for the loader and the watch lists, but a game with an achievement set does not run from it; games without a set do. An internal HDD with an exFAT partition that OPL reads over BDM works like the stick for one tester; the loader cannot hash HDL partitions.": "Nenhum dos dois. Um pendrive com suas imagens, ou o disco, é a configuração testada. Um compartilhamento serve para o loader e as listas vigiadas, mas um jogo com conjunto de conquistas não roda dali; jogos sem conjunto rodam. Um HD interno com partição exFAT que o OPL lê por BDM funciona como o pendrive para um testador; o loader não consegue calcular o hash de partições HDL."
+  "Neither. A USB stick with your images, or the disc, is the tested setup. A share is fine for the loader and the watch lists, but a game with an achievement set does not run from it; games without a set do. An internal HDD with an exFAT partition that OPL reads over BDM works like the stick for one tester; the loader cannot hash HDL partitions.": "Nenhum dos dois. Um pendrive com suas imagens, ou o disco, é a configuração testada. Um compartilhamento serve para o loader e as listas vigiadas, mas um jogo com conjunto de conquistas não roda dali; jogos sem conjunto rodam. Um HD interno com partição exFAT que o OPL lê por BDM funciona como o pendrive para um testador; o loader não consegue calcular o hash de partições HDL.",
+  "Streaming": "Streaming",
+  "xeRAbora on a PC and a phone while the console plays Need for Speed: Underground 2": "xeRAbora em um PC e em um celular enquanto o console roda Need for Speed: Underground 2",
+  "xeRAbora following Shadow of the Colossus on an emulator, with the filter drawer open on the phone": "xeRAbora acompanhando Shadow of the Colossus em um emulador, com o painel de filtros aberto no celular",
+  "One clean screen for OBS.": "Uma tela limpa para o OBS.",
+  "STREAM in the header leaves the game and its achievements: the cover, the count, the points, then a list or a grid with the same filters and orders as LIVE. Two looks, NEON CLASSIC and 8-BIT, on SETTINGS. An unlock pops up in the corner. Capture the window in OBS or keep it on a second monitor.": "STREAM no cabeçalho deixa só o jogo e suas conquistas: a capa, a contagem, os pontos e depois uma lista ou uma grade com os mesmos filtros e ordens do LIVE. Dois visuais, NEON CLASSIC e 8-BIT, em SETTINGS. Cada desbloqueio aparece no canto. Capture a janela no OBS ou deixe-a em um segundo monitor.",
+  "STREAM in NEON CLASSIC as a list": "STREAM em NEON CLASSIC como lista",
+  "STREAM in 8-BIT as a grid, with an unlock in the corner": "STREAM em 8-BIT como grade, com um desbloqueio no canto"
 }

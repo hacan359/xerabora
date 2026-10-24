@@ -8,13 +8,8 @@ const linkStats = computed(() => {
   return pk ? t('{packets} packets', { packets: pk.toLocaleString() }) : '';
 });
 
-/* The footer clock: the console session, or the following session. */
-const clockText = computed(() => {
-  const m = mode.value;
-  if (m === 'console') return fast.seconds.value ? hms(fast.seconds.value) : '';
-  if (m === 'follow') return fast.fSince.value ? hms(fast.fSince.value) : '';
-  return '';
-});
+/* The footer clock: the console session time. */
+const clockText = computed(() => mode.value === 'console' && fast.seconds.value ? hms(fast.seconds.value) : '');
 
 function Header() {
   const tab = S.tab.value;
@@ -35,6 +30,7 @@ function Header() {
     </nav>
     <div class="hdr-right">
       <span class="who">${who}</span>
+      <${Btn} sm onClick=${() => go('stream')} title=${t('compact view for a stream or a second screen')}>${t('STREAM')}<//>
       <select class="lang" aria-label="Language" value=${lang} onChange=${e => setLang(e.target.value)}>
         ${LANGS.map(([code, name]) => html`<option key=${code} value=${code} title=${name}>${(code || 'en').split('-')[0].toUpperCase()}</option>`)}
       </select>
@@ -83,6 +79,9 @@ function App() {
   if (S.closed.value)
     return html`<div class="closed">${t('xerabora is closed. This tab can be closed too.')}</div>`;
 
+  if (S.view.value === 'stream')
+    return html`<div class="app"><main class="wrap"><${StreamView} /></main><${Toast} /><${PowerOn} /></div>`;
+
   const tab = S.tab.value;
   const err = S.error.value;
   return html`<div class="app">
@@ -107,8 +106,11 @@ function showError(err) { S.error.value = String(err && err.stack ? err.stack : 
 window.addEventListener('error', e => showError(e.error || e.message));
 window.addEventListener('unhandledrejection', e => showError(e.reason));
 
-/* data-mode on <html>: the accent and the washes follow it in CSS. */
+/* data-mode on <html>: the accent and the washes follow it in CSS.
+   data-theme: the palette, the fonts and the shapes. */
 effect(() => { document.documentElement.dataset.mode = mode.value; });
+effect(() => { document.documentElement.dataset.theme = THEMES.some(([k]) => k === S.theme.value) ? S.theme.value : 'neon'; });
+window.addEventListener('popstate', () => { S.view.value = viewFromPath(location.pathname); });
 
 /* #tab=boards opens straight on a tab; #game=5761 opens that game's card. */
 {

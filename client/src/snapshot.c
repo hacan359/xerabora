@@ -117,6 +117,31 @@ int snapshot_feed(const char *pkt, size_t len)
         }
     }
 
+    /* Reads the console's link counters from the header. */
+    {
+        unsigned int v;
+        const char *lk = strstr(pkt, " lk=");
+        const char *er = strstr(pkt, " err=");
+
+        if (field_dec(pkt, " us=", 5, &v)) g_stats.send_us = v;
+        if (field_dec(pkt, " mx=", 5, &v)) g_stats.send_max_us = v;
+        if (field_dec(pkt, " fail=", 6, &v)) g_stats.send_fail = v;
+        if (field_dec(pkt, " sk=", 6, &v)) g_stats.send_deferred = v;
+        if (field_dec(pkt, " ds=", 6, &v)) g_stats.ee_skipped = v;
+        if (field_dec(pkt, " bad=", 4, &v)) g_stats.console_torn = v;
+        if (field_dec(pkt, " rc=", 7, &v)) g_stats.read_cycles = v;
+        if (field_dec(pkt, " fc=", 7, &v)) g_stats.frame_cycles = v;
+        if (lk != NULL && lk + 8 <= pkt + len) {
+            memcpy(g_stats.link, lk + 4, 4);
+            g_stats.link[4] = '\0';
+        }
+        /* Reads err with its sign: "+000" or "-005". */
+        if (er != NULL && field_dec(pkt, " err=+", 3, &v))
+            g_stats.send_err = (int)v;
+        else if (er != NULL && field_dec(pkt, " err=-", 3, &v))
+            g_stats.send_err = -(int)v;
+    }
+
     g_stats.count = cnt;
     g_stats.parts = np;
 

@@ -1,4 +1,5 @@
 #include "webui.h"
+#include "snapshot.h"
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -60,6 +61,7 @@ static struct
         time_t at;
     } unlocks[16];
     int unlock_count;
+    struct snapshot_stats hw;   /* the console's link counters */
 } g;
 
 /* The page is the only way to end a windowless process gracefully. */
@@ -76,7 +78,7 @@ void webui_set_login(int ok, const char *user)
 {
     g.dirty = 1;
     g.logged_in = ok;
-    snprintf(g.user, sizeof(g.user), "%s", user != NULL ? user : "");
+    snprintf(g.user, sizeof(g.user), "%.*s", (int)sizeof(g.user) - 1, user != NULL ? user : "");
 }
 
 void webui_set_webapi(int ok)
@@ -170,6 +172,31 @@ void webui_set_stats(unsigned long frames, unsigned long gaps,
     g.watch_parts = parts;
     g.watch_bytes = bytes;
     g.watch_addresses = addresses;
+}
+
+void webui_set_hw(const struct snapshot_stats *st)
+{
+    g.hw = *st;
+}
+
+static void json_field(char **p, char *end, const char *key, const char *val);
+
+/* Writes the console's link counters as the "hw" object. */
+static int write_hw(char *p, char *end)
+{
+    const struct snapshot_stats *h = &g.hw;
+    double share = h->frame_cycles > 0 ? 100.0 * h->read_cycles / h->frame_cycles : 0.0;
+    char *start = p;
+
+    p += snprintf(p, (size_t)(end - p),
+                  "\"hw\":{\"send_us\":%u,\"send_max_us\":%u,\"send_fail\":%u,\"send_deferred\":%u,"
+                  "\"send_err\":%d,\"ee_skipped\":%u,\"console_torn\":%u,\"ee_share\":%.2f,"
+                  "\"rxq\":%u,\"rxq_max\":%u,",
+                  h->send_us, h->send_max_us, h->send_fail, h->send_deferred, h->send_err,
+                  h->ee_skipped, h->console_torn, share, h->rxq, h->rxq_max);
+    json_field(&p, end, "link", h->link);
+    p += snprintf(p, (size_t)(end - p), "}");
+    return (int)(p - start);
 }
 
 /* ---- The listener ------------------------------------------------------- */
@@ -437,10 +464,12 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
     json_field(&p, end, "status", g.status);
     p += snprintf(p, (size_t)(end - p),
                   ",\"packets\":%lu,\"frames\":%lu,\"gaps\":%lu,\"dupes\":%lu,\"torn\":%lu"
-                  ",\"watch\":{\"parts\":%u,\"bytes\":%u,\"addresses\":%u},\"seconds\":%ld},",
+                  ",\"watch\":{\"parts\":%u,\"bytes\":%u,\"addresses\":%u},\"seconds\":%ld,",
                   g.packets, g.frames, g.gaps, g.dupes, g.torn,
                   g.watch_parts, g.watch_bytes, g.watch_addresses,
                   session_seconds());
+    p += write_hw(p, end);
+    p += snprintf(p, (size_t)(end - p), "},");
 
     {
         char ip[48] = "", url[80] = "";
@@ -691,9 +720,11 @@ static int build_delta(char *buf, size_t size, rc_client_t *client)
 
     p += snprintf(p, (size_t)(end - p),
                   "{\"delta\":1,\"console\":{\"frames\":%lu,\"gaps\":%lu,\"dupes\":%lu,"
-                  "\"torn\":%lu,\"seconds\":%ld}",
+                  "\"torn\":%lu,\"seconds\":%ld,",
                   g.frames, g.gaps, g.dupes, g.torn,
                   session_seconds());
+    p += write_hw(p, end);
+    p += snprintf(p, (size_t)(end - p), "}");
 
     p += snprintf(p, (size_t)(end - p), ",\"live\":[");
     if (client != NULL) {
@@ -853,6 +884,9 @@ static void web_cache_expire(void)
     g_me_at = 0;
 }
 
+/* The account's rank in the game, cached with the game. */
+static unsigned g_gp_rank, g_gp_rank_score;
+
 static int build_game(char *buf, size_t size, unsigned id)
 {
     char *p = buf, *end = buf + size;
@@ -863,6 +897,7 @@ static int build_game(char *buf, size_t size, unsigned id)
                                          (int)(sizeof(g_gp_ach) / sizeof(g_gp_ach[0])));
         g_gp_med_count = raweb_median_times(id, g_gp_med_ids, g_gp_med_secs,
                                             (int)(sizeof(g_gp_med_ids) / sizeof(g_gp_med_ids[0])));
+        raweb_user_game_rank(id, &g_gp_rank, &g_gp_rank_score);
         /* The family: the base game and its subsets, found by title in
            the console's list. The base game itself is one of them from
            the page's point of view. */
@@ -884,8 +919,10 @@ static int build_game(char *buf, size_t size, unsigned id)
     json_field(&p, end, "console", g_gp.console);
     p += snprintf(p, (size_t)(end - p), ",");
     json_field(&p, end, "icon", g_gp.image_icon);
-    p += snprintf(p, (size_t)(end - p), ",\"total\":%u,\"awarded\":%u,\"base\":{\"id\":%u,",
-                  g_gp.achievements_total, g_gp.awarded, g_gp_base_id);
+    p += snprintf(p, (size_t)(end - p), ",\"total\":%u,\"awarded\":%u,\"distinct_players\":%u"
+                  ",\"rank\":{\"rank\":%u,\"score\":%u},\"base\":{\"id\":%u,",
+                  g_gp.achievements_total, g_gp.awarded, g_gp.players,
+                  g_gp_rank, g_gp_rank_score, g_gp_base_id);
     json_field(&p, end, "title", g_gp_base_title);
     p += snprintf(p, (size_t)(end - p), "},\"subsets\":[");
     for (i = 0; i < g_gp_subset_count && end - p > 256; i++) {
@@ -921,11 +958,55 @@ static int build_game(char *buf, size_t size, unsigned id)
                     break;
                 }
             p += snprintf(p, (size_t)(end - p),
-                          ",\"points\":%u,\"order\":%u,\"players\":%u,\"median\":%u,\"mode\":%u}",
+                          ",\"points\":%u,\"order\":%u,\"players\":%u,\"hardcore\":%u,\"rp\":%u,\"median\":%u,\"mode\":%u}",
                           g_gp_ach[i].points, g_gp_ach[i].display_order,
-                          g_gp_ach[i].num_awarded, median,
+                          g_gp_ach[i].num_awarded, g_gp_ach[i].num_awarded_hardcore,
+                          g_gp_ach[i].true_ratio, median,
                           (g_gp_ach[i].earned_softcore ? 1u : 0u) | (g_gp_ach[i].earned_hardcore ? 2u : 0u));
         }
+    }
+    p += snprintf(p, (size_t)(end - p), "]}");
+    return (int)(p - buf);
+}
+
+/* Caches the comments of the last eight achievements for five minutes. */
+#define COMMENT_SLOTS 8
+static struct {
+    unsigned id;
+    time_t at;
+    int count;
+    struct raweb_comment rows[40];
+} g_cm[COMMENT_SLOTS];
+static int g_cm_next;
+
+static int build_comments(char *buf, size_t size, unsigned id)
+{
+    char *p = buf, *end = buf + size;
+    int i, slot = -1;
+
+    for (i = 0; i < COMMENT_SLOTS; i++)
+        if (g_cm[i].id == id && id != 0 && time(NULL) - g_cm[i].at < 300)
+            slot = i;
+    if (slot < 0) {
+        slot = g_cm_next;
+        g_cm_next = (g_cm_next + 1) % COMMENT_SLOTS;
+        g_cm[slot].id = id;
+        g_cm[slot].at = time(NULL);
+        g_cm[slot].count = raweb_achievement_comments(id, g_cm[slot].rows,
+                                                      (int)(sizeof(g_cm[slot].rows) / sizeof(g_cm[slot].rows[0])));
+    }
+
+    p += snprintf(p, (size_t)(end - p), "{\"id\":%u,\"comments\":[", id);
+    for (i = 0; i < g_cm[slot].count && end - p > 1024; i++) {
+        if (i > 0)
+            p += snprintf(p, (size_t)(end - p), ",");
+        p += snprintf(p, (size_t)(end - p), "{");
+        json_field(&p, end, "user", g_cm[slot].rows[i].user);
+        p += snprintf(p, (size_t)(end - p), ",");
+        json_field(&p, end, "date", g_cm[slot].rows[i].date);
+        p += snprintf(p, (size_t)(end - p), ",");
+        json_field(&p, end, "text", g_cm[slot].rows[i].text);
+        p += snprintf(p, (size_t)(end - p), "}");
     }
     p += snprintf(p, (size_t)(end - p), "]}");
     return (int)(p - buf);
@@ -1305,6 +1386,7 @@ void webui_serve(sock_t listener, rc_client_t *client)
     if (strncmp(req, "GET /profile", 12) == 0 ||
         strncmp(req, "GET /library", 12) == 0 ||
         strncmp(req, "GET /boards", 11) == 0 ||
+        strncmp(req, "GET /comments", 13) == 0 ||
         strncmp(req, "GET /game", 9) == 0) {
         char *body = malloc(512 * 1024);
 
@@ -1315,6 +1397,11 @@ void webui_serve(sock_t listener, rc_client_t *client)
                 len = build_profile(body, 512 * 1024);
             } else if (strncmp(req, "GET /library", 12) == 0) {
                 len = build_library(body, 512 * 1024);
+            } else if (strncmp(req, "GET /comments", 13) == 0) {
+                const char *q = strstr(req, "id=");
+
+                len = build_comments(body, 512 * 1024,
+                                     q != NULL ? (unsigned)strtoul(q + 3, NULL, 10) : 0);
             } else if (strncmp(req, "GET /boards", 11) == 0) {
                 const char *q = strstr(req, "id=");
 
@@ -1339,9 +1426,9 @@ void webui_serve(sock_t listener, rc_client_t *client)
             respond(c, "application/json; charset=utf-8", body, len);
             free(body);
         }
-    /* "/?lang=es" is still the page, not a miss. */
+    /* Serves the page for /, /?lang=..., /index and /stream. */
     } else if (strncmp(req, "GET / ", 6) == 0 || strncmp(req, "GET /?", 6) == 0 ||
-               strncmp(req, "GET /index", 10) == 0) {
+               strncmp(req, "GET /index", 10) == 0 || strncmp(req, "GET /stream", 11) == 0) {
         /* --ui-file: the page straight from disk, for working on it.
            Edit, refresh, see -- no re-embed, no rebuild. The shipped
            client never sets this and serves the built-in copy. */

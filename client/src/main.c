@@ -57,6 +57,8 @@ static void usage(void)
            "  --window           open the window (window builds only)\n"
            "  --ui-port N        port for the interface page (default %d)\n"
            "  --no-ui            do not serve the interface page\n"
+           "  --server           keep running when the last page closes; for a machine\n"
+           "                     that runs the client as a service\n"
            "  --ui-only          serve the interface and nothing else, for working on it\n"
            "  --ui-file PATH     serve the page from this HTML file instead of the\n"
            "                     built-in copy: edit, refresh, see\n"
@@ -661,6 +663,8 @@ int main(int argc, char **argv)
     int ui_port = XERABORA_UI_PORT, ui_wanted = 1;
     sock_t ui = SOCK_INVALID;
     int i, want_console = 0, ui_only = 0;
+    /* --server: keep running after the last page closes. */
+    int server = 0;
 
     /* Window-subsystem build: a double click opens the page and no console.
        Attach to the terminal this was started from so text commands answer
@@ -723,6 +727,8 @@ int main(int argc, char **argv)
             webui_set_obs_dir(argv[++i]);
         } else if (strcmp(argv[i], "--no-ui") == 0) {
             ui_wanted = 0;
+        } else if (strcmp(argv[i], "--server") == 0) {
+            server = 1;
         } else if (strcmp(argv[i], "--ui-only") == 0) {
             ui_only = 1; /* runs after the loop, so flag order is free */
         } else if (strcmp(argv[i], "--ui-file") == 0 && i + 1 < argc) {
@@ -852,7 +858,7 @@ int main(int argc, char **argv)
             }
             follow_tick(0);
             webui_push(NULL);
-            if (webui_page_gone(PAGE_GONE_GRACE)) {
+            if (!server && webui_page_gone(PAGE_GONE_GRACE)) {
                 log_info("the page was closed; exiting");
                 break;
             }
@@ -1084,7 +1090,7 @@ int main(int argc, char **argv)
                and a page sees the result on the next push. */
             follow_tick(game_up);
             webui_push(client);
-            if (ui != SOCK_INVALID && webui_page_gone(PAGE_GONE_GRACE)) {
+            if (!server && ui != SOCK_INVALID && webui_page_gone(PAGE_GONE_GRACE)) {
                 log_info("the page was closed; exiting");
                 break;
             }
@@ -1247,6 +1253,7 @@ int main(int argc, char **argv)
 
             webui_set_stats(st->frames, st->gaps, st->dupes, st->torn,
                             st->parts, st->bytes, st->count);
+            webui_set_hw(st);
             /* One push per snapshot: the page moves with the game. */
             webui_push(client);
             if ((st->frames % 3600) == 0)

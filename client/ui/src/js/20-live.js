@@ -15,8 +15,6 @@ const framesText = computed(() => {
             : t('{packets} packets', { packets: fast.packets.value.toLocaleString() });
 });
 const sessionText = computed(() => fast.seconds.value ? hms(fast.seconds.value) : '—');
-const fSinceText = computed(() => fast.fSince.value ? hms(fast.fSince.value) : '—');
-const fPolledText = computed(() => fast.fPolled.value >= 0 ? agoText(fast.fPolled.value) : '—');
 
 /* FOLLOW MY PLAY: hidden on REMOTE and without a Web API key. Posts
    /follow and fetches the state again. */
@@ -63,13 +61,45 @@ async function resetConsole() {
   } catch (err) { alert(t('The client did not answer.')); }
 }
 
+/* The pipeline status and the rich presence bar. */
+function LiveBanners({ s }) {
+  const c = s.console;
+  const st = c.connected || c.packets ? STATUS[c.status] : null;
+  const f = s.follow || {};
+  const rp = s.game.rp || (f.active ? f.rp : '');
+  return html`<${Fragment}>
+    ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
+    ${rp && html`<div class="rpbar"><span class="dot" />${rp}</div>`}
+  <//>`;
+}
+
+/* The console's own numbers from the telemetry header. */
+function Hardware() {
+  const h = fast.hw.value || {};
+  const has = h.link || h.send_us || h.ee_share || h.rxq_max;
+  if (!has) return null;
+  const link = h.link ? (h.link.slice(0, 3) === '999' ? t('no link') : parseInt(h.link, 10) + ' Mbit ' + (h.link[3] === 'F' ? t('full duplex') : t('half duplex'))) : '—';
+  return html`<${Fragment}>
+    <${Eyebrow}>${t('HARDWARE')}<//>
+    <div class="stats">
+      <${Cell} k=${t('LINK MODE')} v=${link} />
+      <${Cell} k=${t('EE READ')} v=${h.ee_share > 0 ? h.ee_share.toFixed(1) + ' %' : '—'} />
+      <${Cell} k=${t('EE SKIPPED')} v=${h.ee_skipped || 0} />
+      <${Cell} k=${t('TORN ON CONSOLE')} v=${h.console_torn || 0} />
+      <${Cell} k=${t('SEND TIME')} v=${lines(t('{us} us &middot; max {mx} us', { us: h.send_us || 0, mx: h.send_max_us || 0 }))} />
+      <${Cell} k=${t('SEND ERRORS')} v=${lines(t('{fail} failed &middot; {sk} deferred', { fail: h.send_fail || 0, sk: h.send_deferred || 0 }))} cls=${h.send_fail ? 'warn' : ''} />
+      <${Cell} k=${t('RX FIFO')} v=${lines(t('{q} now &middot; max {mx}', { q: h.rxq || 0, mx: h.rxq_max || 0 }))} />
+      <${Cell} k=${t('LAST ERROR')} v=${h.send_err ? h.send_err : '—'} />
+    </div>
+  <//>`;
+}
+
 /* CONSOLE panel: link, serial, counters, watch list, session clock. */
 function ConsolePanel({ s }) {
   const c = s.console;
   if (!c.connected && !c.packets) return null;
   if (!c.connected && (s.follow || {}).active) return null;
 
-  const st = STATUS[c.status];
   const w = c.watch || {};
   const watch = w.addresses
     ? lines(t('{addresses} addr &middot; {bytes} B &middot; {parts} parts',
@@ -78,8 +108,6 @@ function ConsolePanel({ s }) {
 
   return html`<${Fragment}>
     <${Eyebrow}>${t('CONSOLE')}<//>
-    ${st && html`<div class=${'banner ' + st[1]}>${t(st[0])}</div>`}
-    ${s.game.rp && html`<div class="banner ok">${s.game.rp}</div>`}
     <div class="stats">
       <${Cell} k=${t('LINK')} v=${c.connected ? c.ip : html`<span class="mute">${t('lost')}</span>`} />
       <${Cell} k=${t('GAME')} v=${s.game.serial || '—'} />
@@ -89,6 +117,7 @@ function ConsolePanel({ s }) {
       <${Cell} k=${t('SESSION')} v=${sessionText} />
     </div>
     ${s.game.hash && html`<div class="hash">${t('hash {hash}', { hash: s.game.hash })}</div>`}
+    <${Hardware} />
     ${!REMOTE && c.connected && html`<div class="subsets"><${Btn} danger sm onClick=${resetConsole}>${t('RESET CONSOLE')}<//></div>`}
   <//>`;
 }
@@ -104,13 +133,11 @@ function FollowPanel({ s }) {
 
   return html`<${Fragment}>
     <${Eyebrow}>${t('FOLLOWING')}<//>
-    <div class="banner ok">${f.rp ? f.rp : t('no rich presence line yet')}</div>
+    ${!f.rp && html`<div class="banner">${t('no rich presence line yet')}</div>`}
     <div class="stats">
       <${Cell} k=${t('PLATFORM')} v=${s.game.console || '—'} />
       <${Cell} k=${t('LAST SEEN')} v=${seen} />
       <${Cell} k=${t('SOURCE')} v=${t('RetroAchievements &middot; every 20 s')} />
-      <${Cell} k=${t('POLLED')} v=${fPolledText} />
-      <${Cell} k=${t('SESSION')} v=${fSinceText} />
       <${Cell} k=${t('UNLOCKS')} v=${session.length} />
     </div>
     ${f.failures ? html`<div class="note warn">${t('the Web API is not answering; retrying')}</div>` : null}
@@ -124,6 +151,16 @@ function FollowPanel({ s }) {
   <//>`;
 }
 
+/* Names the source under the title: the console with its address,
+   or the emulator. */
+function SourceTag({ s }) {
+  const c = s.console || {}, f = s.follow || {};
+  if (c.connected) return html`<span class="src on">${t('CONSOLE')} <span class="num">${c.ip}</span></span>`;
+  if (f.active) return html`<span class="src web">${t('EMULATOR')} <span class="mute">${t('via RetroAchievements')}</span></span>`;
+  if (c.packets) return html`<span class="src">${t('CONSOLE')} <span class="mute">${t('lost')}</span></span>`;
+  return null;
+}
+
 /* The game's head: cover, title, progress bar, counts. */
 function LiveHead({ s, list, done, ptsDone, ptsAll, icon }) {
   return html`<div class="head">
@@ -132,6 +169,7 @@ function LiveHead({ s, list, done, ptsDone, ptsAll, icon }) {
       <h1>${s.game.title || s.game.serial}</h1>
       <${Bar} value=${pct(done, list.length)} />
       <div class="sub">
+        <${SourceTag} s=${s} />
         <span>${s.game.checked_only ? t('from an image check, not from a running game') : (s.game.serial || s.game.console || '')}</span>
         <span class="right"><b>${done}</b> / ${list.length} <span class="mute">·</span> <span class="gold">${ptsDone}</span><span class="mute"> / ${t('{points} pts', { points: ptsAll })}</span></span>
       </div>
@@ -155,7 +193,7 @@ function AchievementGroups({ list, subsets, row }) {
 
 /* One row of ALL ACHIEVEMENTS; reads the achievement's live signal for
    the measured value and the progress. */
-function LiveRow({ a, missed, hidden, med }) {
+function LiveRow({ a, missed, hidden, med, lm }) {
   const isDone = a.state === 2;
   /* state 3 is rc_client's disabled state: 'not on hardware'. */
   const na = a.state === 3;
@@ -163,6 +201,7 @@ function LiveRow({ a, missed, hidden, med }) {
   const near = !isDone && !na && lv.p > 0;
   const state = isDone ? 'done' : na ? 'na' : near ? 'near' : 'locked';
   return html`<${AchRow} a=${a} state=${state} mode=${isDone ? a.mode : 0}
+    open=${S.openAch.value === a.id} onClick=${() => toggleAch(a.id)}
     below=${!isDone && !na && html`<${Mini} id=${a.id} />`}
     right=${html`<${Fragment}>
       ${isDone ? html`<span class="lead ok">${t('unlocked')}</span>`
@@ -170,6 +209,7 @@ function LiveRow({ a, missed, hidden, med }) {
         : lv.m ? html`<span class="lead acc">${lv.m}</span>`
         : html`<span class="lead">${t('locked')}</span>`}
       <${Pts} a=${a} extra=${[isDone ? html`<${ModeTag} a=${a} />` : null,
+                               ...rarityExtras(lm, a),
                                med > 0 ? '~' + medianText(med) : null,
                                hidden ? html`<span class="mute">${t('hidden')}</span>`
                                : missed ? html`<span class="warn">${t('possibly skipped')}</span>` : null].filter(Boolean)} />
@@ -222,15 +262,93 @@ function AchievementTiles({ list, subsets, medOf, missed }) {
 }
 
 
+/* Everything the achievement views need, computed once per render. */
+function liveModel(s) {
+  const list = s.game.achievements || [];
+  const done = list.filter(a => a.state === 2).length;
+  const ptsDone = list.filter(a => a.state === 2).reduce((n, a) => n + (a.points || 0), 0);
+  const ptsAll = list.reduce((n, a) => n + (a.points || 0), 0);
+  const lm = S.liveMeta.value;
+  const meta = lm.id === s.game.id ? lm.byId : null;
+  const lmeta = meta ? lm : null;
+  const medOf = a => meta ? ((meta[a.id] || {}).median || 0) : 0;
+  const missed = meta ? possiblyMissed(list, medOf) : new Set();
+  const position = meta ? Math.max(0, ...list.filter(a => a.state === 2).map(medOf)) : 0;
+  const est = meta ? setEstimates(list, medOf) : null;
+  const rpDone = list.filter(a => a.state === 2).reduce((n, a) => n + rpOf(lmeta, a), 0);
+  const rank = lmeta && lm.game && lm.game.rank && lm.game.rank.rank > 0 ? lm.game.rank.rank : 0;
+  const hidden = new Set(S.hidden.value[s.game.id] || []);
+  const icon = (meta && lm.icon) || s.game.icon || '';
+  return { list, done, ptsDone, ptsAll, lm, meta, lmeta, medOf, missed, position, est, rpDone, rank, hidden, icon };
+}
+
+/* The achievement block: filter bar, UP NEXT, then the list or the
+   grid. LIVE and STREAM both draw it. */
+function AchBlock({ s, m }) {
+  const { list, done, meta, lm, lmeta, medOf, missed, position, hidden } = m;
+
+  /* UP NEXT: the nearest locked achievements by median, drawn big.
+     Hidden ones are left out and the next median takes the slot; the
+     chip in the label brings them all back. */
+  let ahead = null;
+  if (meta) {
+    const picked = upNextPick(list.filter(a => !hidden.has(a.id)), medOf);
+    const restore = hidden.size > 0
+      ? html`<span class="chip sm" onClick=${() => showHidden(s.game.id)}>${t('{n} hidden', { n: hidden.size })} · ${t('SHOW ALL')}</span>`
+      : null;
+    const shut = S.upNext.value === 'shut';
+    if (picked.next.length || restore) {
+      ahead = html`<h2 class=${'eyebrow fold' + (shut ? ' shut' : '')} onClick=${() => setPref('upNext', shut ? 'open' : 'shut')}
+          title=${shut ? t('show UP NEXT') : t('hide UP NEXT')}>
+          <${Icon} name="chevron" />${t('UP NEXT &middot; BY MEDIAN UNLOCK TIME')}
+          <span class="count" onClick=${e => e.stopPropagation()}>${shut ? picked.next.length : restore}</span></h2>
+        ${!shut && picked.next.map(a => html`<${AchRow} key=${a.id} a=${a} state="near" big
+          open=${S.openAch.value === a.id} onClick=${() => toggleAch(a.id)}
+          below=${html`<${Mini} id=${a.id} />`}
+          right=${html`<${Fragment}>
+            <${Measured} id=${a.id} />
+            ${a === picked.prog && html`<span class="tag acc">${t('next in progression')}</span>`}
+            ${missed.has(a.id) ? html`<span class="tag warn">${t('possibly skipped')}</span>`
+              : medOf(a) <= position ? html`<span class="tag warn">${t('usually done by now')}</span>` : null}
+            <${Pts} a=${a} extra=${[...rarityExtras(lmeta, a), '~' + medianText(medOf(a))]} />
+            <span class="hide" onClick=${e => { e.stopPropagation(); hideAch(s.game.id, a.id); }} title=${t('hide from UP NEXT')}>✕ ${t('HIDE')}</span>
+          <//>`} />`)}`;
+    }
+  }
+
+  /* A filter or an order other than the author's shows one list
+     without subset headings. */
+  const filter = S.liveFilter.value, sort = S.liveSort.value, view = S.achView.value;
+  const plain = filter === 'all' && sort === 'author';
+  const getMeta = a => (meta && meta[a.id]) || {};
+  const shown = plain ? list
+    : sortAchievements(filterAchievements(list.slice(), filter, a => a.state === 2), sort, getMeta);
+  const showAll = !!ahead || (plain && (s.game.subsets || []).length > 1);
+  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} lm=${lmeta} />`;
+
+  return html`<${Fragment}>
+    <${ToolsBar} filter=${filter} sort=${sort} view=${view}
+      onFilter=${k => { S.liveFilter.value = k; }} onSort=${k => setPref('liveSort', k)} onView=${k => setPref('achView', k)} />
+    ${ahead}
+    ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
+    ${!shown.length ? html`<${Empty}>${t('nothing matches')}<//>`
+      : view === 'grid'
+      ? html`<${AchievementTiles} list=${shown} subsets=${plain ? s.game.subsets : null} medOf=${medOf} missed=${missed} />`
+      : html`<${AchievementGroups} list=${shown} subsets=${plain ? s.game.subsets : null} row=${row} />`}
+  <//>`;
+}
+
 function LiveTab() {
   const s = S.state.value;
   if (!s) return html`<${Empty}>${t('loading...')}<//>`;
 
   const list = s.game.achievements || [];
   const f = s.follow || {};
+  const c = s.console || {};
 
   if (!list.length) {
     return html`<div class="tab">
+      <${LiveBanners} s=${s} />
       <${FollowSwitch} s=${s} /><${ConsolePanel} s=${s} />
       <${Empty}>${s.console.connected
         ? t('console connected, waiting for a game with achievements')
@@ -240,83 +358,39 @@ function LiveTab() {
     </div>`;
   }
 
-  const done = list.filter(a => a.state === 2).length;
-  const ptsDone = list.filter(a => a.state === 2).reduce((n, a) => n + (a.points || 0), 0);
-  const ptsAll = list.reduce((n, a) => n + (a.points || 0), 0);
-
-  const lm = S.liveMeta.value;
-  const meta = lm.id === s.game.id ? lm.byId : null;
-  const medOf = a => meta ? ((meta[a.id] || {}).median || 0) : 0;
-  const missed = meta ? possiblyMissed(list, medOf) : new Set();
-  const position = meta ? Math.max(0, ...list.filter(a => a.state === 2).map(medOf)) : 0;
-  const est = meta ? setEstimates(list, medOf) : null;
-
-  /* UP NEXT: the nearest locked achievements by median, drawn big.
-     Hidden ones are left out and the next median takes the slot; the
-     chip in the label brings them all back. */
-  const hidden = new Set(S.hidden.value[s.game.id] || []);
-  let ahead = null;
-  if (meta) {
-    const picked = upNextPick(list.filter(a => !hidden.has(a.id)), medOf);
-    const restore = hidden.size > 0
-      ? html`<span class="chip sm" onClick=${() => showHidden(s.game.id)}>${t('{n} hidden', { n: hidden.size })} · ${t('SHOW ALL')}</span>`
-      : null;
-    if (picked.next.length || restore) {
-      ahead = html`<${Eyebrow} count=${restore}>${t('UP NEXT &middot; BY MEDIAN UNLOCK TIME')}<//>
-        ${picked.next.map(a => html`<${AchRow} key=${a.id} a=${a} state="near" big
-          below=${html`<${Mini} id=${a.id} />`}
-          right=${html`<${Fragment}>
-            <${Measured} id=${a.id} />
-            ${a === picked.prog && html`<span class="tag acc">${t('next in progression')}</span>`}
-            ${missed.has(a.id) ? html`<span class="tag warn">${t('possibly skipped')}</span>`
-              : medOf(a) <= position ? html`<span class="tag warn">${t('usually done by now')}</span>` : null}
-            <${Pts} a=${a} extra=${'~' + medianText(medOf(a))} />
-            <span class="hide" onClick=${() => hideAch(s.game.id, a.id)} title=${t('hide from UP NEXT')}>✕ ${t('HIDE')}</span>
-          <//>`} />`)}`;
-    }
-  }
+  const m = liveModel(s);
+  const { done, ptsDone, ptsAll, est, position, rpDone, rank } = m;
 
   const strip = html`<div class="stats">
     <${Cell} k=${t('ACHIEVEMENTS')} v=${done + ' / ' + list.length} />
     <${Cell} k=${t('POINTS')} v=${html`<span class="gold">${ptsDone}</span> / ${ptsAll}`} />
+    <${Cell} k=${t('RETROPOINTS')} v=${rpDone > 0 ? rpDone.toLocaleString() : '—'} />
+    <${Cell} k=${t('RANK IN GAME')} v=${rank ? '#' + rank.toLocaleString() : '—'} />
     <${Cell} k=${t('BEATEN AT')} v=${est && est.beaten ? '~' + medianText(est.beaten) : '—'} />
     <${Cell} k=${t('FULL SET AT')} v=${est && est.full ? '~' + medianText(est.full) : '—'} />
     <${Cell} k=${t('YOUR POSITION')} v=${position ? '~' + medianText(position) : '—'} />
     <${Cell} k=${t('MISSABLES LEFT')} v=${list.filter(a => a.state !== 2 && achType(a) === 'missable').length} />
   </div>`;
 
-  const row = a => html`<${LiveRow} key=${a.id} a=${a} med=${medOf(a)} missed=${missed.has(a.id)} hidden=${hidden.has(a.id)} />`;
-
-  const showAll = ahead || (s.game.subsets || []).length > 1;
-
-  /* Achievements and leaderboards each get a sub-tab; the achievements
-     come as the list or as the site's badge grid. Both choices stay in
-     this browser. */
-  const sub = S.liveSub.value, view = S.achView.value;
+  /* Sub-tabs: achievements, leaderboards, and the console while a
+     console is the source. */
+  const sub = S.liveSub.value;
+  const hasConsole = !!(c.connected || (c.packets && !f.active));
   const nTrack = (s.game.tracking || []).length;
   const nav = html`<div class="subnav">
     <${Chip} on=${sub === 'ach'} onClick=${() => setPref('liveSub', 'ach')} n=${done + ' / ' + list.length}>${t('ACHIEVEMENTS')}<//>
     <${Chip} on=${sub === 'lb'} onClick=${() => setPref('liveSub', 'lb')} n=${nTrack || null}>${t('LEADERBOARDS')}<//>
-    ${sub === 'ach' && html`<span class="sp"></span>
-      <${Chip} cls="sm" on=${view === 'list'} onClick=${() => setPref('achView', 'list')}>${t('LIST')}<//>
-      <${Chip} cls="sm" on=${view === 'grid'} onClick=${() => setPref('achView', 'grid')}>${t('GRID')}<//>`}
+    ${hasConsole && html`<${Chip} on=${sub === 'src'} onClick=${() => setPref('liveSub', 'src')} n=${c.connected ? c.ip : null}>${t('CONSOLE')}<//>`}
   </div>`;
 
   return html`<div class="tab">
+    <${LiveBanners} s=${s} />
     <${FollowSwitch} s=${s} />
-    <${FollowPanel} s=${s} />
-    <${ConsolePanel} s=${s} />
-    <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll}
-      icon=${(meta && lm.icon) || s.game.icon || ''} />
+    <${LiveHead} s=${s} list=${list} done=${done} ptsDone=${ptsDone} ptsAll=${ptsAll} icon=${m.icon} />
     ${strip}
     ${nav}
     ${sub === 'lb' ? html`<${BoardsBody} id=${s.game.id} />`
-      : html`<${Fragment}>
-          ${ahead}
-          ${showAll && html`<${Eyebrow} count=${done + ' / ' + list.length}>${t('ALL ACHIEVEMENTS')}<//>`}
-          ${view === 'grid'
-            ? html`<${AchievementTiles} list=${list} subsets=${s.game.subsets} medOf=${medOf} missed=${missed} />`
-            : html`<${AchievementGroups} list=${list} subsets=${s.game.subsets} row=${row} />`}
-        <//>`}
+      : sub === 'src' && hasConsole ? html`<${ConsolePanel} s=${s} />`
+      : html`<${Fragment}><${FollowPanel} s=${s} /><${AchBlock} s=${s} m=${m} /><//>`}
   </div>`;
 }

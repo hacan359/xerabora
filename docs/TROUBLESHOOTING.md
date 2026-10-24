@@ -1,6 +1,6 @@
 # Before you report a problem
 
-xeRAbora is alpha software, and the chain it runs on is long: the
+The chain xeRAbora runs on is long: the
 image, OPL, our code inside the running game, the IOP module that sends
 the frames, the network adapter, your router, the client on a PC or a
 phone, and RetroAchievements itself. Any link can fail, and so far most
@@ -24,7 +24,7 @@ sets that newer ones handle, and the console does not say which build
 it is running.
 
 After "RA: test PC connection" the console shows the client's version
-(`xerabora/0.1.0-alpha.N`). If it is not the one you just installed,
+(`xerabora/1.0.0` or later). If it is not the one you just installed,
 another client is answering: see the next step.
 
 ## 2. One client

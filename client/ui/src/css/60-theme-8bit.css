@@ -1,0 +1,80 @@
+/* ---- Theme: 8-bit ------------------------------------------------------
+   NES palette, square corners, hard shadows, pixel fonts, stepped bars.
+   font-size-adjust scales the pixel fonts to the sizes the rules use. */
+:root[data-theme="8bit"] {
+  --bg: #0D0D1A;
+  --bg-raised: #1A1A33;
+  --bg-sunken: #000000;
+  --bg-hover: #26264D;
+  --line: #3C3C78;
+  --line-strong: #6464B4;
+  --ink: #FCFCFC;
+  --ink-soft: #BCBCFC;
+  --ink-mute: #8484C8;
+
+  --blue: #3CBCFC;
+  --blue-bright: #68E8FC;
+  --gold: #F8B800;
+  --ok: #58D854;
+  --warn: #FCA044;
+  --danger: #F83800;
+
+  --accent: #F878F8;
+  --accent-ink: #000000;
+  --accent-soft: rgba(248, 120, 248, 0.16);
+  --accent-line: #F878F8;
+  --accent-glow: transparent;
+  --bar: #F878F8;
+  --wash-blue: 0;
+  --wash-gold: 0;
+
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-xs: 0;
+  --shadow: 4px 4px 0 #000000;
+
+  --font-display: "Press Start 2P", "Courier New", monospace;
+  --font-body: "VT323", "Courier New", monospace;
+  --font-mono: "VT323", "Courier New", monospace;
+}
+/* Every rule's font shorthand resets font-size-adjust, so it is set on
+   every element. */
+:root[data-theme="8bit"] * { font-size-adjust: 0.5 !important; }
+:root[data-theme="8bit"][data-mode="console"] { --accent: var(--gold); --accent-soft: rgba(248, 184, 0, 0.16); --accent-line: var(--gold); --bar: var(--gold); }
+:root[data-theme="8bit"][data-mode="follow"] { --accent: var(--blue); --accent-soft: rgba(60, 188, 252, 0.16); --accent-line: var(--blue); --bar: var(--blue); }
+
+/* A scanline grid behind the page instead of the washes. */
+:root[data-theme="8bit"] body { background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px); background-size: 100% 3px; }
+
+/* Hard edges: 2 px borders and offset shadows, no blur. */
+:root[data-theme="8bit"] .row, :root[data-theme="8bit"] .cell, :root[data-theme="8bit"] .card,
+:root[data-theme="8bit"] .switch, :root[data-theme="8bit"] .banner, :root[data-theme="8bit"] .comments {
+  border-width: 2px; box-shadow: 3px 3px 0 #000000;
+}
+:root[data-theme="8bit"] .chip, :root[data-theme="8bit"] .btn, :root[data-theme="8bit"] .mode,
+:root[data-theme="8bit"] .src, :root[data-theme="8bit"] .award { border-radius: 0; border-width: 2px; }
+:root[data-theme="8bit"] .ichip, :root[data-theme="8bit"] .dkey { border-width: 2px; background: var(--bg-raised); box-shadow: 0 4px 0 #000000; }
+:root[data-theme="8bit"] .ichip:active, :root[data-theme="8bit"] .ichip.on,
+:root[data-theme="8bit"] .dkey:active, :root[data-theme="8bit"] .dkey.on { transform: translateY(4px); box-shadow: none; background: var(--accent); color: var(--accent-ink); }
+:root[data-theme="8bit"] .dkey.on .l, :root[data-theme="8bit"] .dkey.on .d { color: var(--accent-ink); }
+:root[data-theme="8bit"] .drawer { border-left-width: 3px; box-shadow: -6px 0 0 #000000; }
+:root[data-theme="8bit"] .dot, :root[data-theme="8bit"] .rpbar .dot { border-radius: 0; box-shadow: none; }
+:root[data-theme="8bit"] .eyebrow, :root[data-theme="8bit"] .cell .k, :root[data-theme="8bit"] .chip,
+:root[data-theme="8bit"] nav.tabs button, :root[data-theme="8bit"] .btn { letter-spacing: 0.02em; }
+:root[data-theme="8bit"] .row .t { font-family: var(--font-display); font-weight: 400; line-height: 1.5; }
+
+/* Stepped progress bars. */
+:root[data-theme="8bit"] .bar, :root[data-theme="8bit"] .mini { border-radius: 0; border-width: 2px; }
+:root[data-theme="8bit"] .bar i, :root[data-theme="8bit"] .mini i,
+:root[data-theme="8bit"] .bar.sc i, :root[data-theme="8bit"] .bar.hc i {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--bar) 0 6px, transparent 6px 8px);
+}
+:root[data-theme="8bit"] .bar.sc i { --bar: var(--blue); }
+:root[data-theme="8bit"] .bar.hc i { --bar: var(--gold); }
+
+/* Badges without smoothing. */
+:root[data-theme="8bit"] .badge, :root[data-theme="8bit"] .tile, :root[data-theme="8bit"] .cover,
+:root[data-theme="8bit"] .toast img { image-rendering: pixelated; border-radius: 0; }
+:root[data-theme="8bit"] .toast { border-radius: 0; border-width: 3px; box-shadow: 6px 6px 0 #000000; }
+:root[data-theme="8bit"] .tile.done.m3, :root[data-theme="8bit"] .row.done.m3 .badge { box-shadow: 0 0 0 2px var(--gold); }
