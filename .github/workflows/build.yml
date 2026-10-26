@@ -42,7 +42,9 @@ jobs:
 
   client-linux:
     name: PC client (Linux)
-    runs-on: ubuntu-latest
+    # 24.04, not latest: the 26.04 runner builds for x86-64-v3 (AVX2),
+    # and the binary refuses to start on older CPUs.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,6 +57,12 @@ jobs:
       - name: Build
         working-directory: client
         run: make xerabora && ./xerabora --help
+
+      - name: Check the binary runs on any x86-64 CPU
+        working-directory: client
+        run: |
+          readelf -n xerabora | grep 'ISA needed'
+          ! readelf -n xerabora | grep 'ISA needed' | grep -q 'x86-64-v[234]'
 
       - uses: actions/upload-artifact@v4
         with:
