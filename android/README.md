@@ -11,7 +11,7 @@ the same page as the PC client.
 2. Open the app. It asks for notifications and for running without battery optimization. Allow both:
    that is what keeps the client alive with the screen off in the middle of a game.
 3. On the page's **SETTINGS** tab, sign in to RetroAchievements and paste the Web API key, as on the PC.
-   The page opens in the phone's language (English, Portuguese or Spanish); the menu in its header
+   The page opens in the phone's language (English, Portuguese, Spanish or Russian); the menu in its header
    changes it.
 4. On the PS2, with the phone on the **same Wi-Fi** as the console: **RA: test PC connection** has to show
    the phone's address. Then **RA: check game support**, then the game.

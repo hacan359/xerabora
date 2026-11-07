@@ -14,18 +14,21 @@ change: tools/embed-page.py (src/ui_page.c) and tools/make-demo.py
 
 Layout of ui/src:
 
-    page.html      the skeleton, with {{css}}, {{vendor}}, {{lang}}, {{js}}
+    page.html      the skeleton, with {{fonts}}, {{css}}, {{vendor}}, {{lang}}, {{js}}
     css/*.css      concatenated in name order into one <style>
     js/*.js        concatenated in name order into one <script>
     ../vendor/     preact, hooks, htm, signals: wrapped as CommonJS modules
                    behind a tiny require(), so the CJS/UMD builds work inline
+    ../vendor/fonts/ fonts.css and the woff2 cuts it names, inlined as data URIs
     ../lang/*.json the dictionaries, generated into the LANG table
 
 Every file in css/ and js/ goes in; the leading number in a name fixes
 the order where it matters (tokens before rules, app.js last).
 """
+import base64
 import json
 import pathlib
+import re
 import runpy
 import sys
 import time
@@ -80,6 +83,17 @@ def vendor_block():
     return "\n".join(parts) + "\n"
 
 
+def fonts_block():
+    """fonts.css with each url(file) replaced by that file as a data URI."""
+    folder = vendor / "fonts"
+
+    def inline(m):
+        data = base64.b64encode((folder / m.group(1)).read_bytes()).decode("ascii")
+        return "url(data:font/woff2;base64,%s)" % data
+
+    return re.sub(r"url\(([^)]+)\)", inline, (folder / "fonts.css").read_text(encoding="utf-8"))
+
+
 def lang_block():
     """The English source string is the key; a language with no entry for
     a string shows the English one."""
@@ -103,7 +117,8 @@ def build_page():
     css = concat(src / "css", ".css", "/* ==== %s ==== */")
     js = concat(src / "js", ".js", "/* ==== %s ==== */")
     lang, counts = lang_block()
-    for marker, body in (("{{css}}", css), ("{{vendor}}", vendor_block()),
+    for marker, body in (("{{fonts}}", fonts_block()), ("{{css}}", css),
+                         ("{{vendor}}", vendor_block()),
                          ("{{lang}}", lang), ("{{js}}", js)):
         if marker not in page:
             raise SystemExit("page.html has no %s" % marker)
@@ -125,6 +140,7 @@ def build(page_only=False):
 def inputs():
     files = [src / "page.html"] + list((src / "css").glob("*.css")) + \
             list((src / "js").glob("*.js")) + list(vendor.glob("*.js")) + \
+            list((vendor / "fonts").iterdir()) + \
             list(langdir.glob("*.json")) + [root / "ui" / "demo.js"]
     return {f: f.stat().st_mtime for f in files}
 

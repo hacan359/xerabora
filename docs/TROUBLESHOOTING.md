@@ -85,7 +85,7 @@ images and HDL partitions are not hashed.
 
 | Step | If it fails here |
 |---|---|
-| **RA: test PC connection** shows the PC's address | Network: same subnet, Windows firewall allowing `xerabora.exe` on private networks, one client running. Not us yet. |
+| **RA: test PC connection** shows the PC's address | Network: same subnet or **RA client IP** set, Windows firewall allowing `xerabora.exe` on private networks, one client running. Not us yet. |
 | **RA: check game support** says supported, with counts | "Did not answer": network again. "Does not know this image": the dump. "Could not open a network socket": OPL's ETH settings or the cable. |
 | The game starts on **plain OPL** from the same device | If plain OPL cannot run it, neither can we. Report it to OPL, not here. |
 | The game starts on **OPL-RA** and LIVE shows snapshots arriving | Stuck on the loading screen with the client silent: this is ours. Collect the logs below. |

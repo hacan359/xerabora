@@ -164,7 +164,8 @@ static void send_reply(sock_t sock, char *buf, size_t len, size_t cap, const str
 
 /* The console puts its own address in the request; the reply goes there,
    not to the datagram's source, which NAT may have rewritten. A request
-   without a usable address is answered to its source. */
+   without a usable address is answered to its source. send_reply_both
+   adds the source when the two differ. */
 static void pick_target(struct sockaddr_in *to, const struct sockaddr_in *from, const char *ip, int port)
 {
     unsigned long addr = (ip[0] != '\0') ? inet_addr(ip) : INADDR_NONE;
@@ -176,6 +177,16 @@ static void pick_target(struct sockaddr_in *to, const struct sockaddr_in *from, 
         to->sin_port = htons((unsigned short)port);
         to->sin_addr.s_addr = (unsigned int)addr;
     }
+}
+
+/* Sends a reply to the address the console named and, when it differs,
+   to the datagram's source as well. */
+static void send_reply_both(sock_t sock, char *buf, size_t len, size_t cap,
+                            const struct sockaddr_in *to, const struct sockaddr_in *from)
+{
+    send_reply(sock, buf, len, cap, to);
+    if (to->sin_addr.s_addr != from->sin_addr.s_addr || to->sin_port != from->sin_port)
+        send_reply(sock, buf, len, cap, from);
 }
 
 /* Watch list serialized for the console, cached by hash: the console
@@ -358,7 +369,7 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
         pick_target(&to, from, ip, port);
         /* The version lets the console's link test show what answered. */
         n = snprintf(reply, sizeof(reply), "RAO1 OK %s/%s", XERABORA_NAME, XERABORA_VERSION);
-        send_reply(sock, reply, (size_t)n, sizeof(reply), &to);
+        send_reply_both(sock, reply, (size_t)n, sizeof(reply), &to, from);
         log_info("console found at %s:%d", ip, port);
         g_console = to;
         g_console_bcast = to;
@@ -453,7 +464,7 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
                 log_info("console asked about %s: identifying", hash);
         }
 
-        send_reply(sock, reply, (size_t)n, sizeof(reply), &to);
+        send_reply_both(sock, reply, (size_t)n, sizeof(reply), &to, from);
         return 1;
     }
 
@@ -476,7 +487,7 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
 
         hdr = snprintf(reply, sizeof(reply), "RAC1 %d %d ", idx, take);
         memcpy(reply + hdr, &g_serve[idx * XERABORA_CHUNK], (size_t)take);
-        send_reply(sock, reply, (size_t)hdr + (size_t)take, sizeof(reply), &to);
+        send_reply_both(sock, reply, (size_t)hdr + (size_t)take, sizeof(reply), &to, from);
         return 1;
     }
 

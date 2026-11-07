@@ -33,9 +33,9 @@
   --radius-xs: 0;
   --shadow: 4px 4px 0 #000000;
 
-  --font-display: "Press Start 2P", "Courier New", monospace;
-  --font-body: "VT323", "Courier New", monospace;
-  --font-mono: "VT323", "Courier New", monospace;
+  --font-display: "Tiny5", "Press Start 2P", "Courier New", monospace;
+  --font-body: "VT323", "Tiny5", "Courier New", monospace;
+  --font-mono: "VT323", "Tiny5", "Courier New", monospace;
 }
 /* Every rule's font shorthand resets font-size-adjust, so it is set on
    every element. */

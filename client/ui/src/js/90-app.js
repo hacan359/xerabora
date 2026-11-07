@@ -79,6 +79,8 @@ function App() {
   if (S.closed.value)
     return html`<div class="closed">${t('xerabora is closed. This tab can be closed too.')}</div>`;
 
+  if (S.view.value === 'stream' && overlayOn())
+    return html`<div class="app"><${OverlayView} /></div>`;
   if (S.view.value === 'stream')
     return html`<div class="app"><main class="wrap"><${StreamView} /></main><${Toast} /><${PowerOn} /></div>`;
 

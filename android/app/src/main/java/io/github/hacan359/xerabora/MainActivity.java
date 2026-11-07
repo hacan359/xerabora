@@ -402,6 +402,8 @@ public final class MainActivity extends Activity {
                 return "pt-BR";
             case "es":
                 return "es";
+            case "ru":
+                return "ru";
             default:
                 return "";
         }

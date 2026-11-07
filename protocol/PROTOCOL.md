@@ -24,10 +24,16 @@ contract.
 ## Addressing and NAT
 
 Each request from the console includes the console's own IP and port.
-The client replies to that address, not to the datagram's source. This
-matters when the client runs behind NAT (a container), where the source
-address is rewritten and a reply sent back to it would not reach the
-console.
+The client replies to that address. This matters when the client runs
+behind NAT (a container), where the source address is rewritten and a
+reply sent back to it would not reach the console.
+
+When the source differs from the address in the request, the client
+replies to the source as well. A console behind a NAT router names a
+private address the client cannot reach; the router's address and port
+in the source lead back to it. Unlock notices and resets go to the
+address of the console's latest telemetry, which through such a router
+is the router's.
 
 ## Padding
 
@@ -44,6 +50,11 @@ with header and padding stays under a 960-byte receive ceiling.
 
 The console broadcasts `RAP1`; a listening client answers with its name
 and version. Used to confirm the link.
+
+A broadcast does not cross a router. A console that knows the client's
+address (the PS2 agent takes it from its network settings) sends every
+request there as well, by unicast. On a direct link the client may then
+see the same request twice and answers each one.
 
 ## Identify a game
 

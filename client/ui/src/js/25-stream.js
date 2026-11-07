@@ -27,14 +27,18 @@ function LiveChip({ s }) {
   return html`<span class=${'chip static live' + (on ? ' on' : '')}><span class="dot" />${on ? t('LIVE') : t('OFFLINE')}</span>`;
 }
 
-/* The stream view: the game's head and the achievement block. */
+/* The stream view as a column: the game's head and the achievement
+   block. LAYOUT on the bar opens the layout keys under it. */
 function StreamView() {
   const s = S.state.value;
+  const [pick, setPick] = useState(false);
   const bar = html`<div class="sbar">
     <a class="brand" href="#" onClick=${e => { e.preventDefault(); go('tabs'); }}><span>xe<span class="r">R</span><span class="a">A</span>bora</span></a>
     <span class="mode">${t('STREAM')}</span>
     <${LiveChip} s=${s} /><span class="sp"></span>
-    <${Btn} sm onClick=${() => go('tabs')}>${t('BACK TO TABS')}<//></div>`;
+    <${Btn} sm onClick=${() => setPick(!pick)}>${t('LAYOUT')}<//>
+    <${Btn} sm onClick=${() => go('tabs')}>${t('BACK TO TABS')}<//></div>
+    ${pick && html`<${StreamPicker} />`}`;
   if (!s) return html`<div class="stream">${bar}<${Empty}>${t('loading...')}<//></div>`;
 
   const list = s.game.achievements || [];

@@ -3,7 +3,7 @@
 /* t() looks a string up in LANG[lang] and falls back to the English
    key. LANG is generated from ui/lang/*.json at build time. {name}
    placeholders are filled after the lookup. */
-const LANGS = [['', 'English'], ['pt-BR', 'Português (Brasil)'], ['es', 'Español']];
+const LANGS = [['', 'English'], ['pt-BR', 'Português (Brasil)'], ['es', 'Español'], ['ru', 'Русский']];
 
 let lang = '';
 try { lang = localStorage.getItem('lang') || ''; } catch (e) { lang = ''; }

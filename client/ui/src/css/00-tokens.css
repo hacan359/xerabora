@@ -40,8 +40,8 @@
   --radius-xs: 6px;
   --shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
 
-  --font-display: "Chakra Petch", "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-body: "Atkinson Hyperlegible", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: "Exo 2", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);

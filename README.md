@@ -94,6 +94,8 @@ shows nothing for it.
    **RA: test PC connection**. A notice tells you whether `xerabora` answered,
    from which address and how fast. If nothing answers, check that the PC
    is on the same network and that the firewall allows inbound UDP 18194.
+   A console behind a router needs **RA client IP** in OPL's Network
+   settings; see [USAGE](docs/USAGE.md#console-behind-a-router).
 6. In the same menu choose **RA: check game support**. Do this before you
    start the game, once per game: it fetches the list of addresses the
    console will read, and without it there is nothing to track. The
@@ -141,7 +143,7 @@ and live leaderboards work only with the PS2.
 | **LIBRARY** | Every game your account has touched, up to 500: two bars per game, softcore and hardcore, the highest award in the corner of the cover, filters by status and console. Not the whole RetroAchievements catalogue: only what you have played. | Web API (completion progress) | cached 2 min |
 | **GAME** | One set in full: the author's order, the intended path (progression, win condition, missables flagged), the median-time order or rarity; each achievement's points, unlock date, median, rarity and RetroPoints, and its comments on a click. The player count and your rank in the head. A game's subsets and its main set as a strip of chips, so you move between them without leaving the tab. | Web API (game info, game progression, the console's game list for subsets) | cached 30 s |
 | **BOARDS** | A game's leaderboards with the top entry and your own, and, when the console plays, the trackers moving with the game. | Web API; trackers from the console | on open |
-| **Header** | Your name and points. The language menu: English, Brazilian Portuguese, Spanish. | Web API (profile) | on load |
+| **Header** | Your name and points. The language menu: English, Brazilian Portuguese, Spanish, Russian. | Web API (profile) | on load |
 
 Unlocks reach your profile the moment rcheevos fires them, with a toast
 on the page, a short sound on the PC and the gold flash on the console.
@@ -262,8 +264,8 @@ external dependencies. `make macos` builds one file holding both Mac
 architectures, against the libcurl the system ships.
 
 The page is written in `client/ui/src`: a skeleton, one stylesheet per
-concern, one script per tab, with Preact, htm and signals vendored in
-`client/ui/vendor`. `python3 tools/build-page.py` (from `client/`)
+concern, one script per tab, with Preact, htm, signals and the fonts
+vendored in `client/ui/vendor`. `python3 tools/build-page.py` (from `client/`)
 assembles `ui/index.html`, embeds it into `src/ui_page.c` and rebuilds
 `docs/demo.html`; `--watch` does that on every save. While working on
 it, `--ui-file client/ui/index.html` serves the assembled page from disk
@@ -323,7 +325,8 @@ after cloning. Building the client needs only `third_party/rcheevos`; the
 ## License
 
 The OPL fork keeps OPL's license (Academic Free License 3.0). The PC
-client is released under the MIT license. rcheevos is MIT.
+client is released under the MIT license. rcheevos is MIT. The fonts
+in `client/ui/vendor/fonts` are under the SIL Open Font License 1.1.
 
 The RA mark belongs to RetroAchievements and the OPL name to the Open
 PS2 Loader project; they appear here to show what this project connects.

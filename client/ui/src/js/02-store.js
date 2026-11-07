@@ -33,6 +33,8 @@ const S = {
   error: signal(''),
   liveSub: signal(loadPref('liveSub', 'ach')),   /* LIVE: 'ach', 'lb' or 'src' */
   achView: signal(loadPref('achView', 'list')),  /* 'list' or 'grid' */
+  streamLayout: signal(urlOpt('layout', loadPref('streamLayout', 'column'))),  /* STREAM: 'column', 'a', 'b', 'c' or 'v' */
+  streamAch: signal(urlOpt('ach', loadPref('streamAch', 'auto'))),          /* STREAM achievements: 'auto', 'list' or 'grid' */
   theme: signal(new URLSearchParams(location.hash.slice(1)).get('theme') || loadPref('theme', 'neon')),  /* 'neon' or '8bit'; #theme= in the address sets it for this window */
   upNext: signal(loadPref('upNext', 'open')),    /* 'open' or 'shut' */
   liveFilter: signal('all'),
@@ -46,6 +48,11 @@ const S = {
 /* Small per-browser choices: the LIVE sub-tab and the list or grid view. */
 function loadPref(key, def) {
   try { return localStorage.getItem(key) || def; } catch (e) { return def; }
+}
+
+/* A choice given in the address (?layout=a) wins over the stored one. */
+function urlOpt(name, def) {
+  return new URLSearchParams(location.search).get(name) || def;
 }
 
 function setPref(key, val) {

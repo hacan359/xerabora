@@ -1,0 +1,150 @@
+/* ---- Stream layouts ------------------------------------------------------
+   The layout keys under the stream bar, and the overlay: a fixed stage
+   (1920x1080 or 1080x1920) scaled to the window, one panel with
+   cut-outs for the game, the camera and the chat. */
+.spick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 0 14px; }
+.spick .k { font: 600 10.5px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); margin: 0 4px 0 8px; }
+.spick .k:first-child { margin-left: 0; }
+
+/* The page under the overlay is transparent, for an OBS browser source. */
+html.ov-on, html.ov-on body { background: transparent; overflow: hidden; }
+html.ov-on body::before, html.ov-on body::after { display: none; }
+
+.ov { position: fixed; inset: 0; overflow: hidden; }
+.ov-stage { position: absolute; left: 50%; top: 50%; transform-origin: center; }
+.ov-shell { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.ov-s0 { stop-color: var(--bg-raised); }
+.ov-s1 { stop-color: var(--bg); }
+.ov-s2 { stop-color: var(--bg-sunken); }
+.ov-acc { stop-color: var(--accent); }
+.ov-lip { fill: none; stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1.5; }
+.ov-lip-dark { fill: none; stroke: var(--bg-sunken); stroke-width: 6; }
+.ov-tick { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.ov-rule { fill: none; stroke: var(--line-strong); stroke-opacity: 0.7; }
+
+/* The name of a cut-out, outside OBS only. */
+.ov-hole {
+  position: absolute; display: grid; place-items: center; pointer-events: none;
+  font: 600 18px var(--font-display); letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute); opacity: 0.35;
+}
+
+.ov-sec { position: absolute; }
+.ov-hd {
+  display: flex; align-items: center; gap: 10px; height: 30px;
+  font: 700 11px/1 var(--font-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute);
+}
+.ov-hd b { color: var(--accent); }
+.ov-hd .rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
+.ov-hd .n { font: 600 11px var(--font-mono); letter-spacing: 0; }
+
+/* Achievements: a viewport and a track that rides inside it. */
+.ov-vp {
+  position: absolute; inset: 30px 0 0 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 18px), transparent 100%);
+}
+.ov-track { padding: 6px 0 10px; animation: fadein 0.25s var(--ease); }
+.ov-none { padding: 10px 2px; color: var(--ink-mute); font-size: 14px; }
+.ov-mini { position: absolute; height: 2px; border-radius: 2px; background: rgba(0, 0, 0, 0.45); overflow: hidden; }
+.ov-mini i { display: block; height: 100%; background: var(--bar); }
+
+.ov-ach.v-list .ov-track { display: block; }
+.ov-item { position: relative; display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; height: 36px; padding: 0 2px; }
+.ov-item + .ov-item { border-top: 1px solid var(--line); }
+.ov-item img { width: 28px; height: 28px; border-radius: var(--radius-xs); }
+.ov-item.locked img, .ov-item.near img, .ov-item.na img { filter: saturate(0.4) brightness(0.7); }
+.ov-item .tx { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-item .t { font: 600 14.5px var(--font-display); color: var(--ink); }
+.ov-item.locked .t, .ov-item.na .t { color: var(--ink-soft); }
+.ov-item .d { font-size: 12.5px; color: var(--ink-mute); margin-left: 8px; }
+.ov-item.near .d { color: var(--accent); }
+.ov-item .pts { font: 700 14px var(--font-display); color: var(--accent); text-align: right; min-width: 28px; }
+.ov-item.done .pts::before { content: "✓ "; color: var(--ok); font-size: 12px; }
+.ov-item .ov-mini { left: 40px; right: 44px; bottom: 3px; }
+
+.ov-ach.v-grid .ov-track { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; }
+.ov-tile { position: relative; display: block; aspect-ratio: 1; }
+.ov-tile img { display: block; width: 100%; height: 100%; border-radius: var(--radius-sm); }
+.ov-tile.locked img, .ov-tile.near img, .ov-tile.na img { filter: saturate(0.4) brightness(0.6); }
+.ov-tile.done img { box-shadow: 0 0 0 1.5px var(--accent-line); }
+.ov-tile .ov-mini { left: 6px; right: 6px; bottom: 5px; height: 3px; background: rgba(0, 0, 0, 0.6); }
+
+/* The game's head. */
+.ov-head { display: flex; align-items: center; gap: 20px; }
+.ov-cover { width: 54px; height: 54px; flex: none; border-radius: var(--radius-sm); background: var(--bg-raised); object-fit: cover; }
+.ov-title { min-width: 0; flex: 0 1 auto; }
+.ov-title h1 { margin: 0; font: 700 22px/1.1 var(--font-display); color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-rp { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 14px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; }
+.ov-rp::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+.ov-rp span { overflow: hidden; text-overflow: ellipsis; animation: fadein 0.5s var(--ease); }
+.ov-vr { width: 1px; align-self: stretch; margin: 6px 0; flex: none; background: linear-gradient(180deg, transparent, var(--line-strong), transparent); }
+.ov-prog { flex: 1; min-width: 220px; }
+.ov-prog .nums { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+.ov-prog .big { font: 800 24px/1 var(--font-display); color: var(--white); }
+.ov-prog .big small { font-size: 14px; color: var(--ink-mute); font-weight: 600; }
+.ov-prog .k { font: 600 11px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
+.ov-bar { height: 8px; border-radius: 8px; background: rgba(0, 0, 0, 0.45); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6); overflow: hidden; }
+.ov-bar i { display: block; height: 100%; border-radius: inherit; background: var(--bar); box-shadow: 0 0 14px var(--accent-glow); transition: width 0.8s var(--ease); }
+.ov-head.stack { flex-wrap: wrap; gap: 14px; }
+.ov-head.stack .ov-title { flex: 1; }
+.ov-head.stack .ov-vr { display: none; }
+.ov-head.stack .ov-prog { flex-basis: 100%; }
+
+/* The status line. */
+.ov-status { display: flex; align-items: center; gap: 12px; font: 12.5px/1 var(--font-mono); color: var(--ink-mute); white-space: nowrap; overflow: hidden; }
+.ov-status b { color: var(--ink-soft); font-weight: 500; }
+.ov-status .ok { color: var(--ok); }
+.ov-status .warn { color: var(--warn); }
+.ov-status .src { font: 700 10px/1 var(--font-display); letter-spacing: 0.14em; color: var(--gold); }
+.ov-status .src.web { color: var(--blue-bright); }
+.ov-status .sp { flex: 1; }
+.ov-dot { width: 3px; height: 3px; flex: none; border-radius: 50%; background: var(--line-strong); }
+.ov-live { display: inline-flex; align-items: center; gap: 6px; font: 700 10px/1 var(--font-display); letter-spacing: 0.14em; color: var(--ink-mute); }
+.ov-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-mute); }
+.ov-live.on { color: var(--white); }
+.ov-live.on i { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: ovblink 1.6s infinite; }
+@keyframes ovblink { 50% { opacity: 0.35; } }
+.ov-brand { font: 800 15px var(--font-display); color: var(--white); }
+.ov-brand .r { color: var(--blue-bright); }
+.ov-brand .a { color: var(--gold); }
+
+.ov-foot { text-align: center; }
+.ov-foot .ov-brand { font-size: 64px; }
+.ov-foot .k { margin-top: 14px; font: 700 14px/1 var(--font-display); letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); }
+
+/* The unlock card over the game cut-out, centred by its holder. */
+.ov-toast-at { position: absolute; z-index: 2; transform: translateX(-50%); }
+.ov-toast {
+  display: flex; align-items: center; gap: 18px; padding: 16px 24px 16px 16px;
+  border-radius: 14px; border: 1px solid rgba(243, 200, 107, 0.8);
+  background: linear-gradient(180deg, rgba(40, 28, 6, 0.96), rgba(18, 13, 4, 0.96));
+  box-shadow: 0 0 0 4px rgba(224, 165, 38, 0.18), 0 0 60px rgba(224, 165, 38, 0.45), 0 20px 50px rgba(0, 0, 0, 0.6);
+  animation: ovtoast 6s var(--ease) forwards;
+}
+@keyframes ovtoast {
+  0% { opacity: 0; transform: translateY(-24px) scale(0.96); }
+  7%, 90% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+.ov-toast img { width: 72px; height: 72px; border-radius: 10px; box-shadow: 0 0 0 2px #F3C86B, 0 0 24px rgba(243, 200, 107, 0.6); }
+.ov-toast .k { font: 700 11px/1 var(--font-display); letter-spacing: 0.18em; text-transform: uppercase; color: #F3C86B; }
+.ov-toast .t { margin-top: 6px; font: 800 26px/1.15 var(--font-display); color: var(--white); white-space: nowrap; }
+.ov-toast .d { margin-top: 4px; font-size: 14px; color: #E6D3A8; white-space: nowrap; }
+.ov-toast .p { margin-left: 14px; font: 800 30px var(--font-display); color: #F3C86B; }
+
+/* The keys over the overlay: shown while the mouse moves. */
+.ov-ctl {
+  position: fixed; left: 50%; top: 10px; z-index: 5; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px; padding: 8px 12px; max-width: calc(100vw - 20px); flex-wrap: wrap;
+  background: var(--bg-raised); border: 1px solid var(--line-strong);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease);
+}
+.ov-ctl.on, .ov-ctl:hover { opacity: 1; pointer-events: auto; }
+.ov-ctl .spick { padding: 0; }
+.ov-ctl .obs { font: 12px var(--font-mono); color: var(--ink-mute); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-toast { animation: none; }
+  .ov-live.on i { animation: none; }
+}

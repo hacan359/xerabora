@@ -22,8 +22,10 @@ There are two parts:
   to the RetroAchievements server, tells the console what to watch,
   receives the snapshots, and unlocks achievements.
 
-The console and the PC talk over the local network by UDP. No PC address
-is configured anywhere — the console finds the client by broadcast.
+The console and the PC talk over the local network by UDP. On one subnet
+no PC address is configured: the console finds the client by broadcast.
+A console behind a router needs the PC's address, see
+[Console behind a router](#console-behind-a-router).
 
 ## What you need
 
@@ -32,8 +34,10 @@ is configured anywhere — the console finds the client by broadcast.
    fat consoles, or the built-in port on slims) with a working IP —
    DHCP is fine. Configure it once in OPL: **Settings → Network settings**.
 3. `OPL-RA.ELF` installed as an app in OPL (see below).
-4. The PC client running on a machine on the **same LAN/subnet**, logged
-   in to your RetroAchievements account.
+4. The PC client running on a machine on the **same LAN/subnet** (or
+   reachable through a router, see
+   [Console behind a router](#console-behind-a-router)), logged in to
+   your RetroAchievements account.
 5. Your game images (`.iso`) on a USB stick, or the original disc in the
    drive. These two we have tested, and they are the ones to play from.
    A game with an achievement set does not run from a network share;
@@ -391,7 +395,7 @@ issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 |---|---|
 | OPL+RA not listed under Apps | `conf_apps.cfg` is on a different device than OPL's config device, uses the wrong path prefix, or is malformed. Fix the path/device, or launch the ELF directly. |
 | No on-screen messages at all | Turn on **Notifications** and cold-boot. |
-| "test" works, "check" says no answer | Client not running, or not on the same subnet. |
+| "test" works, "check" says no answer | Client not running, or not on the same subnet with **RA client IP** unset. |
 | "could not open a network socket" | ETH device off/misconfigured, or no cable/link. |
 | Client shows nothing when you press a menu item | Windows firewall blocking inbound UDP to `xerabora.exe`. |
 | Game starts, client shows nothing | You did not run "check game support" on it, or RetroAchievements does not know the image. Check it once; if the notice says the image is unknown, the game plays without achievements. |
@@ -401,12 +405,32 @@ issue, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 | Page says the port is busy | Another copy of the client holds UDP 18194. QUIT it from its footer, or end it in Task Manager. |
 | Game breaks with the in-game reset on: items missing, inputs dead (Sly Cooper does this) | Turn on **Mode 6** in the game's compatibility settings. Achievements keep working without the IGR. |
 
+## Console behind a router
+
+A router does not pass the console's broadcast. This is the case when the
+PS2 sits behind a Raspberry Pi that shares its Wi-Fi over Ethernet, and
+the client runs on a PC in the home network.
+
+1. In OPL open **Settings → Network settings**.
+2. Set **RA client IP** to the PC's address. `0.0.0.0` means broadcast
+   only, the default.
+3. Press **OK** at the bottom of the dialog, then **Save changes**.
+4. Reopen Network settings and check the address stayed.
+5. Run **RA: test PC connection**.
+
+The console sends to this address and to the broadcast, and the client
+answers the address the datagram came from. The router needs no port
+forwarding. Both sides must be 1.1.0 or newer.
+
+The second way is to run the client on the router itself, in the
+console's subnet. Then nothing needs setting.
+
 ## Notes and limits
 
 - OPL-RA carries no cheat engine and reads no `CHT/` files; stock OPL
   is for play with cheats.
-- Console and PC must be on the same subnet (the client learns the
-  console's MAC from its request).
+- A console on another subnet needs **RA client IP** set; a router does
+  not pass the broadcast.
 - Mode 6 turns the in-game reset off and keeps the achievements. RESET
   CONSOLE from the client needs the IGR, so it does nothing in that mode.
 - Images may be named `Title.iso` or the OPL Manager way,
