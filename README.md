@@ -33,13 +33,10 @@ notification. No PC needed.
 the setup as a walkthrough: [How to start](https://hacan359.github.io/xerabora/#start).
 
 > [!IMPORTANT]
-> **After an update, check every game again.** The ELF on the console
-> and the client on the PC are a pair: update both to the same release.
-> Then run **RA: check game support** on each game you play. The console
-> keeps the address list from the last check, and a list written by an
-> older client makes it skip pointer chains, so achievements that read
-> through them stay locked with no error on screen. A release that
-> changes the first number of the version (2.0.0) always needs this.
+> **A new major version means checking your games again.** When the
+> first number of the version changes, for example from 1.x to 2.0,
+> update both the ELF on the console and the client on the PC, then run
+> **RA: check game support** again on every game you play.
 
 <p align="center">
   <img src="docs/screenshots/console.png" alt="LIVE on a PC and a phone while the console plays" width="720">
