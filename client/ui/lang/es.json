@@ -223,5 +223,21 @@
   "CLOSE": "CERRAR",
   "filter and order": "filtro y orden",
   "show UP NEXT": "mostrar LO SIGUIENTE",
-  "hide UP NEXT": "ocultar LO SIGUIENTE"
+  "hide UP NEXT": "ocultar LO SIGUIENTE",
+  "your Discord profile shows the game, what you are doing in it and the last unlock.": "Tu perfil de Discord muestra el juego, lo que haces en él y el último logro.",
+  "HIDE FROM DISCORD": "OCULTAR EN DISCORD",
+  "Discord shows nothing about your play.": "Discord no muestra nada sobre tu partida.",
+  "SHOW ON DISCORD": "MOSTRAR EN DISCORD",
+  "DIAGNOSTICS": "DIAGNÓSTICO",
+  "test mode is on: every achievement can trigger again, and nothing is sent to RetroAchievements. Each one that triggers is written to a file with its conditions and the memory it read.": "El modo de prueba está activo: cada logro puede dispararse de nuevo y no se envía nada a RetroAchievements. Cada uno que se dispara se guarda en un archivo con sus condiciones y la memoria que leyó.",
+  "BACK TO NORMAL PLAY": "VOLVER AL JUEGO NORMAL",
+  "test mode checks achievements without touching your account: every achievement can trigger again, nothing is sent to RetroAchievements, and each trigger is written to a file.": "El modo de prueba comprueba los logros sin tocar tu cuenta: cada logro puede dispararse de nuevo, no se envía nada a RetroAchievements y cada disparo se guarda en un archivo.",
+  "START TEST MODE": "INICIAR MODO DE PRUEBA",
+  "an achievement did not unlock, or unlocked by itself? Save the last minute right after it happens and attach the file to your report.": "¿Un logro no se desbloqueó o se desbloqueó solo? Guarda el último minuto justo después y adjunta el archivo a tu informe.",
+  "SAVE THE LAST MINUTE": "GUARDAR EL ÚLTIMO MINUTO",
+  "files go to {dir}": "los archivos se guardan en {dir}",
+  "saved: {path}": "guardado: {path}",
+  "no game is being tracked": "no se está siguiendo ningún juego",
+  "TEST MODE": "MODO DE PRUEBA",
+  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "no se envía nada a RetroAchievements; se desactiva en AJUSTES"
 }

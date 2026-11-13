@@ -91,13 +91,22 @@ by `count` 32-bit entries. Each entry packs an address and a read size:
 The client builds this list from the game's achievement set, so the
 agent never needs to know which addresses matter.
 
-After the entries the file may carry a tail of pointer-chain nodes: a
-`struct ra_node_file` header with the magic `RANL` and a count, then
-that many `struct ra_node`. Each node names a parent, a static offset
-and a read size. The parent is either an entry or an earlier node, and
-nodes come in dependency order, so one pass resolves a chain of any
-depth. The version in the file header stays 1: an agent that stops
-after `count` entries never sees the tail and works as before.
+After the entries the file may carry a tail of chain nodes: a
+`struct ra_node_file` header with the magic `RAN2` and a count, then
+that many `struct ra_node`, three words each. A node names a parent,
+the bits of the parent it uses, a scale, a static offset and a read
+size:
+
+    address = ((parent >> shift) & mask(width)) * scale + offset
+
+in 32-bit arithmetic. A pointer step is shift 0, width 0 (the whole
+value) and scale 1; a table lookup scales an index by the element
+size. The parent is either an entry or an earlier node, and nodes come
+in dependency order, so one pass resolves a chain of any depth. An
+agent that does not know the magic stops after `count` entries and
+sends direct values only. Before 1.2.0 the tail was `RANL` with
+two-word nodes, parent plus offset; a 1.2.0 agent and client do not
+read it.
 
 An agent that reads the tail resolves every chain in the same frame it
 takes the snapshot, and appends an (address, value) pair per node after

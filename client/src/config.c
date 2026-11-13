@@ -166,6 +166,8 @@ int config_load_lan(void) { return load_flag("lan", 0); }
 int config_save_lan(int on) { return save_flag("lan", on); }
 int config_load_notice(void) { return load_flag("notice", 1); }
 int config_save_notice(int on) { return save_flag("notice", on); }
+int config_load_discord(void) { return load_flag("discord", 1); }
+int config_save_discord(int on) { return save_flag("discord", on); }
 int config_load_follow(void) { return load_flag("follow", 1); }
 int config_save_follow(int on) { return save_flag("follow", on); }
 

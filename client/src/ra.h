@@ -24,11 +24,17 @@ int ra_login_with_password(rc_client_t *client, const char *user, const char *pa
 int ra_load_game(rc_client_t *client, const char *hash);
 int ra_last_load_result(void);
 
+/* Drops the loaded set; the next ra_load_game asks the server again. */
+void ra_unload_game(rc_client_t *client);
+
 /* Hash of the game currently loaded, or "" when none. */
 const char *ra_loaded_hash(void);
 
 /* Logs the achievement summary of the loaded game. */
 void ra_log_summary(rc_client_t *client);
+
+/* Hands Discord the game, the rich presence line and the last unlock. */
+void ra_presence(rc_client_t *client);
 
 /* Title and achievement counts of the loaded game: total core, already
    unlocked, and unsupported (pointer chains the console cannot read).

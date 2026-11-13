@@ -6,6 +6,11 @@ on:
     tags: ["v*"]
   pull_request:
 
+# The Discord application id for the client's rich presence. A fork
+# without the secret builds a client with no presence.
+env:
+  DISCORD_APP_ID: ${{ secrets.DISCORD_APP_ID }}
+
 jobs:
   opl:
     name: OPL fork (${{ matrix.variant }})

@@ -223,5 +223,21 @@
   "CLOSE": "FECHAR",
   "filter and order": "filtro e ordem",
   "show UP NEXT": "mostrar A SEGUIR",
-  "hide UP NEXT": "ocultar A SEGUIR"
+  "hide UP NEXT": "ocultar A SEGUIR",
+  "your Discord profile shows the game, what you are doing in it and the last unlock.": "Seu perfil do Discord mostra o jogo, o que você está fazendo nele e a última conquista.",
+  "HIDE FROM DISCORD": "OCULTAR NO DISCORD",
+  "Discord shows nothing about your play.": "O Discord não mostra nada sobre o seu jogo.",
+  "SHOW ON DISCORD": "MOSTRAR NO DISCORD",
+  "DIAGNOSTICS": "DIAGNÓSTICO",
+  "test mode is on: every achievement can trigger again, and nothing is sent to RetroAchievements. Each one that triggers is written to a file with its conditions and the memory it read.": "O modo de teste está ligado: cada conquista pode disparar de novo e nada é enviado ao RetroAchievements. Cada uma que dispara é gravada em um arquivo com suas condições e a memória que leu.",
+  "BACK TO NORMAL PLAY": "VOLTAR AO JOGO NORMAL",
+  "test mode checks achievements without touching your account: every achievement can trigger again, nothing is sent to RetroAchievements, and each trigger is written to a file.": "O modo de teste verifica as conquistas sem tocar na sua conta: cada conquista pode disparar de novo, nada é enviado ao RetroAchievements e cada disparo é gravado em um arquivo.",
+  "START TEST MODE": "INICIAR MODO DE TESTE",
+  "an achievement did not unlock, or unlocked by itself? Save the last minute right after it happens and attach the file to your report.": "Uma conquista não desbloqueou ou desbloqueou sozinha? Salve o último minuto logo depois e anexe o arquivo ao seu relato.",
+  "SAVE THE LAST MINUTE": "SALVAR O ÚLTIMO MINUTO",
+  "files go to {dir}": "os arquivos vão para {dir}",
+  "saved: {path}": "salvo: {path}",
+  "no game is being tracked": "nenhum jogo está sendo acompanhado",
+  "TEST MODE": "MODO DE TESTE",
+  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "nada é enviado ao RetroAchievements; desligue em AJUSTES"
 }

@@ -35,6 +35,10 @@ int config_save_lan(int on);
 int config_load_notice(void);
 int config_save_notice(int on);
 
+/* Whether the game shows on the Discord profile. On by default. */
+int config_load_discord(void);
+int config_save_discord(int on);
+
 /* Whether the client follows the account's play on other devices
    through the Web API. On by default: it costs a key and nothing else. */
 int config_load_follow(void);

@@ -3,8 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "console.h"
+#include "diag.h"
+#include "discord.h"
 #include "rc_client_internal.h"
 #include "http.h"
 #include "log.h"
@@ -66,6 +69,11 @@ static void on_log(const char *message, const rc_client_t *client)
     log_trace("rc: %s", message);
 }
 
+/* The last unlock, for the small icon of the Discord presence. */
+static char g_unlock_badge[192];
+static char g_unlock_title[128];
+static time_t g_unlock_at;
+
 static void on_event(const rc_client_event_t *event, rc_client_t *client)
 {
     (void)client;
@@ -82,6 +90,12 @@ static void on_event(const rc_client_event_t *event, rc_client_t *client)
                      event->achievement->title, event->achievement->points);
             log_info("    %s", event->achievement->description);
             log_info("");
+            diag_report_unlock(client, event->achievement->id);
+            if (rc_client_achievement_get_image_url(event->achievement, RC_CLIENT_ACHIEVEMENT_STATE_UNLOCKED,
+                                                    g_unlock_badge, sizeof(g_unlock_badge)) != RC_OK)
+                g_unlock_badge[0] = '\0';
+            snprintf(g_unlock_title, sizeof(g_unlock_title), "%s", event->achievement->title);
+            g_unlock_at = time(NULL);
             sound_play(SOUND_ACHIEVEMENT);
             console_notify_unlock(event->achievement->id, event->achievement->points);
             webui_note_unlock(event->achievement->id, event->achievement->title,
@@ -252,6 +266,15 @@ int ra_load_game(rc_client_t *client, const char *hash)
     return 1;
 }
 
+void ra_unload_game(rc_client_t *client)
+{
+    rc_client_unload_game(client);
+    g_loaded_hash[0] = '\0';
+    g_game.done = 0;
+    g_game.result = RC_NO_GAME_LOADED;
+    watchlist_set_have_values(0);
+}
+
 int ra_last_load_result(void)
 {
     return g_game.result;
@@ -278,6 +301,44 @@ int ra_game_summary(rc_client_t *client, char *title, size_t title_size,
        pointer readers, which stay active but cannot unlock here. */
     *unsupported = sum.num_unsupported_achievements + (unsigned)watchlist_indirect_count();
     return 1;
+}
+
+/* How long the last unlock stays on the Discord presence, seconds. */
+#define PRESENCE_UNLOCK_HOLD 60
+
+void ra_presence(rc_client_t *client)
+{
+    const rc_client_game_t *game = rc_client_get_game_info(client);
+    const rc_client_user_t *user = rc_client_get_user_info(client);
+    rc_client_user_game_summary_t sum;
+    struct discord_presence p;
+    char line[256] = "", progress[64], game_url[96], profile[192] = "";
+
+    if (game == NULL || g_game.result != RC_OK) {
+        discord_set(NULL);
+        return;
+    }
+
+    memset(&p, 0, sizeof(p));
+    rc_client_get_user_game_summary(client, &sum);
+    snprintf(progress, sizeof(progress), "%u of %u achievements",
+             (unsigned)sum.num_unlocked_achievements, (unsigned)sum.num_core_achievements);
+    rc_client_get_rich_presence_message(client, line, sizeof(line));
+    snprintf(game_url, sizeof(game_url), "https://retroachievements.org/game/%u", (unsigned)game->id);
+    if (user != NULL && user->display_name != NULL)
+        snprintf(profile, sizeof(profile), "https://retroachievements.org/user/%s", user->display_name);
+
+    p.title = game->title;
+    p.state = line[0] != '\0' ? line : progress;
+    p.game_url = game_url;
+    p.icon_url = game->badge_url;
+    p.icon_text = progress;
+    p.profile_url = profile;
+    if (g_unlock_badge[0] != '\0' && time(NULL) - g_unlock_at < PRESENCE_UNLOCK_HOLD) {
+        p.badge_url = g_unlock_badge;
+        p.badge_text = g_unlock_title;
+    }
+    discord_set(&p);
 }
 
 void ra_log_summary(rc_client_t *client)

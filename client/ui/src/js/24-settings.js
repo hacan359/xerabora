@@ -6,7 +6,8 @@ const settingsKey = computed(() => {
   const s = S.state.value;
   if (!s) return '';
   const li = s.login || {}, lan = s.lan || {}, notice = s.notice || {};
-  return [li.ok, li.user, li.webapi, lan.on, lan.url, notice.on].join('|');
+  const dc = s.discord || {}, diag = s.diag || {};
+  return [li.ok, li.user, li.webapi, lan.on, lan.url, notice.on, dc.available, dc.on, diag.test, diag.dir].join('|');
 });
 
 function Msg({ text, good }) {
@@ -140,6 +141,72 @@ function NoticeBlock({ notice }) {
   </div>`;
 }
 
+function DiscordBlock({ discord }) {
+  const [msg, setMsg] = useState(['', true]);
+  const [busy, setBusy] = useState(false);
+
+  const flip = async () => {
+    setBusy(true); setMsg(['', true]);
+    try {
+      const r = await postForm('/discord', { on: discord.on ? '0' : '1' });
+      if (!r.ok) { setMsg([r.error || t('failed'), false]); setBusy(false); return; }
+      await refreshState();
+    } catch (err) { setMsg([t('could not reach the client'), false]); }
+    setBusy(false);
+  };
+
+  return html`<div class="block">
+    <${Eyebrow}>DISCORD<//>
+    ${discord.on
+      ? html`<div>${t('your Discord profile shows the game, what you are doing in it and the last unlock.')}</div>
+          <${Btn} onClick=${flip} disabled=${busy}>${t('HIDE FROM DISCORD')}<//>`
+      : html`<div class="note">${t('Discord shows nothing about your play.')}</div>
+          <${Btn} onClick=${flip} primary disabled=${busy}>${t('SHOW ON DISCORD')}<//>`}
+    <${Msg} text=${msg[0]} good=${msg[1]} />
+  </div>`;
+}
+
+/* Test mode and the report of the last minute, for looking into an
+   achievement that fired when it should not have, or did not fire. */
+function DiagBlock({ diag }) {
+  const [msg, setMsg] = useState(['', true]);
+  const [busy, setBusy] = useState(false);
+
+  const flip = async () => {
+    setBusy(true); setMsg(['', true]);
+    try {
+      const r = await postForm('/diag', { on: diag.test ? '0' : '1' });
+      if (!r.ok) { setMsg([r.error || t('failed'), false]); setBusy(false); return; }
+      /* The client switches on its next turn, within a second. */
+      await new Promise(done => setTimeout(done, 1200));
+      await refreshState();
+    } catch (err) { setMsg([t('could not reach the client'), false]); }
+    setBusy(false);
+  };
+
+  const save = async () => {
+    setBusy(true); setMsg(['', true]);
+    try {
+      const r = await postForm('/diag/save', {});
+      setMsg(r.ok ? [t('saved: {path}', { path: r.path }), true] : [t(r.error || 'failed'), false]);
+    } catch (err) { setMsg([t('could not reach the client'), false]); }
+    setBusy(false);
+  };
+
+  return html`<div class="block">
+    <${Eyebrow}>${t('DIAGNOSTICS')}<//>
+    ${diag.test
+      ? html`<div>${t('test mode is on: every achievement can trigger again, and nothing is sent to RetroAchievements. Each one that triggers is written to a file with its conditions and the memory it read.')}</div>
+          <${Btn} onClick=${flip} disabled=${busy}>${t('BACK TO NORMAL PLAY')}<//>`
+      : html`<div class="note">${t('test mode checks achievements without touching your account: every achievement can trigger again, nothing is sent to RetroAchievements, and each trigger is written to a file.')}</div>
+          <${Btn} onClick=${flip} primary disabled=${busy}>${t('START TEST MODE')}<//>`}
+    <div class="note">${t('an achievement did not unlock, or unlocked by itself? Save the last minute right after it happens and attach the file to your report.')}</div>
+    <${Btn} onClick=${save} disabled=${busy}>${t('SAVE THE LAST MINUTE')}<//>
+    ${diag.dir && html`<div class="note">${t('files go to {dir}', { dir: diag.dir })}</div>`}
+    <${Msg} text=${msg[0]} good=${msg[1]} />
+  </div>`;
+}
+
 
 /* ABOUT: the version this client runs, the newest release on GitHub,
    and where to go with a problem. The release list includes
@@ -198,6 +265,8 @@ function SettingsTab() {
   const li = (s && s.login) || { ok: false, user: '', webapi: false };
   const lan = (s && s.lan) || { on: false, url: '' };
   const notice = (s && s.notice) || { on: true };
+  const discord = (s && s.discord) || { available: false, on: false };
+  const diag = (s && s.diag) || { test: false, dir: '' };
 
   if (REMOTE) {
     return html`<div class="tab"><div class="set">
@@ -215,6 +284,8 @@ function SettingsTab() {
     <${KeyBlock} li=${li} />
     <${LanBlock} lan=${lan} />
     <${NoticeBlock} notice=${notice} />
+    ${discord.available && html`<${DiscordBlock} discord=${discord} />`}
+    <${DiagBlock} diag=${diag} />
     <${ThemeBlock} />
     <${AboutBlock} />
   </div></div>`;

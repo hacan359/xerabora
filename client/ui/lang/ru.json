@@ -246,5 +246,21 @@
   "watch {addresses} addr · {kb} KB": "watch {addresses} адр. · {kb} КБ",
   "session {time}": "сессия {time}",
   "OBS: browser source with this address, {w}×{h}": "OBS: источник «Браузер» с этим адресом, {w}×{h}",
-  "RetroAchievements on a real PlayStation 2": "RetroAchievements на настоящей PlayStation 2"
+  "RetroAchievements on a real PlayStation 2": "RetroAchievements на настоящей PlayStation 2",
+  "your Discord profile shows the game, what you are doing in it and the last unlock.": "В профиле Discord видно игру, что вы в ней делаете, и последнее достижение.",
+  "HIDE FROM DISCORD": "СКРЫТЬ ИЗ DISCORD",
+  "Discord shows nothing about your play.": "Discord ничего не показывает о вашей игре.",
+  "SHOW ON DISCORD": "ПОКАЗЫВАТЬ В DISCORD",
+  "DIAGNOSTICS": "ДИАГНОСТИКА",
+  "test mode is on: every achievement can trigger again, and nothing is sent to RetroAchievements. Each one that triggers is written to a file with its conditions and the memory it read.": "Режим теста включён: каждое достижение может сработать заново, в RetroAchievements ничего не отправляется. Каждое сработавшее записывается в файл с условиями и памятью, которую оно читало.",
+  "BACK TO NORMAL PLAY": "ВЕРНУТЬСЯ К ОБЫЧНОЙ ИГРЕ",
+  "test mode checks achievements without touching your account: every achievement can trigger again, nothing is sent to RetroAchievements, and each trigger is written to a file.": "Режим теста проверяет достижения, не трогая аккаунт: каждое достижение может сработать заново, в RetroAchievements ничего не отправляется, каждое срабатывание записывается в файл.",
+  "START TEST MODE": "ВКЛЮЧИТЬ РЕЖИМ ТЕСТА",
+  "an achievement did not unlock, or unlocked by itself? Save the last minute right after it happens and attach the file to your report.": "Достижение не засчиталось или открылось само? Сохраните последнюю минуту сразу после этого и приложите файл к сообщению об ошибке.",
+  "SAVE THE LAST MINUTE": "СОХРАНИТЬ ПОСЛЕДНЮЮ МИНУТУ",
+  "files go to {dir}": "Файлы сохраняются в {dir}",
+  "saved: {path}": "Сохранено: {path}",
+  "no game is being tracked": "Сейчас ни одна игра не отслеживается",
+  "TEST MODE": "РЕЖИМ ТЕСТА",
+  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "В RetroAchievements ничего не отправляется; выключается в НАСТРОЙКАХ"
 }

@@ -11,6 +11,12 @@ const linkStats = computed(() => {
 /* The footer clock: the console session time. */
 const clockText = computed(() => mode.value === 'console' && fast.seconds.value ? hms(fast.seconds.value) : '');
 
+/* Test mode keeps unlocks off the account; the header says so on every tab. */
+const testMode = computed(() => {
+  const s = S.state.value;
+  return !!(s && s.diag && s.diag.test);
+});
+
 function Header() {
   const tab = S.tab.value;
   const p = S.profile.value;
@@ -29,6 +35,8 @@ function Header() {
         onClick=${() => { S.tab.value = name; }}>${t(name.toUpperCase())}</button>`)}
     </nav>
     <div class="hdr-right">
+      ${testMode.value && html`<${Btn} danger sm onClick=${() => { S.tab.value = 'settings'; }}
+        title=${t('nothing is sent to RetroAchievements; switch it off on SETTINGS')}>${t('TEST MODE')}<//>`}
       <span class="who">${who}</span>
       <${Btn} sm onClick=${() => go('stream')} title=${t('compact view for a stream or a second screen')}>${t('STREAM')}<//>
       <select class="lang" aria-label="Language" value=${lang} onChange=${e => setLang(e.target.value)}>

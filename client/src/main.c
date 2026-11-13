@@ -18,6 +18,7 @@
 
 #include "badge_data.h"
 #include "config.h"
+#include "diag.h"
 #include "console.h"
 #include "discord.h"
 #include "follow.h"
@@ -173,6 +174,21 @@ static void link_seen(const char *ip)
     }
 }
 
+/* Keeps Discord current, once a second: the presence of the game being
+   tracked, then the pipe. */
+static void presence_tick(rc_client_t *client, int tracking)
+{
+    static time_t last;
+    time_t now = time(NULL);
+
+    if (now == last)
+        return;
+    last = now;
+    if (tracking && discord_available() && discord_enabled())
+        ra_presence(client);
+    discord_tick();
+}
+
 static void link_idle(unsigned long waited_ms)
 {
     if (!g_link_up)
@@ -182,6 +198,7 @@ static void link_idle(unsigned long waited_ms)
         g_link_up = 0;
         log_warn("console connection lost: no packets for %d seconds", LINK_TIMEOUT_MS / 1000);
         webui_set_console(NULL, 0);
+        discord_set(NULL);
         sound_play(SOUND_DISCONNECT);
     }
 }
@@ -1001,7 +1018,7 @@ int main(int argc, char **argv)
     }
 
     sound_init(sounds);
-    discord_init();
+    discord_set_enabled(config_load_discord());
     platform_on_stop(&g_stop);
 
     {
@@ -1069,6 +1086,21 @@ int main(int argc, char **argv)
         busy = console_ident_busy();
         wait_ms = busy ? 100 : 1000;
 
+        /* Test mode switched from the page: the set loads again under
+           the new mode when the next packet asks for it. */
+        if (!busy) {
+            int on;
+
+            if (diag_take_request(&on)) {
+                diag_set_test_mode(client, on);
+                console_forget_set();
+                snapshot_reset();
+                game_up = 0;
+                said_first = 0;
+                webui_mark_dirty();
+            }
+        }
+
         ready = platform_wait_readable2(sock, ui, wait_ms);
         if (ready < 0) {
             platform_sleep_ms(1000);
@@ -1094,7 +1126,7 @@ int main(int argc, char **argv)
                 log_info("the page was closed; exiting");
                 break;
             }
-            discord_tick();
+            presence_tick(client, 0);
             test_unlock_tick();
             badge_tick();
             continue;
@@ -1164,7 +1196,7 @@ int main(int argc, char **argv)
             loading_hash[0] = '\0';
             log_info("console started %s", serial);
             webui_set_game(serial, hash, NULL);
-            discord_set(serial, "on a real PlayStation 2", NULL);
+            discord_set(NULL);
             webui_write_obs(client);
             snapshot_reset();
             said_first = 0;
@@ -1236,17 +1268,15 @@ int main(int argc, char **argv)
             {
                 char title[64] = "";
                 unsigned total = 0, unlocked = 0, unsupported = 0;
-                char detail[96];
 
-                if (ra_game_summary(client, title, sizeof(title), &total, &unlocked, &unsupported)) {
+                if (ra_game_summary(client, title, sizeof(title), &total, &unlocked, &unsupported))
                     webui_set_game_title(title);
-                    snprintf(detail, sizeof(detail), "%u of %u achievements", unlocked, total);
-                    discord_set(title, detail, NULL);
-                }
             }
         }
 
+        diag_record(snapshot_seq(), snapshot_stats()->bytes);
         rc_client_do_frame(client);
+        presence_tick(client, 1);
 
         {
             const struct snapshot_stats *st = snapshot_stats();

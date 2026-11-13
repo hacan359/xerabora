@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "diag.h"
 #include "protocol.h"
 #include "watchlist.h"
 
@@ -71,6 +72,12 @@ void snapshot_reset(void)
     g_asm_seen = 0;
     g_asm_sq = 0;
     g_asm_np = 0;
+    diag_reset();
+}
+
+unsigned int snapshot_seq(void)
+{
+    return g_last_sq;
 }
 
 const struct snapshot_stats *snapshot_stats(void)

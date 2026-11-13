@@ -15,13 +15,19 @@
 #include <unistd.h>
 #endif
 
-/* Discord application id. Zero until one is registered: the presence is
-   skipped rather than shown under someone else's app name. */
+#ifndef DISCORD_APP_ID
 #define DISCORD_APP_ID ""
+#endif
 
-/* Discord accepts one presence update every fifteen seconds. */
-#define DISCORD_MIN_GAP 15
-#define DISCORD_RETRY 60
+/* Discord takes five presence updates in twenty seconds. */
+#define DISCORD_MIN_GAP 5
+#define DISCORD_RETRY   60
+
+#define OP_HANDSHAKE 0
+#define OP_FRAME     1
+#define OP_CLOSE     2
+#define OP_PING      3
+#define OP_PONG      4
 
 #ifdef _WIN32
 static HANDLE g_pipe = INVALID_HANDLE_VALUE;
@@ -31,15 +37,32 @@ static int g_sock = -1;
 #define PIPE_OK (g_sock >= 0)
 #endif
 
-static int g_ready;          /* handshake accepted */
+static int g_enabled = 1;
+static int g_ready;       /* Discord answered the handshake */
 static time_t g_last_send;
 static time_t g_last_try;
-static time_t g_since;       /* when the current game started */
+static time_t g_since;    /* when the current game started */
 
-static char g_game[128];
-static char g_detail[128];
-static char g_badge[32];
-static int g_dirty;
+static char g_title[160];
+static char g_want[1800]; /* the activity to show, "" for none */
+static char g_sent[1800];
+static int g_sent_any;
+
+/* Bytes read from Discord and not yet parsed, and how much of an
+   oversized reply is still to be thrown away. */
+static unsigned char g_in[8192];
+static unsigned g_in_len;
+static unsigned g_in_skip;
+
+int discord_available(void)
+{
+    return DISCORD_APP_ID[0] != '\0';
+}
+
+int discord_enabled(void)
+{
+    return g_enabled;
+}
 
 /* ---- The pipe ----------------------------------------------------------- */
 
@@ -57,35 +80,25 @@ static void discord_close(void)
     }
 #endif
     g_ready = 0;
+    g_in_len = 0;
+    g_in_skip = 0;
+    g_sent_any = 0;
 }
 
-/* Discord listens on ten possible endpoints, numbered 0 to 9, because
-   several clients can run side by side. First one that answers wins. */
-static int discord_open(void)
+#ifndef _WIN32
+/* Tries the ten endpoints of one directory. */
+static int discord_open_in(const char *dir, const char *sub)
 {
     int i;
 
     for (i = 0; i < 10; i++) {
-#ifdef _WIN32
-        char name[64];
-
-        snprintf(name, sizeof(name), "\\\\\\\\.\\\\pipe\\\\discord-ipc-%d", i);
-        g_pipe = CreateFileA(name, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                             OPEN_EXISTING, 0, NULL);
-        if (g_pipe != INVALID_HANDLE_VALUE)
-            return 1;
-#else
         struct sockaddr_un addr;
-        const char *base = getenv("XDG_RUNTIME_DIR");
-
-        if (base == NULL)
-            base = getenv("TMPDIR");
-        if (base == NULL)
-            base = "/tmp";
 
         memset(&addr, 0, sizeof(addr));
         addr.sun_family = AF_UNIX;
-        snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/discord-ipc-%d", base, i);
+        if (snprintf(addr.sun_path, sizeof(addr.sun_path), "%s%s/discord-ipc-%d", dir, sub, i) >=
+            (int)sizeof(addr.sun_path))
+            return 0;
 
         g_sock = socket(AF_UNIX, SOCK_STREAM, 0);
         if (g_sock < 0)
@@ -94,17 +107,51 @@ static int discord_open(void)
             return 1;
         close(g_sock);
         g_sock = -1;
-#endif
     }
     return 0;
 }
+#endif
 
-/* One frame: opcode, length, payload. Both numbers are little-endian,
-   which is what the machines this runs on write anyway. */
-static int discord_send(unsigned opcode, const char *json)
+/* Opens the first of Discord's ten endpoints, 0 to 9, that answers.
+   Also looks in the Flatpak and Snap socket folders. */
+static int discord_open(void)
+{
+#ifdef _WIN32
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        char name[64];
+
+        snprintf(name, sizeof(name), "\\\\.\\pipe\\discord-ipc-%d", i);
+        g_pipe = CreateFileA(name, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+        if (g_pipe != INVALID_HANDLE_VALUE)
+            return 1;
+    }
+    return 0;
+#else
+    static const char *subs[] = {"", "/app/com.discordapp.Discord", "/snap.discord"};
+    const char *dirs[3];
+    int d, s;
+
+    dirs[0] = getenv("XDG_RUNTIME_DIR");
+    dirs[1] = getenv("TMPDIR");
+    dirs[2] = "/tmp";
+
+    for (d = 0; d < 3; d++) {
+        if (dirs[d] == NULL || dirs[d][0] == '\0')
+            continue;
+        for (s = 0; s < 3; s++)
+            if (discord_open_in(dirs[d], subs[s]))
+                return 1;
+    }
+    return 0;
+#endif
+}
+
+/* One frame: opcode, length, payload. Both numbers are little-endian. */
+static int discord_send(unsigned opcode, const char *json, unsigned len)
 {
     unsigned char head[8];
-    unsigned len = (unsigned)strlen(json);
 
     if (!PIPE_OK)
         return 0;
@@ -129,85 +176,242 @@ static int discord_send(unsigned opcode, const char *json)
         }
     }
 #else
-    if (send(g_sock, head, 8, 0) != 8 || send(g_sock, json, len, 0) != (int)len) {
-        discord_close();
-        return 0;
+    {
+#ifdef MSG_NOSIGNAL
+        const int flags = MSG_NOSIGNAL;
+#else
+        const int flags = 0;
+#endif
+
+        if (send(g_sock, head, 8, flags) != 8 || send(g_sock, json, len, flags) != (int)len) {
+            discord_close();
+            return 0;
+        }
     }
 #endif
     return 1;
 }
 
+/* Reads what Discord has sent so far and returns at once. 0 when the
+   pipe is gone. */
+static int discord_pull(void)
+{
+    for (;;) {
+        unsigned room = (unsigned)sizeof(g_in) - g_in_len;
+        unsigned got;
+
+        if (room == 0)
+            return 1;
+#ifdef _WIN32
+        {
+            DWORD avail = 0, n = 0;
+
+            if (!PeekNamedPipe(g_pipe, NULL, 0, NULL, &avail, NULL))
+                return 0;
+            if (avail == 0)
+                return 1;
+            if (!ReadFile(g_pipe, g_in + g_in_len, avail < room ? avail : room, &n, NULL) || n == 0)
+                return 0;
+            got = (unsigned)n;
+        }
+#else
+        {
+            long n = (long)recv(g_sock, g_in + g_in_len, room, MSG_DONTWAIT);
+
+            if (n == 0)
+                return 0;
+            if (n < 0)
+                return 1; /* nothing waiting */
+            got = (unsigned)n;
+        }
+#endif
+        if (g_in_skip > 0) {
+            unsigned drop = got < g_in_skip ? got : g_in_skip;
+
+            g_in_skip -= drop;
+            memmove(g_in + g_in_len, g_in + g_in_len + drop, got - drop);
+            got -= drop;
+        }
+        g_in_len += got;
+    }
+}
+
+/* Whether the JSON carries this key with this string value. */
+static int json_says(const char *json, const char *key, const char *value)
+{
+    char pat[64];
+
+    snprintf(pat, sizeof(pat), "\"%s\":\"%s\"", key, value);
+    return strstr(json, pat) != NULL;
+}
+
+/* Handles every complete reply in the buffer. */
+static void discord_read(void)
+{
+    if (!discord_pull()) {
+        log_info("discord: the connection closed");
+        discord_close();
+        return;
+    }
+
+    while (g_in_len >= 8) {
+        unsigned opcode = (unsigned)g_in[0] | ((unsigned)g_in[1] << 8);
+        unsigned len = (unsigned)g_in[4] | ((unsigned)g_in[5] << 8) | ((unsigned)g_in[6] << 16) |
+                       ((unsigned)g_in[7] << 24);
+        char *body = (char *)g_in + 8;
+        char saved;
+
+        /* A reply that cannot fit is dropped as it arrives. */
+        if (len > sizeof(g_in) - 9) {
+            g_in_skip = len - (g_in_len - 8);
+            g_in_len = 0;
+            return;
+        }
+        if (g_in_len < 8 + len)
+            return;
+
+        saved = body[len];
+        body[len] = '\0';
+
+        if (opcode == OP_PING) {
+            discord_send(OP_PONG, body, len);
+        } else if (opcode == OP_CLOSE) {
+            log_warn("discord: refused: %.200s", body);
+            discord_close();
+            return;
+        } else if (opcode == OP_FRAME && json_says(body, "evt", "READY")) {
+            g_ready = 1;
+            log_info("discord: connected");
+        } else if (opcode == OP_FRAME && json_says(body, "evt", "ERROR")) {
+            log_warn("discord: %.300s", body);
+        }
+
+        body[len] = saved;
+        memmove(g_in, g_in + 8 + len, g_in_len - 8 - len);
+        g_in_len -= 8 + len;
+    }
+}
+
 /* ---- Presence ----------------------------------------------------------- */
 
-static void discord_handshake(void)
+static void discord_connect(void)
 {
-    char json[128];
+    char json[96];
+    int n;
 
-    snprintf(json, sizeof(json), "{\"v\":1,\"client_id\":\"%s\"}", DISCORD_APP_ID);
-    if (discord_send(0, json)) {
-        g_ready = 1;
-        log_info("discord: connected");
-    }
+    g_last_try = time(NULL);
+    if (!discord_open())
+        return;
+    n = snprintf(json, sizeof(json), "{\"v\":1,\"client_id\":\"%s\"}", DISCORD_APP_ID);
+    discord_send(OP_HANDSHAKE, json, (unsigned)n);
 }
 
-static void json_escape(char *out, size_t size, const char *in)
+/* Appends "key":"value", escaped, and a comma. Leaves out a value
+   shorter than two characters. */
+static void add_text(char **p, const char *end, const char *key, const char *value)
 {
-    size_t o = 0;
+    if (value == NULL || strlen(value) < 2 || *p + strlen(key) + 8 >= end)
+        return;
 
-    for (; in != NULL && *in != '\0' && o + 2 < size; in++) {
-        if (*in == '"' || *in == '\\') {
-            out[o++] = '\\';
-            out[o++] = *in;
-        } else if ((unsigned char)*in >= 0x20) {
-            out[o++] = *in;
+    *p += snprintf(*p, (size_t)(end - *p), "\"%s\":\"", key);
+    for (; *value != '\0' && *p + 8 < end; value++) {
+        if (*value == '"' || *value == '\\') {
+            *(*p)++ = '\\';
+            *(*p)++ = *value;
+        } else if ((unsigned char)*value >= 0x20) {
+            *(*p)++ = *value;
         }
     }
-    out[o] = '\0';
+    *p += snprintf(*p, (size_t)(end - *p), "\",");
 }
 
+/* Drops the comma the last field left behind. */
+static void end_object(char **p, const char *end, const char *close)
+{
+    if ((*p)[-1] == ',')
+        (*p)--;
+    *p += snprintf(*p, (size_t)(end - *p), "%s", close);
+}
+
+void discord_set(const struct discord_presence *pr)
+{
+    char *p = g_want, *end = g_want + sizeof(g_want) - 64;
+
+    if (pr == NULL || pr->title == NULL || pr->title[0] == '\0') {
+        g_want[0] = '\0';
+        g_title[0] = '\0';
+        return;
+    }
+
+    if (strcmp(g_title, pr->title) != 0) {
+        snprintf(g_title, sizeof(g_title), "%s", pr->title);
+        g_since = time(NULL);
+    }
+
+    /* status_display_type 2: the member list shows the game, not the
+       application's name. */
+    p += snprintf(p, (size_t)(end - p), "{\"type\":0,\"status_display_type\":2,");
+    add_text(&p, end, "details", pr->title);
+    add_text(&p, end, "details_url", pr->game_url);
+    add_text(&p, end, "state", pr->state);
+    p += snprintf(p, (size_t)(end - p), "\"timestamps\":{\"start\":%ld},\"assets\":{", (long)g_since);
+    add_text(&p, end, "large_image", pr->icon_url);
+    add_text(&p, end, "large_text", pr->icon_text);
+    add_text(&p, end, "large_url", pr->game_url);
+    add_text(&p, end, "small_image", pr->badge_url);
+    add_text(&p, end, "small_text", pr->badge_text);
+    end_object(&p, end, "},");
+    if (pr->profile_url != NULL && pr->profile_url[0] != '\0') {
+        p += snprintf(p, (size_t)(end - p), "\"buttons\":[{\"label\":\"RetroAchievements profile\",");
+        add_text(&p, end, "url", pr->profile_url);
+        end_object(&p, end, "}],");
+    }
+    end_object(&p, end, "}");
+}
+
+/* Sends the presence when it differs from the one Discord has. */
 static void discord_flush(void)
 {
-    char json[768], game[256], detail[256];
+    char json[2000];
+    int n, pid;
 
-    if (!g_ready || !g_dirty)
+    if (g_sent_any && strcmp(g_want, g_sent) == 0)
+        return;
+    if (!g_sent_any && g_want[0] == '\0')
         return;
     if (time(NULL) - g_last_send < DISCORD_MIN_GAP)
         return;
 
-    json_escape(game, sizeof(game), g_game);
-    json_escape(detail, sizeof(detail), g_detail);
+#ifdef _WIN32
+    pid = (int)GetCurrentProcessId();
+#else
+    pid = (int)getpid();
+#endif
 
     /* The nonce has to be there and has to be unique; the clock is
-       unique enough for a presence update. */
-    snprintf(json, sizeof(json),
-             "{\"cmd\":\"SET_ACTIVITY\",\"nonce\":\"%ld\",\"args\":{\"pid\":%d,\"activity\":{"
-             "\"details\":\"%s\",\"state\":\"%s\","
-             "\"timestamps\":{\"start\":%ld},"
-             "\"assets\":{\"large_image\":\"%s\",\"large_text\":\"RetroAchievements on real hardware\"}"
-             "}}}",
-             (long)time(NULL),
-#ifdef _WIN32
-             (int)GetCurrentProcessId(),
-#else
-             (int)getpid(),
-#endif
-             game, detail, (long)g_since,
-             g_badge[0] != '\0' ? g_badge : "ps2");
+       unique enough at one update in five seconds. No activity clears
+       the presence. */
+    if (g_want[0] != '\0')
+        n = snprintf(json, sizeof(json), "{\"cmd\":\"SET_ACTIVITY\",\"nonce\":\"%ld\",\"args\":{\"pid\":%d,\"activity\":%s}}",
+                     (long)time(NULL), pid, g_want);
+    else
+        n = snprintf(json, sizeof(json), "{\"cmd\":\"SET_ACTIVITY\",\"nonce\":\"%ld\",\"args\":{\"pid\":%d}}",
+                     (long)time(NULL), pid);
 
-    if (discord_send(1, json)) {
+    if (discord_send(OP_FRAME, json, (unsigned)n)) {
         g_last_send = time(NULL);
-        g_dirty = 0;
+        snprintf(g_sent, sizeof(g_sent), "%s", g_want);
+        g_sent_any = 1;
     }
 }
 
-void discord_init(void)
+void discord_set_enabled(int on)
 {
-    if (DISCORD_APP_ID[0] == '\0')
-        return; /* no application registered yet; stay silent */
-
-    g_last_try = time(NULL);
-    if (discord_open())
-        discord_handshake();
+    g_enabled = on ? 1 : 0;
+    if (!g_enabled)
+        discord_close(); /* Discord drops the presence with the pipe */
+    else
+        g_last_try = 0;
 }
 
 void discord_shutdown(void)
@@ -215,34 +419,19 @@ void discord_shutdown(void)
     discord_close();
 }
 
-void discord_set(const char *game, const char *detail, const char *badge)
-{
-    if (game != NULL && strcmp(g_game, game) != 0)
-        g_since = time(NULL);
-
-    snprintf(g_game, sizeof(g_game), "%s", game != NULL ? game : "");
-    snprintf(g_detail, sizeof(g_detail), "%s", detail != NULL ? detail : "");
-    snprintf(g_badge, sizeof(g_badge), "%s", badge != NULL ? badge : "");
-    g_dirty = 1;
-}
-
 void discord_tick(void)
 {
-    if (DISCORD_APP_ID[0] == '\0')
+    if (!discord_available() || !g_enabled)
         return;
 
     if (!PIPE_OK) {
         /* Discord may have been started after us, or restarted. */
-        if (time(NULL) - g_last_try < DISCORD_RETRY)
-            return;
-        g_last_try = time(NULL);
-        if (discord_open())
-            discord_handshake();
+        if (time(NULL) - g_last_try >= DISCORD_RETRY)
+            discord_connect();
         return;
     }
 
-    if (!g_ready)
-        discord_handshake();
-    else
+    discord_read();
+    if (PIPE_OK && g_ready)
         discord_flush();
 }

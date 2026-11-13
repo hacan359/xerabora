@@ -9,6 +9,8 @@
 #include <time.h>
 
 #include "config.h"
+#include "diag.h"
+#include "discord.h"
 #include "console.h"
 #include "follow.h"
 #include "log.h"
@@ -485,6 +487,11 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
     }
 
     p += snprintf(p, (size_t)(end - p), "\"notice\":{\"on\":%s},", console_notice() ? "true" : "false");
+    p += snprintf(p, (size_t)(end - p), "\"discord\":{\"available\":%s,\"on\":%s},",
+                  discord_available() ? "true" : "false", discord_enabled() ? "true" : "false");
+    p += snprintf(p, (size_t)(end - p), "\"diag\":{\"test\":%s,", diag_test_mode() ? "true" : "false");
+    json_field(&p, end, "dir", diag_dir());
+    p += snprintf(p, (size_t)(end - p), "},");
 
     /* Following: the account's play elsewhere, from the Web API. It
        shows on LIVE only while the console is not the source. */
@@ -1194,6 +1201,48 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
             log_warn("could not save the notice setting; it holds until exit");
         log_info(console_notice() ? "unlock notices to the TV turned on from the page"
                                   : "unlock notices to the TV turned off from the page");
+        n = snprintf(out, sizeof(out), "{\"ok\":true}");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
+    if (strncmp(req, "POST /discord", 13) == 0) {
+        char on[8] = "";
+
+        form_field(body, "on", on, sizeof(on));
+        discord_set_enabled(on[0] == '1');
+        if (config_save_discord(discord_enabled()) != 0)
+            log_warn("could not save the Discord setting; it holds until exit");
+        log_info(discord_enabled() ? "Discord presence turned on from the page"
+                                   : "Discord presence turned off from the page");
+        g.dirty = 1;
+        n = snprintf(out, sizeof(out), "{\"ok\":true}");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
+    if (strncmp(req, "POST /diag/save", 15) == 0) {
+        char path[640] = "", reply[1400], *p = reply, *end = reply + sizeof(reply);
+
+        /* Saves the report unless a set is loading. */
+        if (client == NULL || diag_save(client, path, sizeof(path)) != 0) {
+            n = snprintf(out, sizeof(out), "{\"ok\":false,\"error\":\"no game is being tracked\"}");
+            respond(c, "application/json; charset=utf-8", out, n);
+            return 1;
+        }
+        p += snprintf(p, (size_t)(end - p), "{\"ok\":true,");
+        json_field(&p, end, "path", path);
+        p += snprintf(p, (size_t)(end - p), "}");
+        respond(c, "application/json; charset=utf-8", reply, (int)(p - reply));
+        return 1;
+    }
+
+    if (strncmp(req, "POST /diag", 10) == 0) {
+        char on[8] = "";
+
+        form_field(body, "on", on, sizeof(on));
+        diag_request_test_mode(on[0] == '1');
+        g.dirty = 1;
         n = snprintf(out, sizeof(out), "{\"ok\":true}");
         respond(c, "application/json; charset=utf-8", out, n);
         return 1;

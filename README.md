@@ -33,9 +33,13 @@ notification. No PC needed.
 the setup as a walkthrough: [How to start](https://hacan359.github.io/xerabora/#start).
 
 > [!IMPORTANT]
-> **1.0.0 is the first stable release.** Still on an alpha? Update both
-> halves, the ELF on the console and the client, to 1.0.0. Alphas get no
-> more fixes, and bug reports and pull requests should start from 1.0.0.
+> **After an update, check every game again.** The ELF on the console
+> and the client on the PC are a pair: update both to the same release.
+> Then run **RA: check game support** on each game you play. The console
+> keeps the address list from the last check, and a list written by an
+> older client makes it skip pointer chains, so achievements that read
+> through them stay locked with no error on screen. A release that
+> changes the first number of the version (2.0.0) always needs this.
 
 <p align="center">
   <img src="docs/screenshots/console.png" alt="LIVE on a PC and a phone while the console plays" width="720">

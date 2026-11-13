@@ -300,6 +300,12 @@ static void ident_run(void *arg)
     g_ident.state = 2;
 }
 
+void console_forget_set(void)
+{
+    g_serve_len = 0;
+    g_serve_hash[0] = '\0';
+}
+
 int console_ident_busy(void)
 {
     return g_ident.state != 0;

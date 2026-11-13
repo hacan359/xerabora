@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "rc_client.h"
+#include "rc_runtime_types.h"
 
 /* Builds the list from the memrefs of the game loaded in rc_client.
    Returns 1 on success. */
@@ -62,6 +63,13 @@ void watchlist_set_have_values(int have);
 /* Whether the last snapshot carried the node pairs. An older console
    sends direct values only. */
 void watchlist_set_have_nodes(int have);
+
+int watchlist_have_nodes(void);
+
+/* Where a memref's value sits in a snapshot: the entry index, or the
+   node index with *is_node set. -1 when the console does not read it. */
+int watchlist_locate(const rc_memref_t *m, int *is_node);
+void watchlist_entry_info(int i, unsigned int *address, unsigned int *size, unsigned int *offset);
 
 /* rc_client memory callback backed by the last snapshot. */
 uint32_t watchlist_read_memory(uint32_t address, uint8_t *buffer, uint32_t num_bytes,

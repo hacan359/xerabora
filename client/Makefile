@@ -22,6 +22,11 @@ CFLAGS  += -Wall -Wextra -std=gnu99 \
 ifneq ($(VERSION),)
 CFLAGS  += -DXERABORA_VERSION=\"$(VERSION)\"
 endif
+# Discord application id, from the environment or the command line. A
+# build without one has no Discord presence.
+ifneq ($(DISCORD_APP_ID),)
+CFLAGS  += -DDISCORD_APP_ID=\"$(DISCORD_APP_ID)\"
+endif
 
 HDRS := $(wildcard src/*.h) $(wildcard $(PROTO)/*.h)
 
@@ -50,7 +55,7 @@ RC_SRC := \
 	$(RC)/src/rc_util.c \
 	$(RC)/src/rc_version.c
 
-SRC := src/main.c src/badge_data.c src/config.c src/console.c src/discord.c src/follow.c src/log.c \
+SRC := src/main.c src/badge_data.c src/config.c src/console.c src/diag.c src/discord.c src/follow.c src/log.c \
        src/platform.c src/ra.c src/raweb.c src/snapshot.c src/sound.c src/sounds_data.c \
        src/ui_page.c src/watchlist.c src/webui.c
 

@@ -49,4 +49,7 @@ int snapshot_stale(void);
 
 const struct snapshot_stats *snapshot_stats(void);
 
+/* The console's number of the last complete snapshot. */
+unsigned int snapshot_seq(void);
+
 #endif
