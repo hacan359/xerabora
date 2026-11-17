@@ -514,8 +514,8 @@ static int memref_needed(rc_client_t *client, const rc_memref_t *m)
     return 0;
 }
 
-/* The window the console reads, ee_core/src/ra.c RA_RAM_LOW..HIGH.
-   RA itself maps the 16 KB scratchpad right above the 32 MB of RAM. */
+/* The RAM window the console reads, and the 16 KB scratchpad RA maps
+   right above it, which a PS2 reads too. */
 #define CONSOLE_RAM_LOW   0x00080000u
 #define CONSOLE_RAM_HIGH  0x02000000u
 #define RA_SCRATCH_HIGH   0x02004000u
@@ -609,7 +609,8 @@ static void count_unread(rc_client_t *client, struct watch_survey *out)
                 out->scratch++;
             else
                 out->low++;
-            log_info("survey: address %08X is read as zero on the console", (unsigned)addr);
+            if (zone == ZONE_LOW)
+                log_info("survey: address %08X is read as zero on the console", (unsigned)addr);
         }
     }
     free(seen);
@@ -757,7 +758,7 @@ void watchlist_log_survey(rc_client_t *client)
     log_info("survey: locked + leaderboards: %d addresses, %d bytes direct, %d chains (%d compile), snapshot %d bytes, %d parts",
              s.need_entries, s.need_bytes, s.need_chains, s.need_chains_ok,
              s.need_snapshot, parts_for(s.need_snapshot));
-    log_info("survey: read as zero by the console: %d scratchpad addresses (%d achievements), %d below 0x80000 (%d achievements)",
+    log_info("survey: %d scratchpad addresses (%d achievements); read as zero by the console: %d below 0x80000 (%d achievements)",
              s.scratch, s.scratch_ach, s.low, s.low_ach);
 }
 
@@ -904,16 +905,20 @@ int watchlist_snapshot_bytes(void)
     return g_bytes + g_node_count * RA_NODE_PAIR_BYTES;
 }
 
-int watchlist_serialize(unsigned char *out, size_t cap)
+int watchlist_serialize(unsigned char *out, size_t cap, const char *hash)
 {
     struct ra_watch_file hdr;
     struct ra_node_file nhdr;
+    struct ra_hash_file hhdr;
+    int with_hash = hash != NULL && strlen(hash) == RA_HASH_LEN;
     size_t need = sizeof(hdr) + (size_t)g_count * sizeof(unsigned int);
     size_t at;
     int i;
 
     if (g_node_count > 0)
         need += sizeof(nhdr) + (size_t)g_node_count * sizeof(struct ra_node);
+    if (with_hash)
+        need += sizeof(hhdr);
 
     if (g_count == 0 || need > cap)
         return 0;
@@ -937,6 +942,12 @@ int watchlist_serialize(unsigned char *out, size_t cap)
 
         for (i = 0; i < g_node_count; i++, at += sizeof(struct ra_node))
             memcpy(out + at, &g_nodes[i], sizeof(struct ra_node));
+    }
+
+    if (with_hash) {
+        hhdr.magic = RA_HASH_MAGIC;
+        memcpy(hhdr.hash, hash, RA_HASH_LEN);
+        memcpy(out + at, &hhdr, sizeof(hhdr));
     }
 
     return (int)need;

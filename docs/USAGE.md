@@ -205,7 +205,7 @@ game. The client may be started or restarted while the game runs; it
 picks the console up from its stream.
 
 The console follows pointer chains as it reads, so achievements behind
-one unlock like any other. A game needing more than 128 chains keeps its
+one unlock like any other. A game needing more than 256 chains keeps its
 direct reads and loses the rest; the client reports how many.
 
 ## The PC client

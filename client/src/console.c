@@ -287,7 +287,7 @@ static void ident_run(void *arg)
     } else if (!watchlist_build(g_ident.client)) {
         snprintf(g_ident.reason, sizeof(g_ident.reason), "%s", watchlist_last_error());
     } else {
-        g_serve_len = watchlist_serialize(g_serve, sizeof(g_serve));
+        g_serve_len = watchlist_serialize(g_serve, sizeof(g_serve), hash);
         if (g_serve_len == 0) {
             log_warn("watch list does not fit in the reply buffer");
             snprintf(g_ident.reason, sizeof(g_ident.reason), "Watch list too big for the reply buffer");
@@ -390,8 +390,18 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
     }
 
     if (strncmp(pkt, "RAH1 ", 5) == 0 || strncmp(pkt, "RAK1 ", 5) == 0 ||
-        strncmp(pkt, "RAK2 ", 5) == 0)
+        strncmp(pkt, "RAK2 ", 5) == 0 || strncmp(pkt, "RAI1 ", 5) == 0)
         console_learn(sock, from);
+
+    if (strncmp(pkt, "RAI1 ", 5) == 0) {
+        /* The running game's serial and the image hash its watch list
+           was built for, once a second. */
+        char game[16] = "", image[40] = "";
+
+        if (sscanf(pkt + 5, "%15s %39s", game, image) == 2)
+            console_remember_game(game, image);
+        return 1;
+    }
 
     if (strncmp(pkt, "RAH1 ", 5) == 0) {
         /* The console's ten-second heartbeat: what its receive side has
