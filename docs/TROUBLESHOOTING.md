@@ -86,7 +86,7 @@ images and HDL partitions are not hashed.
 | Step | If it fails here |
 |---|---|
 | **RA: test PC connection** shows the PC's address | Network: same subnet or **RA client IP** set, Windows firewall allowing `xerabora.exe` on private networks, one client running. Not us yet. |
-| **RA: check game support** says supported, with counts | "Did not answer": network again. "Does not know this image": the dump. "Could not open a network socket": OPL's ETH settings or the cable. |
+| **RA: check game support** says supported, with counts | "Did not answer": network again. "Does not know this image": the dump. "The check did not finish" with an error number: run it again, and report the number if it repeats. |
 | The game starts on **plain OPL** from the same device | If plain OPL cannot run it, neither can we. Report it to OPL, not here. |
 | The game starts on **OPL-RA** and LIVE shows snapshots arriving | Stuck on the loading screen with the client silent: this is ours. Collect the logs below. |
 | An achievement unlocks and the TV flashes | Unlock on the page, no flash: look for `console acknowledged unlock notice` in `xerabora.log`. Present means the console got it. |

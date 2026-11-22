@@ -1040,7 +1040,7 @@ int main(int argc, char **argv)
         const char *head = (const char *)pkt;
         char serial[16];
         const char *hash;
-        int n, served, ready, busy, wait_ms;
+        int n, served, ready, busy, held, wait_ms;
 
         /* A set finished loading on the worker: take its outcome. It is
            the running game's set only when the hash matches; a set an
@@ -1102,7 +1102,12 @@ int main(int argc, char **argv)
             }
         }
 
-        ready = platform_wait_readable2(sock, ui, wait_ms);
+        /* While the console takes the watch list, the loop listens to the
+           console only. */
+        held = console_transfer_active();
+        if (held)
+            wait_ms = 100;
+        ready = platform_wait_readable2(sock, held ? SOCK_INVALID : ui, wait_ms);
         if (ready < 0) {
             platform_sleep_ms(1000);
             continue;
@@ -1115,7 +1120,7 @@ int main(int argc, char **argv)
         }
         if (ready == 0) {
             link_idle((unsigned long)wait_ms);
-            if (busy)
+            if (busy || held)
                 continue;
             rc_client_idle(client); /* retries of queued unlocks */
             login_retry(client, 60);

@@ -123,7 +123,11 @@ struct ra_watch_file
 
 /* Node ceiling. Nodes travel with the list into module storage, 20
    bytes each there, and add 8 bytes each to a snapshot. */
-#define RA_NODE_MAX 256
+#define RA_NODE_MAX 512
+
+/* Node ceiling for a PS1 game. rapops holds the nodes in its module
+   image, 12 bytes each. */
+#define RA_NODE_MAX_PS1 256
 
 /* Bytes one node adds to a snapshot: the resolved address and the value. */
 #define RA_NODE_PAIR_BYTES 8

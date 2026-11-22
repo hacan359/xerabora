@@ -159,7 +159,10 @@ nothing for it. That is by design, not a fault.
 - Unsupported: `RetroAchievements does not know this image`.
 - Client busy identifying: `The PC is still identifying the image` — try
   again in a few seconds.
-- No answer: `The PC client did not answer` — run "test PC connection".
+- No answer: `The PC client did not answer` / `Error 2`. Run "test PC
+  connection".
+- Anything else: `The check did not finish` / `Error <n>`. Run the check
+  again. If it fails the same way, report the error number.
 
 ## Playing from the original disc
 
@@ -172,10 +175,11 @@ console's own driver, hashes them and asks the PC, exactly like the
 image check. Run it once per disc; the watch list is then in memory (and
 saved next to your other games when a USB stick or share is available).
 
-- `Could not read SYSTEM.CNF from the disc`: the drive gave up on that
-  disc. If the console does not boot it from its own browser either, it is
-  the disc or the laser, not the software.
-- `No disc in the drive` / `The disc tray is open` — as it says.
+- `The disc could not be read` / `Error <n>`: no disc, an open tray, or
+  a disc the drive could not read. Check the disc and try again. If the
+  console does not boot it from its own browser either, it is the disc or
+  the laser, not the software. When you report it, give the error
+  number.
 
 ### RA: launch disc
 
@@ -205,8 +209,9 @@ game. The client may be started or restarted while the game runs; it
 picks the console up from its stream.
 
 The console follows pointer chains as it reads, so achievements behind
-one unlock like any other. A game needing more than 256 chains keeps its
-direct reads and loses the rest; the client reports how many.
+one unlock like any other. A PS2 game needing more than 512 chains (256
+for a PS1 game) keeps its direct reads and loses the rest; the client
+reports how many.
 
 ## The PC client
 

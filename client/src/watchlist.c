@@ -11,6 +11,7 @@
    only place that knows which addresses the achievement set reads, and
    rcheevos has no public accessor for it. */
 #include "rc_client_internal.h"
+#include "rc_consoles.h"
 #include "rc_internal.h"
 #include "rc_runtime_types.h"
 
@@ -33,6 +34,8 @@ static struct ra_node g_nodes[RA_NODE_MAX];
 static const rc_memref_t *g_node_of[RA_NODE_MAX];
 static int g_node_count = 0;
 static int g_node_full = 0;
+static int g_node_cap = RA_NODE_MAX;
+static int g_with_recall = 0;
 
 /* Snapshot values are little-endian on the wire, whatever this PC is. */
 static unsigned int load_le32(const unsigned char *p)
@@ -138,6 +141,15 @@ struct term
 
 static int compile_node(const rc_memref_t *m);
 
+/* The memref a {recall} operand reads. NULL for a remembered constant,
+   a delta or prior read, or a recall with nothing remembered. */
+static const rc_memref_t *recall_memref(const rc_operand_t *op)
+{
+    if (op->type != RC_OPERAND_RECALL || op->memref_access_type != RC_OPERAND_ADDRESS)
+        return NULL;
+    return op->value.memref;
+}
+
 /* Which bits of the stored value an operand of this size uses. */
 static int term_cut(struct term *t, uint8_t size)
 {
@@ -179,16 +191,22 @@ static int resolve_operand(const rc_operand_t *op, struct term *t)
     memset(t, 0, sizeof(*t));
     t->scale = 1;
 
-    if (op->type == RC_OPERAND_CONST) {
+    if (op->type == RC_OPERAND_RECALL && !g_with_recall)
+        return 0;
+
+    if (op->type == RC_OPERAND_CONST ||
+        (op->type == RC_OPERAND_RECALL && op->memref_access_type == RC_OPERAND_CONST)) {
         t->kind = TERM_CONST;
         t->add = op->value.num;
         return 1;
     }
 
-    if (!rc_operand_is_memref(op) || op->type != RC_OPERAND_ADDRESS)
+    if (op->type == RC_OPERAND_RECALL)
+        m = recall_memref(op);
+    else if (op->type == RC_OPERAND_ADDRESS)
+        m = op->value.memref;
+    else
         return 0;
-
-    m = op->value.memref;
     if (m == NULL)
         return 0;
 
@@ -235,6 +253,7 @@ static int resolve_operand(const rc_operand_t *op, struct term *t)
             break;
 
         case RC_OPERATOR_ADD:
+        case RC_OPERATOR_ADD_ACCUMULATOR:
             if (b.kind != TERM_CONST) {
                 struct term c = a;
 
@@ -244,7 +263,16 @@ static int resolve_operand(const rc_operand_t *op, struct term *t)
             a.add += b.add;
             break;
 
+        case RC_OPERATOR_SUB_PARENT: {
+            /* Swaps the operands: the value is modifier minus parent. */
+            struct term c = a;
+
+            a = b;
+            b = c;
+        }
+            /* fallthrough */
         case RC_OPERATOR_SUB:
+        case RC_OPERATOR_SUB_ACCUMULATOR:
             if (b.kind == TERM_CONST) {
                 a.add -= b.add;
             } else {
@@ -310,11 +338,11 @@ static int compile_node(const rc_memref_t *m)
     if (t.index > 0x0FFF)
         return -1;
 
-    if (g_node_count >= RA_NODE_MAX) {
+    if (g_node_count >= g_node_cap) {
         /* Once, not once per chain: a big set has hundreds. */
         if (!g_node_full) {
             g_node_full = 1;
-            log_warn("more than %d pointer chains in this set; the rest stay unsupported", RA_NODE_MAX);
+            log_warn("more than %d pointer chains in this set; the rest stay unsupported", g_node_cap);
         }
         return -1;
     }
@@ -329,21 +357,28 @@ static int compile_node(const rc_memref_t *m)
     return at;
 }
 
-/* Every pointer chain in the set, in dependency order. */
+/* Every pointer chain in the set, in dependency order: the chains
+   without {recall} first, then the chains through it. */
 static void build_nodes(rc_client_t *client)
 {
     rc_memrefs_t *pool = client->game->runtime.memrefs;
     rc_modified_memref_list_t *ml;
+    int pass;
 
     g_node_count = 0;
     g_node_full = 0;
+    g_node_cap = client->game->public_.console_id == RC_CONSOLE_PLAYSTATION ? RA_NODE_MAX_PS1 : RA_NODE_MAX;
 
-    for (ml = &pool->modified_memrefs; ml != NULL; ml = ml->next) {
-        uint16_t k;
+    for (pass = 0; pass < 2; pass++) {
+        g_with_recall = pass;
+        for (ml = &pool->modified_memrefs; ml != NULL; ml = ml->next) {
+            uint16_t k;
 
-        for (k = 0; k < ml->count; k++)
-            compile_node(&ml->items[k].memref);
+            for (k = 0; k < ml->count; k++)
+                compile_node(&ml->items[k].memref);
+        }
     }
+    g_with_recall = 0;
 
     /* Each node costs eight bytes in every snapshot. Over the ceiling
        the whole set would be refused, which would cost the game its
@@ -375,6 +410,10 @@ static int memref_unsupported(const rc_memref_t *m)
     if (rc_operand_is_memref(&mm->parent) && memref_unsupported(mm->parent.value.memref))
         return 1;
     if (rc_operand_is_memref(&mm->modifier) && memref_unsupported(mm->modifier.value.memref))
+        return 1;
+    if (memref_unsupported(recall_memref(&mm->parent)))
+        return 1;
+    if (memref_unsupported(recall_memref(&mm->modifier)))
         return 1;
 
     return 0;
