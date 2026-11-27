@@ -34,7 +34,7 @@ function demoRoute(url, opts) {
   const [path, q] = url.split('?');
   const id = q ? Number(new URLSearchParams(q).get('id')) : 0;
 
-  if (opts && opts.method === 'POST') return { ok: true };
+  if (opts && opts.method === 'POST') return { ok: true, sent: true };
   if (path === '/state') return demoState();
   if (path === '/library') return { games: DEMO.library };
   if (path === '/game') return DEMO.games[id] || { id, title: '', achievements: [] };

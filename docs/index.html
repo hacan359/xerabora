@@ -29,7 +29,7 @@
   "applicationCategory": "GameApplication",
   "operatingSystem": "PlayStation 2, Windows, Linux, macOS, Android",
   "description": "RetroAchievements on a real PlayStation 2: a patched Open PS2 Loader and a PC client that unlocks achievements on the original console, from an ISO image or the disc, without an emulator.",
-  "softwareVersion": "2.2.0",
+  "softwareVersion": "2.3.0",
   "url": "https://hacan359.github.io/xerabora/",
   "downloadUrl": "https://github.com/hacan359/xerabora/releases/latest",
   "codeRepository": "https://github.com/hacan359/xerabora",
@@ -471,7 +471,7 @@
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v2.2.0</small></a>
+    <a class="brand" href="#top"><span class="word">xe<img class="ra" src="ra-mark.png" alt="RA">bora</span> <small>v2.3.0</small></a>
     <nav class="links" aria-label="Sections">
       <a href="#how">How it works</a>
       <a href="#need">What you need</a>
@@ -495,7 +495,7 @@
         <h1>RetroAchievements on a <span>real</span> PlayStation&nbsp;2.</h1>
         <p class="lede">A patched Open PS2 Loader sends the game's memory to your PC every frame. xeRAbora checks it against the achievement set, unlocks the achievement on your RetroAchievements profile and flashes the TV gold. No emulator.</p>
         <div class="hero-cta">
-          <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download v2.2.0</a>
+          <a class="btn primary" href="https://github.com/hacan359/xerabora/releases/latest">Download v2.3.0</a>
           <a class="btn" href="#start">How to start</a>
         </div>
         <div class="hero-meta">
@@ -806,7 +806,7 @@
   Rename
   Delete
 
-<span class="notice">  PC client found at 192.168.1.10 xerabora/2.2.0</span>
+<span class="notice">  PC client found at 192.168.1.10 xerabora/2.3.0</span>
 <span class="notice">  Reply in 3 ms, console at 192.168.1.142</span></pre>
           </div>
           <div class="app"><div class="app__bar"><span class="brand-mini">xe<span class="r">R</span><span class="a">A</span>bora</span><span class="tab on">LIVE</span><span class="tab">LIBRARY</span><span class="tab">GAME</span><span class="tab">BOARDS</span><span class="tab">SETTINGS</span><span class="who"><b>Hacan359</b> · <i>10 847 points</i></span></div>
@@ -906,6 +906,18 @@
         <p>You give up OPL's virtual memory cards, per-game compatibility patches and cheats. They live in the part of OPL that emulates the drive, and a real disc does not use it.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="pad">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">A gamepad over the network</span>
+      <h2>Any controller your PC or phone sees.</h2>
+      <p>The <strong>PAD</strong> tab is a DualShock 2 on the page. What you press there is pressed on the console, in OPL's menu and in the game, on port 1. Use a gamepad connected to the PC or the phone, the keyboard, or the drawing itself. The picture stays on the TV; only the buttons travel.</p>
+      <p>Experimental, and off until you turn it on: in OPL, <strong>Network settings</strong>, <strong>RA network gamepad</strong>, then <strong>Save changes</strong>. After that, start OPL-RA with the cable in and open the tab. It needs no login, and the game needs no achievements. The pad in port 1 has the port back three seconds after the tab closes. Games started from an SMB share do not get it, and there is no rumble.</p>
+    </div>
+    <img class="shot" src="screenshots/pad.png" width="1600" height="1164" loading="lazy" alt="The PAD tab: a DualShock 2 drawn on the page, three buttons pressed">
   </div>
 </section>
 

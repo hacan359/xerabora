@@ -57,6 +57,10 @@ int console_notice(void);
 /* Asks the console to leave the game for the loader menu, the way the
    in-game reset combo does. 1 when sent, 0 with no console address. */
 int console_send_reset(void);
+/* Sends one gamepad state to the console: buttons in libpad bit order,
+   set bit = pressed, and four stick axes, 0x80 at rest. 1 when sent, 0
+   with no console address. */
+int console_send_pad(unsigned seq, unsigned buttons, const unsigned char axes[4]);
 int console_send_badge_chunk(const unsigned char *px, int idx);
 
 /* Any packet from the console names its address: a client started while

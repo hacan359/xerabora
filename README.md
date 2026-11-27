@@ -130,6 +130,44 @@ virtual memory cards, per-game compatibility patches and cheats are not
 available: they live inside the part of OPL that emulates the drive,
 which a real disc does not use.
 
+## A gamepad over the network (experimental)
+
+The **PAD** tab is a DualShock 2 on the page. What you press there is
+pressed on the console: in OPL's menu and in the game, on port 1. The
+picture stays on the TV; only the buttons travel.
+
+It is off until you turn it on: in OPL, **Network settings** → **RA
+network gamepad (experimental)** → On, then **Save changes**. Left off,
+OPL-RA loads nothing for it and behaves as before.
+
+<p align="center">
+  <img src="docs/screenshots/pad.png" alt="PAD: a DualShock 2 on the page" width="720">
+</p>
+
+- **Three ways to press.** A gamepad the PC or the phone already sees
+  (the browser shows it after its first button press), the keyboard, or
+  the drawing itself, by mouse or by finger. The sticks drag.
+- **Nothing else to set up.** With the switch on, start OPL-RA with
+  the cable in, on the same network as the client, and open the tab. No
+  login is needed, and the game does not need achievements.
+- **The real pad keeps working.** The port belongs to the network
+  gamepad only while the client sends. Three seconds after the tab
+  closes, the pad in port 1 has it back. A game may show its "no
+  controller" screen for a moment at the handover.
+- **From a phone.** Open the page from a phone (OPEN TO THE NETWORK on
+  SETTINGS), or run the [Android app](android/README.md): the phone is
+  then the controller.
+- **Limits.** Games started from an SMB share do not get it. No rumble.
+  The page must stay in front: a browser stops a hidden tab's timers.
+  The delay is that of your network; on Wi-Fi it shows in fast games.
+- **Other pads.** A port set up in OPL's own pad emulator for a USB or
+  Bluetooth pad is left alone.
+- **If nothing is pressed.** The line above the drawing says whether
+  the client has found the console; if not, check the switch in OPL.
+  If it has and the game still does
+  not react, look at the game's Pad Emulator settings in OPL: a USB or
+  Bluetooth mode with port 1 ticked keeps the port.
+
 ## Without a PS2
 
 Without the console, xeRAbora shows your RetroAchievements account while
@@ -190,6 +228,9 @@ open.
   work only from the PC that runs the client. On a narrow screen the
   tabs move to a bar along the bottom. To run the client itself on a
   phone, with no PC at all, there is the [Android app](android/README.md).
+  On a machine with no browser of its own, `--bind 0.0.0.0` (or one of
+  its addresses) serves the page to the network for that run; sign in
+  there with `--user` and `--api-key`.
 - **Stream-ready.** See [Perfect for streaming](#perfect-for-streaming).
   `--obs DIR` writes text labels and a `data.json` for a layout of your
   own. `#tab=live` opens a window straight on a tab.
@@ -255,7 +296,7 @@ hash, and speak the protocol. The client does the rest.
 container the OPL project uses:
 
 ```
-docker run --rm -v "$PWD":/src -w /src/opl ghcr.io/ps2homebrew/ps2homebrew:main make PADEMU=0 all
+docker run --rm -v "$PWD":/src -w /src/opl ghcr.io/ps2homebrew/ps2homebrew:main make PADEMU=1 all
 ```
 
 `make RA_DEBUG=1 all` builds the debug variant: it writes the loader's
@@ -334,6 +375,8 @@ after cloning. Building the client needs only `third_party/rcheevos`; the
 The OPL fork keeps OPL's license (Academic Free License 3.0). The PC
 client is released under the MIT license. rcheevos is MIT. The fonts
 in `client/ui/vendor/fonts` are under the SIL Open Font License 1.1.
+The controller drawing on the PAD tab is adapted from a drawing by
+Tokyoship, CC BY 3.0 (`client/ui/vendor/LICENSE.pad-art`).
 
 The RA mark belongs to RetroAchievements and the OPL name to the Open
 PS2 Loader project; they appear here to show what this project connects.

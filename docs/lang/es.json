@@ -4,7 +4,7 @@
   "How to start": "Cómo empezar",
   "Language": "Idioma",
   "Download": "Descargar",
-  "Download v2.2.0": "Descargar v2.2.0",
+  "Download v2.3.0": "Descargar v2.3.0",
   "<b>Windows</b> / <b>Linux</b> / <b>macOS</b>, one file": "<b>Windows</b> / <b>Linux</b> / <b>macOS</b>, un archivo",
   "<b>Android</b>, no PC needed": "<b>Android</b>, sin PC",
   "Your PS2": "Tu PS2",
@@ -49,7 +49,7 @@
   "On the console: Apps → <strong>OPL+RA</strong>. It looks and behaves like OPL 1.2.0. Highlight a game, press <kbd>△</kbd> for its menu and choose <strong>RA: test PC connection</strong>. A notice tells you whether xerabora answered, from which address and how fast.": "En la consola: Apps → <strong>OPL+RA</strong>. Se ve y se comporta como OPL 1.2.0. Marca un juego, pulsa <kbd>△</kbd> para su menú y elige <strong>RA: test PC connection</strong>. Un aviso te dice si xerabora respondió, desde qué dirección y en cuánto tiempo.",
   "Nothing answers? Same subnet, PC firewall allows inbound UDP 18194, the client is running.": "¿No responde nada? Misma subred, el firewall del PC permitiendo UDP 18194 de entrada, y el cliente en marcha.",
   "PS2 · OPL+RA · game menu": "PS2 · OPL+RA · menú del juego",
-  "PC client found at 192.168.1.10 xerabora/2.2.0": "cliente PC encontrado en 192.168.1.10 xerabora/2.2.0",
+  "PC client found at 192.168.1.10 xerabora/2.3.0": "cliente PC encontrado en 192.168.1.10 xerabora/2.3.0",
   "Reply in 3 ms, console at 192.168.1.142": "Respuesta en 3 ms, consola en 192.168.1.142",
   "10 847 points": "10 847 puntos",
   "start a game on the console, or browse your library above": "empieza un juego en la consola, o mira tu biblioteca arriba",
@@ -204,5 +204,10 @@
   "One clean screen for OBS.": "Una pantalla limpia para OBS.",
   "STREAM in the header leaves the game and its achievements: the cover, the count, the points, then a list or a grid with the same filters and orders as LIVE. Two looks, NEON CLASSIC and 8-BIT, on SETTINGS. An unlock pops up in the corner. Capture the window in OBS or keep it on a second monitor.": "STREAM en la cabecera deja solo el juego y sus logros: la portada, el recuento, los puntos y después una lista o una cuadrícula con los mismos filtros y órdenes que LIVE. Dos aspectos, NEON CLASSIC y 8-BIT, en SETTINGS. Cada desbloqueo aparece en la esquina. Captura la ventana en OBS o déjala en un segundo monitor.",
   "STREAM in NEON CLASSIC as a list": "STREAM en NEON CLASSIC como lista",
-  "STREAM in 8-BIT as a grid, with an unlock in the corner": "STREAM en 8-BIT como cuadrícula, con un desbloqueo en la esquina"
+  "STREAM in 8-BIT as a grid, with an unlock in the corner": "STREAM en 8-BIT como cuadrícula, con un desbloqueo en la esquina",
+  "A gamepad over the network": "Un mando por la red",
+  "Any controller your PC or phone sees.": "Cualquier mando que vea tu PC o tu teléfono.",
+  "The <strong>PAD</strong> tab is a DualShock 2 on the page. What you press there is pressed on the console, in OPL's menu and in the game, on port 1. Use a gamepad connected to the PC or the phone, the keyboard, or the drawing itself. The picture stays on the TV; only the buttons travel.": "La pestaña <strong>MANDO</strong> es un DualShock 2 en la página. Lo que pulsas ahí se pulsa en la consola, en el menú de OPL y en el juego, en el puerto 1. Usa un mando conectado al PC o al teléfono, el teclado o el propio dibujo. La imagen se queda en la tele; solo viajan los botones.",
+  "The PAD tab: a DualShock 2 drawn on the page, three buttons pressed": "La pestaña MANDO: un DualShock 2 dibujado en la página, con tres botones pulsados",
+  "Experimental, and off until you turn it on: in OPL, <strong>Network settings</strong>, <strong>RA network gamepad</strong>, then <strong>Save changes</strong>. After that, start OPL-RA with the cable in and open the tab. It needs no login, and the game needs no achievements. The pad in port 1 has the port back three seconds after the tab closes. Games started from an SMB share do not get it, and there is no rumble.": "Experimental, y desactivado hasta que lo actives: en OPL, <strong>Network settings</strong>, <strong>RA network gamepad</strong> y luego <strong>Save changes</strong>. Después, inicia OPL-RA con el cable puesto y abre la pestaña. No hace falta iniciar sesión, y el juego no necesita logros. El mando del puerto 1 recupera el puerto tres segundos después de cerrar la pestaña. Los juegos iniciados desde un recurso SMB no lo reciben, y no hay vibración."
 }

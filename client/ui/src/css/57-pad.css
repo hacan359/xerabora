@@ -1,0 +1,74 @@
+/* ---- PAD: the on-screen DualShock 2 ------------------------------------ */
+
+.pad-status { margin: 0 0 12px; color: var(--ink-soft); font-size: 14px; }
+.pad-status .warn, .pad-readout .warn { color: var(--warn); }
+
+.pad {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  aspect-ratio: 680 / 444;
+  margin: 0 auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pad-art { position: absolute; inset: 0; pointer-events: none; filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45)); }
+.pad-art svg { display: block; width: 100%; height: 100%; }
+
+/* Buttons the drawing already shows are clear zones over it. */
+.pad-btn {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid transparent;
+  background: transparent;
+  color: transparent;
+  font: 600 0/1 var(--font-mono);
+  cursor: pointer;
+  touch-action: none;
+  transition: background 0.06s, border-color 0.06s, box-shadow 0.06s;
+}
+.pad-btn.dp { width: 7.4%; aspect-ratio: 1; border-radius: 22%; }
+.pad-btn.face { width: 8%; aspect-ratio: 1; border-radius: 50%; }
+.pad-btn.opt { width: 10%; height: 13%; border-radius: 10px; }
+.pad-btn.bump { width: 13%; height: 7%; border-radius: 40% 40% 12px 12px / 70% 70% 12px 12px; }
+.pad-btn.sh, .pad-btn.mid {
+  border: 1px solid var(--line-strong);
+  background: var(--bg-raised);
+  color: var(--ink-soft);
+  font-size: clamp(9px, 1.5vw, 12px);
+}
+.pad-btn.bump { color: var(--ink-soft); font-size: clamp(9px, 1.5vw, 12px); }
+.pad-btn.sh { width: 11%; height: 6.4%; border-radius: 10px 10px 4px 4px; }
+.pad-btn.mid { width: 8%; height: 6.4%; border-radius: 99px; }
+.pad-btn.on {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.pad-btn.sh.on, .pad-btn.mid.on, .pad-btn.bump.on { color: var(--ink); }
+
+.pad-stick {
+  position: absolute;
+  width: 20.6%; aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  touch-action: none;
+  cursor: grab;
+}
+.pad-stick i {
+  position: absolute; inset: 19%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #4a4f5c, #23262f 70%);
+  border: 1px solid #50556a;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.pad-readout {
+  display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center;
+  margin: 14px 0 6px;
+  font: 13px var(--font-mono); color: var(--ink-mute);
+}
+.pad-help { text-align: center; color: var(--ink-mute); font-size: 13px; line-height: 1.6; }

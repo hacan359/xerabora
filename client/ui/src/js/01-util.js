@@ -7,7 +7,7 @@ const MEDIA = 'https://media.retroachievements.org';
    follow switch and QUIT are then hidden. */
 const REMOTE = !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(location.hostname);
 
-const TABS = ['live', 'library', 'game', 'boards', 'settings'];
+const TABS = ['live', 'library', 'game', 'boards', 'pad', 'settings'];
 
 /* The looks, chosen on SETTINGS and kept in this browser. */
 const THEMES = [['neon', 'NEON CLASSIC'], ['8bit', '8-BIT']];

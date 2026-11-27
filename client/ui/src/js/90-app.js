@@ -103,6 +103,7 @@ function App() {
         : tab === 'library' ? html`<${LibraryTab} />`
         : tab === 'game' ? html`<${GameTab} />`
         : tab === 'boards' ? html`<${BoardsTab} />`
+        : tab === 'pad' ? html`<${PadTab} />`
         : html`<${SettingsTab} />`}
     </main>
     <${Footer} />

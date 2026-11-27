@@ -215,6 +215,25 @@ int webui_port(void)
 static int g_lan;
 static int g_rebind;
 
+/* Set by --bind; empty when the saved network setting decides. */
+static char g_bind[48];
+
+int webui_set_bind(const char *addr)
+{
+    if (strcmp(addr, "0.0.0.0") != 0 && inet_addr(addr) == INADDR_NONE)
+        return 0;
+    snprintf(g_bind, sizeof(g_bind), "%s", addr);
+    return 1;
+}
+
+/* Whether the interface listens beyond this machine. */
+static int open_to_network(void)
+{
+    if (g_bind[0] != '\0')
+        return strncmp(g_bind, "127.", 4) != 0;
+    return g_lan;
+}
+
 void webui_set_lan(int on)
 {
     g_lan = on ? 1 : 0;
@@ -292,14 +311,19 @@ sock_t webui_start(int port)
            carries the settings and the off switch, so opening it to
            every interface is a choice, not an accident. */
         addr.sin_addr.s_addr = htonl(g_lan ? INADDR_ANY : INADDR_LOOPBACK);
+        if (g_bind[0] != '\0')
+            addr.sin_addr.s_addr = inet_addr(g_bind);
         addr.sin_port = htons((unsigned short)port);
 
         if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) == 0 && listen(s, 8) == 0) {
             g_port = port;
-            if (g_lan) {
+            if (open_to_network()) {
                 char ip[48];
 
-                lan_address(ip, sizeof(ip));
+                if (g_bind[0] != '\0' && strcmp(g_bind, "0.0.0.0") != 0)
+                    snprintf(ip, sizeof(ip), "%s", g_bind);
+                else
+                    lan_address(ip, sizeof(ip));
                 if (ip[0] != '\0')
                     log_info("interface open to the network at http://%s:%d/", ip, port);
             }
@@ -476,12 +500,15 @@ static int build_state(char *buf, size_t size, rc_client_t *client)
     {
         char ip[48] = "", url[80] = "";
 
-        if (g_lan) {
-            lan_address(ip, sizeof(ip));
+        if (open_to_network()) {
+            if (g_bind[0] != '\0' && strcmp(g_bind, "0.0.0.0") != 0)
+                snprintf(ip, sizeof(ip), "%s", g_bind);
+            else
+                lan_address(ip, sizeof(ip));
             if (ip[0] != '\0')
                 snprintf(url, sizeof(url), "http://%s:%d/", ip, g_port);
         }
-        p += snprintf(p, (size_t)(end - p), "\"lan\":{\"on\":%s,", g_lan ? "true" : "false");
+        p += snprintf(p, (size_t)(end - p), "\"lan\":{\"on\":%s,", open_to_network() ? "true" : "false");
         json_field(&p, end, "url", url);
         p += snprintf(p, (size_t)(end - p), "},");
     }
@@ -1270,6 +1297,30 @@ static int serve_settings(sock_t c, const char *req, const char *body, rc_client
         return 1;
     }
 
+    if (strncmp(req, "POST /pad", 9) == 0) {
+        char f[16];
+        unsigned seq, buttons;
+        unsigned char axes[4];
+        static const char *names[4] = {"lx", "ly", "rx", "ry"};
+        int i, sent;
+
+        form_field(body, "seq", f, sizeof(f));
+        seq = (unsigned)strtoul(f, NULL, 10);
+        form_field(body, "b", f, sizeof(f));
+        buttons = (unsigned)strtoul(f, NULL, 10);
+        for (i = 0; i < 4; i++) {
+            long v;
+
+            form_field(body, names[i], f, sizeof(f));
+            v = f[0] != '\0' ? strtol(f, NULL, 10) : 0x80;
+            axes[i] = (unsigned char)(v < 0 ? 0 : v > 255 ? 255 : v);
+        }
+        sent = console_send_pad(seq, buttons, axes);
+        n = snprintf(out, sizeof(out), "{\"ok\":true,\"sent\":%s}", sent ? "true" : "false");
+        respond(c, "application/json; charset=utf-8", out, n);
+        return 1;
+    }
+
     if (strncmp(req, "POST /quit", 10) == 0) {
         g_quit = 1;
         log_info("quit requested from the page");
@@ -1392,9 +1443,9 @@ void webui_serve(sock_t listener, rc_client_t *client)
     if (strncmp(req, "POST ", 5) == 0) {
         char *body = strstr(req, "\r\n\r\n");
 
-        /* Another device may watch; only this machine changes the
-           settings or turns the client off. */
-        if (from.sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {
+        /* Another device may watch and press gamepad buttons; only this
+           machine changes the settings or turns the client off. */
+        if (from.sin_addr.s_addr != htonl(INADDR_LOOPBACK) && strncmp(req, "POST /pad ", 10) != 0) {
             const char *fb = "{\"ok\":false,\"error\":\"settings change only on the PC running xerabora\"}";
             char head[160];
             int hn = snprintf(head, sizeof(head),

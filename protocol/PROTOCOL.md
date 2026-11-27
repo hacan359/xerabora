@@ -189,6 +189,40 @@ there because the reference agent takes every message as a tag, a
 space and a value. An agent that cannot reset ignores it. Where the
 console lands afterwards is the loader's setting, not the protocol's.
 
+## Gamepad
+
+    PC -> console   RAJ1 <seq> <buttons> <lx><ly><rx><ry>
+
+The state of a gamepad on the PC, for an agent that can press buttons
+on the console. Every field is hex of a fixed width, so a small agent
+reads it by offset:
+
+| offset | field | width |
+|---|---|---|
+| 0 | `RAJ1 ` | 5 |
+| 5 | `seq`, grows with every state sent | 8 |
+| 14 | `buttons`, a set bit is a pressed button | 4 |
+| 19 | `lx` `ly` `rx` `ry`, `80` at rest | 8 |
+
+Button bits, in the order of the PS2 pad library: SELECT `0001`, L3
+`0002`, R3 `0004`, START `0008`, up `0010`, right `0020`, down `0040`,
+left `0080`, L2 `0100`, R2 `0200`, L1 `0400`, R1 `0800`, triangle
+`1000`, circle `2000`, cross `4000`, square `8000`.
+
+The client sends a state when it changes and repeats the current one
+every 250 ms, to the agent's address and to the subnet broadcast, like
+`RAU1`; the two copies share a `seq`. There is no answer. The agent
+decides what silence means. The reference PS2 agent releases every
+button after 500 ms without a state and hands the port back to the real
+pad after 3 s. An agent without a gamepad ignores the message.
+
+    console -> PC   RAM1 <reserved>
+
+Sent every two seconds by an agent that listens for `RAJ1` while no
+game runs (the reference agent sends it from the loader's menu, from the
+port it uses in a game). The client takes the console's address from it,
+as it does from `RAH1`, and answers nothing.
+
 `RAB1` and `RAK2` (a badge picture pushed to the console) were an
 experiment; the reference agent no longer takes them, and the client
 sends them only when started with `--badge`.
@@ -201,8 +235,8 @@ sends them only when started with `--badge`.
 3. Fetch the watch list with `RAG1` and keep it.
 4. Every frame, read the listed addresses and stream them as `RA15`
    snapshots in watch-list order.
-5. Optionally, keep the discovery port open and act on `RAU1` and
-   `RAR1`.
+5. Optionally, keep the discovery port open and act on `RAU1`, `RAR1`
+   and `RAJ1`.
 
 The hash must match what RetroAchievements expects for that console. The
 memory addresses and the hashing scheme are the only console-specific

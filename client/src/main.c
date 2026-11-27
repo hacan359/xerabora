@@ -57,6 +57,10 @@ static void usage(void)
            "  --recent           print your recent unlocks from the Web API and exit\n"
            "  --window           open the window (window builds only)\n"
            "  --ui-port N        port for the interface page (default %d)\n"
+           "  --bind ADDR        address the interface page listens on, for this run:\n"
+           "                     0.0.0.0 for every interface, or one of this machine's\n"
+           "                     addresses. A page opened from another machine shows\n"
+           "                     everything and changes nothing; sign in with --user\n"
            "  --no-ui            do not serve the interface page\n"
            "  --server           keep running when the last page closes; for a machine\n"
            "                     that runs the client as a service\n"
@@ -741,6 +745,11 @@ int main(int argc, char **argv)
             log_set_trace(1);
         } else if (strcmp(argv[i], "--ui-port") == 0 && i + 1 < argc) {
             ui_port = atoi(argv[++i]);
+        } else if (strcmp(argv[i], "--bind") == 0 && i + 1 < argc) {
+            if (!webui_set_bind(argv[++i])) {
+                fprintf(stderr, "--bind takes an IPv4 address, such as 0.0.0.0 or 192.168.1.20\n");
+                return 2;
+            }
         } else if (strcmp(argv[i], "--obs") == 0 && i + 1 < argc) {
             webui_set_obs_dir(argv[++i]);
         } else if (strcmp(argv[i], "--no-ui") == 0) {

@@ -239,5 +239,14 @@
   "saved: {path}": "salvo: {path}",
   "no game is being tracked": "nenhum jogo está sendo acompanhado",
   "TEST MODE": "MODO DE TESTE",
-  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "nada é enviado ao RetroAchievements; desligue em AJUSTES"
+  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "nada é enviado ao RetroAchievements; desligue em AJUSTES",
+  "PAD": "CONTROLE",
+  "buttons go to the console at {ip}": "os botões vão para o console {ip}",
+  "buttons go to the console": "os botões vão para o console",
+  "not delivered": "não entregue",
+  "gamepad: {name}": "controle: {name}",
+  "connect a gamepad and press any button on it; the browser shows it only after a press": "conecte um controle e aperte qualquer botão: o navegador só o mostra depois de um toque",
+  "keyboard: arrows, Z ✕, X ○, A □, S △, Q L1, W R1, 1 L2, 2 R2, Enter START, Backspace SELECT, C L3, V R3": "teclado: setas, Z ✕, X ○, A □, S △, Q L1, W R1, 1 L2, 2 R2, Enter START, Backspace SELECT, C L3, V R3",
+  "NETWORK GAMEPAD &middot; EXPERIMENTAL": "CONTROLE PELA REDE &middot; EXPERIMENTAL",
+  "no console yet: turn on RA network gamepad in OPL's network settings and stay on the same network": "ainda sem console: ative RA network gamepad nas configurações de rede do OPL e fique na mesma rede"
 }

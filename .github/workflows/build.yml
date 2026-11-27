@@ -37,7 +37,7 @@ jobs:
       - name: Build
         working-directory: opl
         run: |
-          make PADEMU=0 ${{ matrix.flags }} all
+          make PADEMU=1 ${{ matrix.flags }} all
           cp OPNPS2LD.ELF ../${{ matrix.elf }}
 
       - uses: actions/upload-artifact@v4

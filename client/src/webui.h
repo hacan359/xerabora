@@ -22,6 +22,9 @@ int webui_port(void);
    or keep it to this machine. Set before webui_start; a change from
    the page takes effect through webui_rebind. */
 void webui_set_lan(int on);
+/* --bind: the address the interface listens on, over the saved network
+   setting. Returns 0 when the text is not an IPv4 address. */
+int webui_set_bind(const char *addr);
 int webui_lan(void);
 
 /* Called from the main loop after webui_serve: when the page switched

@@ -1,0 +1,12 @@
+The controller drawing on the PAD tab (ui/src/js/27-pad-art.js) is adapted
+from "Dualshock3 Layout.svg" by Tokyoship:
+
+  https://commons.wikimedia.org/wiki/File:Dualshock3_Layout.svg
+
+Licensed under the Creative Commons Attribution 3.0 Unported license:
+
+  https://creativecommons.org/licenses/by/3.0/
+
+Changes: the labels, the pointer lines, the maker's wordmark and logo, the
+stick caps and the shoulder letters are removed; the greys are lifted; the
+picture is cropped to the controller.

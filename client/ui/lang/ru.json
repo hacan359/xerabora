@@ -262,5 +262,14 @@
   "saved: {path}": "Сохранено: {path}",
   "no game is being tracked": "Сейчас ни одна игра не отслеживается",
   "TEST MODE": "РЕЖИМ ТЕСТА",
-  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "В RetroAchievements ничего не отправляется; выключается в НАСТРОЙКАХ"
+  "nothing is sent to RetroAchievements; switch it off on SETTINGS": "В RetroAchievements ничего не отправляется; выключается в НАСТРОЙКАХ",
+  "PAD": "ГЕЙМПАД",
+  "buttons go to the console at {ip}": "кнопки уходят на консоль {ip}",
+  "buttons go to the console": "кнопки уходят на консоль",
+  "not delivered": "не доставлено",
+  "gamepad: {name}": "геймпад: {name}",
+  "connect a gamepad and press any button on it; the browser shows it only after a press": "подключите геймпад и нажмите на нём любую кнопку: браузер видит его только после нажатия",
+  "keyboard: arrows, Z ✕, X ○, A □, S △, Q L1, W R1, 1 L2, 2 R2, Enter START, Backspace SELECT, C L3, V R3": "клавиатура: стрелки, Z ✕, X ○, A □, S △, Q L1, W R1, 1 L2, 2 R2, Enter START, Backspace SELECT, C L3, V R3",
+  "NETWORK GAMEPAD &middot; EXPERIMENTAL": "ГЕЙМПАД ПО СЕТИ &middot; ЭКСПЕРИМЕНТ",
+  "no console yet: turn on RA network gamepad in OPL's network settings and stay on the same network": "консоли пока нет: включите RA network gamepad в сетевых настройках OPL и будьте в одной сети"
 }

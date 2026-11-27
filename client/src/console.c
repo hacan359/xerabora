@@ -402,8 +402,14 @@ int console_serve(sock_t sock, const char *pkt, size_t len,
     }
 
     if (strncmp(pkt, "RAH1 ", 5) == 0 || strncmp(pkt, "RAK1 ", 5) == 0 ||
-        strncmp(pkt, "RAK2 ", 5) == 0 || strncmp(pkt, "RAI1 ", 5) == 0)
+        strncmp(pkt, "RAK2 ", 5) == 0 || strncmp(pkt, "RAI1 ", 5) == 0 ||
+        strncmp(pkt, "RAM1 ", 5) == 0)
         console_learn(sock, from);
+
+    /* "RAM1": the console sits in the loader's menu and listens for the
+       gamepad. Nothing to answer. */
+    if (strncmp(pkt, "RAM1 ", 5) == 0)
+        return 1;
 
     if (strncmp(pkt, "RAI1 ", 5) == 0) {
         /* The running game's serial and the image hash its watch list
@@ -556,6 +562,23 @@ int console_send_reset(void)
     send_reply(g_console_sock, msg, sizeof(msg) - 1, sizeof(msg), &g_console);
     send_reply(g_console_sock, msg, sizeof(msg) - 1, sizeof(msg), &g_console_bcast);
     log_info("reset sent to the console");
+    return 1;
+}
+
+/* ---- Network gamepad: "RAJ1 <seq> <buttons> <lx ly rx ry>", every field
+   fixed-width hex so the IOP parses it by offset. */
+int console_send_pad(unsigned seq, unsigned buttons, const unsigned char axes[4])
+{
+    char msg[64];
+    int n;
+
+    if (!g_console_known || g_console_sock == SOCK_INVALID)
+        return 0;
+
+    n = snprintf(msg, sizeof(msg), "RAJ1 %08x %04x %02x%02x%02x%02x", seq, buttons & 0xFFFFu,
+                 axes[0], axes[1], axes[2], axes[3]);
+    send_reply(g_console_sock, msg, (size_t)n, sizeof(msg), &g_console);
+    send_reply(g_console_sock, msg, (size_t)n, sizeof(msg), &g_console_bcast);
     return 1;
 }
 
