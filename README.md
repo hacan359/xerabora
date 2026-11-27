@@ -8,6 +8,12 @@
   <a href="https://github.com/hacan359/xerabora/releases"><img src="https://img.shields.io/github/downloads/hacan359/xerabora/total" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/runs%20on-PS2%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20macOS%20%C2%B7%20Android-555" alt="Runs on PS2, Windows, Linux, macOS, Android">
   <a href="https://discord.gg/JZVNPF7cS2"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
+  <a href="https://boosty.to/mastermates"><img src="https://img.shields.io/badge/Support-Boosty-F15F2C" alt="Support the project on Boosty"></a>
+</p>
+
+<p align="center">
+  xeRAbora is free and made in spare time. If you want to support the work:
+  <a href="https://boosty.to/mastermates">boosty.to/mastermates</a>
 </p>
 
 > **Something does not work?** Read [Before you report a problem](docs/TROUBLESHOOTING.md)
